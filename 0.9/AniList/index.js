@@ -3259,9 +3259,25 @@ query($id: Int) {
         variables
       );
       const mangaDetails = json.data.Media;
-      throw new Error(
-        `Not implemented manga progress ${JSON.stringify(sourceMangaInfo)}`
-      );
+      if (!mangaDetails?.mediaListEntry) {
+        return void 0;
+      }
+      const sourceId = "Manganato";
+      const mangaId = sourceMangaInfo.mangaId;
+      const lastReadChapterNumber = mangaDetails.mediaListEntry.progress ?? 0;
+      const lastReadVolumeNumber = mangaDetails.mediaListEntry.progressVolumes;
+      const trackedListName = mangaDetails.mediaListEntry.status;
+      const lastReadTime = void 0;
+      const userRating = mangaDetails.mediaListEntry.score;
+      return {
+        sourceId,
+        mangaId,
+        lastReadChapterNumber,
+        lastReadVolumeNumber,
+        trackedListName,
+        lastReadTime,
+        userRating
+      };
     }
     async getMangaProgressManagementForm(mangaId) {
       return new SettingsForm();
