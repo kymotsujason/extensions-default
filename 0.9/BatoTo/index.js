@@ -25150,7 +25150,14 @@ Type: ${row["type"]}`
         date = new Date(Date.now() - 1e3 * 3600 * Number(timeAgo[0]));
       if (timeAgo[1] == "days")
         date = new Date(Date.now() - 1e3 * 3600 * 24 * Number(timeAgo[0]));
-      let chapNum;
+      let chapNum = 0;
+      let volumeNum = 0;
+      const volumeNumRegex = title.match(
+        /(?:volume|vol|v)[\s.:]*#?(\d+(?:\.\d+)?)/i
+      );
+      if (volumeNumRegex && volumeNumRegex[1]) {
+        volumeNum = Number(volumeNumRegex[1]);
+      }
       const chapNumRegex = title.match(
         /(?:chapter|chap|ch|c)[\s.:]*#?(\d+(?:\.\d+)?)/i
       );
@@ -25166,19 +25173,28 @@ Type: ${row["type"]}`
           const beforeNumber = title.substring(0, index2).toLowerCase().trim();
           const words = beforeNumber.split(/\s+/);
           const lastWord = words[words.length - 1];
-          if (!/^(volume|vol|v)$/i.test(lastWord)) {
-            numbers.push({ index: index2, value: num });
+          if (/^(volume|vol|v)$/i.test(lastWord)) {
+            volumeNum = Number(num);
+          } else if (/^(chapter|chap|ch|c)$/i.test(lastWord)) {
+            chapNum = Number(num);
+          } else {
+            numbers.push({ index: index2, value: num, type: "unknown" });
           }
         }
-        if (numbers.length > 0) {
-          const lastNumber = numbers[numbers.length - 1].value;
-          chapNum = Number(lastNumber);
-        } else {
-          chapNum = 0;
+        if (chapNum === 0 && numbers.length > 0) {
+          const possibleChapNumbers = numbers.filter(
+            (n) => Number(n.value) !== volumeNum
+          );
+          if (possibleChapNumbers.length > 0) {
+            const lastNumber = possibleChapNumbers[possibleChapNumbers.length - 1].value;
+            chapNum = Number(lastNumber);
+          }
         }
       }
       if (isNaN(chapNum))
         chapNum = 0;
+      if (isNaN(volumeNum))
+        volumeNum = 0;
       chapters.push({
         id: chapterId2,
         name: title,
@@ -25186,7 +25202,7 @@ Type: ${row["type"]}`
         chapNum,
         time: date,
         sortingIndex,
-        volume: 0,
+        volume: volumeNum,
         group
       });
       sortingIndex--;
