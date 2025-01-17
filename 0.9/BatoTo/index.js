@@ -25132,7 +25132,7 @@ Type: ${row["type"]}`
     const chapters = [];
     let sortingIndex = 0;
     for (const chapter of $3("div.episode-list div.main .item").toArray()) {
-      const title = $3("b", chapter).text().trim() + "AA";
+      const title = $3("b", chapter).text().trim();
       const chapterId2 = $3("a", chapter).attr("href")?.replace(/\/$/, "")?.split("/").pop() ?? "";
       const group = $3("a.ps-3 > span", chapter).text().trim();
       if (!chapterId2)
@@ -25151,9 +25151,7 @@ Type: ${row["type"]}`
         date = new Date(Date.now() - 1e3 * 3600 * Number(timeAgo[0]));
       if (timeAgo[1] == "days")
         date = new Date(Date.now() - 1e3 * 3600 * 24 * Number(timeAgo[0]));
-      let chapNum = chapNumRegex && chapNumRegex[1] ? Number(chapNumRegex[1].replace("-", ".")) : 0;
-      if (isNaN(chapNum))
-        chapNum = 0;
+      let chapNum = 0;
       chapters.push({
         id: chapterId2,
         name: title,
