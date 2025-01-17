@@ -3221,10 +3221,10 @@ query($id: Int) {
       };
     }
     async getMangaProgress(mangaId) {
-      throw new Error("Not implemented manga progress");
+      throw new Error(`Not implemented manga progress ${mangaId}`);
     }
     async getMangaProgressManagementForm(mangaId) {
-      throw new Error("Not implemented manga progress management form");
+      throw new Error(`Not implemented manga progress form ${mangaId}`);
     }
     async makeRequest(query, QueryVariables, search) {
       const request = {
