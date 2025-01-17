@@ -25141,7 +25141,6 @@ Type: ${row["type"]}`
       if (language === "Unknown")
         language = "\u{1F1EC}\u{1F1E7}";
       const timeAgo = $3("i.ps-3", chapter).text().trim().split(" ");
-      const chapNumRegex = title.match(/(\d+)(?:[-.]\d+)?/);
       let date = new Date(Date.now());
       if (timeAgo[1] == "secs")
         date = new Date(Date.now() - 1e3 * Number(timeAgo[0]));
@@ -25151,7 +25150,34 @@ Type: ${row["type"]}`
         date = new Date(Date.now() - 1e3 * 3600 * Number(timeAgo[0]));
       if (timeAgo[1] == "days")
         date = new Date(Date.now() - 1e3 * 3600 * 24 * Number(timeAgo[0]));
-      let chapNum = 0;
+      let chapNum;
+      const chapNumRegex = title.match(
+        /(?:chapter|chap|ch|c)[\s.:]*#?(\d+)/i
+      );
+      if (chapNumRegex && chapNumRegex[1]) {
+        chapNum = Number(chapNumRegex[1]);
+      } else {
+        const numberRegex = /\b\d+\b/g;
+        const numbers = [];
+        let match;
+        while (match = numberRegex.exec(title)) {
+          const num = match[0];
+          const index2 = match.index;
+          const beforeNumber = title.substring(0, index2).toLowerCase().trim();
+          const words = beforeNumber.split(/\s+/);
+          const lastWord = words[words.length - 1];
+          if (!/^(volume|vol|v)$/i.test(lastWord)) {
+            numbers.push({ index: index2, value: num });
+          }
+        }
+        if (numbers.length > 0) {
+          chapNum = Number(numbers[numbers.length - 1].value);
+        } else {
+          chapNum = 0;
+        }
+      }
+      if (isNaN(chapNum))
+        chapNum = 0;
       chapters.push({
         id: chapterId2,
         name: title,
