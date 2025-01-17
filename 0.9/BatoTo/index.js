@@ -25132,7 +25132,7 @@ Type: ${row["type"]}`
     const chapters = [];
     let sortingIndex = 0;
     for (const chapter of $3("div.episode-list div.main .item").toArray()) {
-      const title = $3("b", chapter).text().trim();
+      const title = $3("b", chapter).text().trim() + "AA";
       const chapterId2 = $3("a", chapter).attr("href")?.replace(/\/$/, "")?.split("/").pop() ?? "";
       const group = $3("a.ps-3 > span", chapter).text().trim();
       if (!chapterId2)
@@ -25154,18 +25154,6 @@ Type: ${row["type"]}`
       let chapNum = chapNumRegex && chapNumRegex[1] ? Number(chapNumRegex[1].replace("-", ".")) : 0;
       if (isNaN(chapNum))
         chapNum = 0;
-      throw new Error(
-        `${JSON.stringify({
-          id: chapterId2,
-          name: title,
-          langCode: language,
-          chapNum,
-          time: date,
-          sortingIndex,
-          volume: 0,
-          group
-        })}`
-      );
       chapters.push({
         id: chapterId2,
         name: title,
