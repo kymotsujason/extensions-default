@@ -10163,7 +10163,7 @@ Type: ${row["type"]}`
   var main_exports = {};
   __export(main_exports, {
     Madara: () => Madara,
-    Manganato: () => Manganato
+    Toonily: () => Toonily
   });
   init_buffer();
   var import__ = __toESM(require__());
@@ -24975,7 +24975,7 @@ Please go to the homepage of <${this.baseUrl}> and press the cloud icon.`
       }
     }
   };
-  var Manganato = (0, import__.CompatWrapper)(
+  var Toonily = (0, import__.CompatWrapper)(
     { registerHomeSectionsInInitialise: true },
     new Madara(browser_exports)
   );
