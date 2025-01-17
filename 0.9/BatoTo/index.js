@@ -25189,6 +25189,9 @@ Type: ${row["type"]}`
     const tknList = JSON.parse(
       import_crypto_js.default.AES.decrypt(batoWord, batoPass).toString(import_crypto_js.default.enc.Utf8)
     );
+    throw new Error(
+      import_crypto_js.default.AES.decrypt(batoWord, batoPass).toString(import_crypto_js.default.enc.Utf8)
+    );
     const pages = imgList.map(
       (value, index2) => `${value}?${tknList[index2]}`
     );
