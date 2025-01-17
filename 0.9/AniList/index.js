@@ -3222,7 +3222,7 @@ query($id: Int) {
     }
     async getMangaProgress(mangaProcessVariables) {
       throw new Error(
-        `Not implemented manga progress ${mangaProcessVariables.sourceId}`
+        `Not implemented manga progress ${mangaProcessVariables}`
       );
     }
     async getMangaProgressManagementForm(mangaId) {
