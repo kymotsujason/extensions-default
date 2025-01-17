@@ -2916,6 +2916,36 @@ query($id: Int) {
 	}
 }
 `;
+  var mangaProgressQuery = `query($id: Int) {
+        Media(id: $id) {
+            id
+            mediaListEntry {
+                id
+                status
+                progress
+                progressVolumes
+                repeat
+                private
+                hiddenFromStatusLists
+                score
+                notes
+            }
+            title {
+                romaji
+                english
+                native
+                userPreferred
+            }
+            coverImage {
+                extraLarge
+            }
+            bannerImage
+            averageScore
+            isAdult
+            popularity
+            status
+        }
+    }`;
 
   // src/AniList/SettingsForm.ts
   init_buffer();
@@ -3220,11 +3250,16 @@ query($id: Int) {
         }
       };
     }
-    async getMangaProgress(mangaProcessVariables) {
+    async getMangaProgress(sourceMangaInfo) {
+      const variables = {
+        id: +sourceMangaInfo.mangaId
+      };
+      const json = await this.makeRequest(
+        mangaProgressQuery,
+        variables
+      );
       throw new Error(
-        `Not implemented manga progress ${JSON.stringify(
-          mangaProcessVariables
-        )}`
+        `Not implemented manga progress ${JSON.stringify(json)}`
       );
     }
     async getMangaProgressManagementForm(mangaId) {
