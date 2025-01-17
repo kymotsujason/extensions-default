@@ -25154,6 +25154,18 @@ Type: ${row["type"]}`
       let chapNum = chapNumRegex && chapNumRegex[1] ? Number(chapNumRegex[1].replace("-", ".")) : 0;
       if (isNaN(chapNum))
         chapNum = 0;
+      throw new Error(
+        `${JSON.stringify({
+          id: chapterId2,
+          name: title,
+          langCode: language,
+          chapNum,
+          time: date,
+          sortingIndex,
+          volume: 0,
+          group
+        })}`
+      );
       chapters.push({
         id: chapterId2,
         name: title,
@@ -25187,9 +25199,6 @@ Type: ${row["type"]}`
     const imgHttps = script.match(/const\s+imgHttps\s*=\s*(.*?);/)?.[1] ?? "";
     const imgList = JSON.parse(imgHttps);
     const tknList = JSON.parse(
-      import_crypto_js.default.AES.decrypt(batoWord, batoPass).toString(import_crypto_js.default.enc.Utf8)
-    );
-    throw new Error(
       import_crypto_js.default.AES.decrypt(batoWord, batoPass).toString(import_crypto_js.default.enc.Utf8)
     );
     const pages = imgList.map(
