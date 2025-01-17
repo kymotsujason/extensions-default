@@ -3034,6 +3034,9 @@ query($id: Int) {
   init_buffer();
   var import_types2 = __toESM(require_lib());
   var SourceForm = class extends import_types2.Form {
+    constructor(sourceMangaInfo) {
+      super();
+    }
     getSections() {
       return [
         (0, import_types2.Section)("playground", [
@@ -3363,7 +3366,7 @@ query($id: Int) {
       };
     }
     async getMangaProgressManagementForm(sourceMangaInfo) {
-      return new SourceForm();
+      return new SourceForm(sourceMangaInfo);
     }
     async makeRequest(query, QueryVariables, search) {
       const request = {
