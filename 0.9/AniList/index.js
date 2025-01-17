@@ -3263,10 +3263,8 @@ query($id: Int) {
         `Not implemented manga progress ${JSON.stringify(sourceMangaInfo)}`
       );
     }
-    asyncgetMangaProgressManagementForm(mangaId) {
-      throw new Error(
-        `Not implemented manga progress form ${JSON.stringify(mangaId)}`
-      );
+    async getMangaProgressManagementForm(mangaId) {
+      return new SettingsForm();
     }
     async makeRequest(query, QueryVariables, search) {
       const request = {
