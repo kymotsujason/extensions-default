@@ -3132,7 +3132,10 @@ query($id: Int) {
       );
       const mangaDetails = json.data.Media;
       const thumbnailUrl = mangaDetails.coverImage.extraLarge;
-      const synopsis = mangaDetails.description ? mangaDetails.description.replace(/<br>|<i>|<\/i>|<a.*?>|<\/a>/g, "") : "No description";
+      const synopsis = mangaDetails.description ? mangaDetails.description.replace(
+        /<br>|<i>|<\/i>|<a.*?>|<\/a>/g,
+        ""
+      ) : "No description";
       const secondaryTitles = [
         mangaDetails.title.romaji ?? "No Romaji Title",
         mangaDetails.title.english ?? "No English Title",
@@ -3216,6 +3219,9 @@ query($id: Int) {
           artworkUrls
         }
       };
+    }
+    async getMangaProgressManagementForm(mangaId) {
+      throw new Error("Not implemented@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@");
     }
     async makeRequest(query, QueryVariables, search) {
       const request = {
