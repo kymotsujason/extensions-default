@@ -1,0 +1,28 @@
+import { ContentRating, SourceIntents } from "@paperback/types";
+
+export default {
+	icon: "icon.png",
+	name: "MangaDex",
+	version: "0.9.3",
+	description: "The mangadex.org extension.",
+	contentRating: ContentRating.MATURE,
+	developers: [
+		{
+			name: "niclimcy",
+			website: "https://github.com/niclimcy",
+		},
+		{
+			name: "Paperback Community",
+			website: "https://github.com/paperback-community",
+		},
+	],
+	badges: [],
+	capabilities: [
+		SourceIntents.COLLECTION_MANAGEMENT,
+		SourceIntents.MANGA_CHAPTERS,
+		SourceIntents.HOMEPAGE_SECTIONS,
+		SourceIntents.MANGA_SEARCH,
+		SourceIntents.SETTINGS_UI,
+		SourceIntents.CLOUDFLARE_BYPASS_REQUIRED,
+	],
+};
