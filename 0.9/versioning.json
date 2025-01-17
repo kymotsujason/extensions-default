@@ -1,5 +1,5 @@
 {
-  "buildTime": "2025-01-17T10:59:20.234Z",
+  "buildTime": "2025-01-17T12:10:08.638Z",
   "builtWith": {
     "toolchain": "1.0.0-alpha.27",
     "types": "1.0.0-alpha.27"
@@ -9,36 +9,6 @@
     "name": "Paperback Extension Repository"
   },
   "sources": [
-    {
-      "name": "AniList",
-      "description": "The anilist.co tracker extension.",
-      "version": "2.0.0",
-      "icon": "icon.png",
-      "language": "en",
-      "contentRating": "SAFE",
-      "badges": [
-        {
-          "label": "Tracker",
-          "textColor": "#FFFFFF",
-          "backgroundColor": "#005ff9"
-        }
-      ],
-      "capabilities": [
-        32,
-        4,
-        64,
-        2,
-        8
-      ],
-      "developers": [
-        {
-          "name": "Celarye",
-          "website": "https://celarye.dev",
-          "github": "https://github.com/Celarye"
-        }
-      ],
-      "id": "AniList"
-    },
     {
       "icon": "icon.png",
       "name": "BatoTo",
