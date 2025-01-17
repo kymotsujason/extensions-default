@@ -3258,8 +3258,9 @@ query($id: Int) {
         mangaProgressQuery,
         variables
       );
+      const mangaDetails = json.data.Media;
       throw new Error(
-        `Not implemented manga progress ${JSON.stringify(json)}`
+        `Not implemented manga progress ${sourceMangaInfo.mangaId}`
       );
     }
     async getMangaProgressManagementForm(mangaId) {
