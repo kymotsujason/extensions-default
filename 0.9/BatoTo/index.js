@@ -25152,12 +25152,12 @@ Type: ${row["type"]}`
         date = new Date(Date.now() - 1e3 * 3600 * 24 * Number(timeAgo[0]));
       let chapNum;
       const chapNumRegex = title.match(
-        /(?:chapter|chap|ch|c)[\s.:]*#?(\d+)/i
+        /(?:chapter|chap|ch|c)[\s.:]*#?(\d+(?:\.\d+)?)/i
       );
       if (chapNumRegex && chapNumRegex[1]) {
         chapNum = Number(chapNumRegex[1]);
       } else {
-        const numberRegex = /\b\d+\b/g;
+        const numberRegex = /\b\d+(?:\.\d+)?\b/g;
         const numbers = [];
         let match;
         while (match = numberRegex.exec(title)) {
@@ -25171,7 +25171,8 @@ Type: ${row["type"]}`
           }
         }
         if (numbers.length > 0) {
-          chapNum = Number(numbers[numbers.length - 1].value);
+          const lastNumber = numbers[numbers.length - 1].value;
+          chapNum = Number(lastNumber);
         } else {
           chapNum = 0;
         }
