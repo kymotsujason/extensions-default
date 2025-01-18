@@ -3171,6 +3171,12 @@ query($id: Int) {
   var SourceForm = class extends import_types2.Form {
     constructor(anilistManga) {
       super();
+      this.changes = {
+        status: ["CURRENT"],
+        privacy: false,
+        hideFromStatus: false,
+        notes: ""
+      };
       this.anilistManga = anilistManga;
     }
     getSections() {
@@ -3316,15 +3322,23 @@ query($id: Int) {
       ];
     }
     async statusDidChange(value) {
+      throw new Error(value);
+      this.changes.status = [value];
     }
     async changePrivacy(value) {
+      throw new Error(value.toString());
+      this.changes.privacy = value;
     }
     async hideFromStatusLists(value) {
+      throw new Error(value.toString());
+      this.changes.hideFromStatus = value;
     }
     async updateNotes(value) {
+      throw new Error(value);
+      this.changes.notes = value;
     }
     async submit() {
-      throw new Error("Not implemented");
+      throw new Error(JSON.stringify(this.changes));
     }
     formatStatus(value) {
       switch (value) {
