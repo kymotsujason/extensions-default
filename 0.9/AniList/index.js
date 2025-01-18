@@ -3418,6 +3418,7 @@ query($id: Int) {
           mutation
         );
       }
+      return;
     }
     formatStatus(value) {
       switch (value) {
