@@ -3546,16 +3546,15 @@ query($id: Int) {
       const lastReadChapterNumber = mangaDetails.mediaListEntry.progress ?? 0;
       const lastReadVolumeNumber = mangaDetails.mediaListEntry.progressVolumes;
       const trackedListName = mangaDetails.mediaListEntry.status;
-      const lastReadTime = void 0;
       const userRating = mangaDetails.mediaListEntry.score;
-      throw new Error("Not implemented");
+      throw new Error(JSON.stringify(mangaDetails));
       return {
         sourceId,
         mangaId,
         lastReadChapterNumber,
         lastReadVolumeNumber,
         trackedListName,
-        lastReadTime,
+        //lastReadTime,
         userRating
       };
     }
