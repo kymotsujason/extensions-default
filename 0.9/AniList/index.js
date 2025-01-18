@@ -3049,11 +3049,16 @@ query($id: Int) {
   var SourceForm = class extends import_types2.Form {
     constructor(sourceMangaInfo) {
       super();
+      this.sourceMangaInfo = sourceMangaInfo;
     }
     getSections() {
       return [
-        (0, import_types2.Section)("playground", [
-          (0, import_types2.NavigationRow)("playground", {
+        (0, import_types2.Section)("information", [
+          (0, import_types2.LabelRow)("title", {
+            title: "Title",
+            value: this.sourceMangaInfo.mediaListEntry?.id?.toString()
+          }),
+          (0, import_types2.NavigationRow)("information", {
             title: "Source Form",
             form: new SourceUIPlaygroundForm2()
           })
@@ -3138,8 +3143,8 @@ query($id: Int) {
     }
     getSections() {
       return [
-        (0, import_types3.Section)("playground", [
-          (0, import_types3.NavigationRow)("playground", {
+        (0, import_types3.Section)("login", [
+          (0, import_types3.NavigationRow)("login", {
             title: "Login Form",
             form: new SourceUIPlaygroundForm3()
           })
@@ -3513,7 +3518,22 @@ query($id: Int) {
       if (user == null) {
         return new LoginForm(sourceMangaInfo);
       } else {
-        return new SourceForm(sourceMangaInfo);
+        const variables = {
+          id: +sourceMangaInfo.mangaId
+        };
+        const response = await this.makeRequest(
+          mangaProgressQuery,
+          variables
+        );
+        const anilistManga = AnilistResult(
+          // @ts-ignore
+          response.data
+        ).data?.Media;
+        if (!anilistManga?.mediaListEntry) {
+          return void 0;
+        } else {
+          return new SourceForm(anilistManga);
+        }
       }
     }
     async makeRequest(query, QueryVariables, search) {
