@@ -3145,20 +3145,6 @@ query($id: Int) {
             title: "SourceUI Playground",
             form: new SourceUIPlaygroundForm3()
           })
-        ]),
-        (0, import_types3.Section)("oAuthSection", [
-          (0, import_types3.OAuthButtonRow)("oAuthButton", {
-            title: "Login with Anilist",
-            authorizeEndpoint: "https://anilist.co/api/v2/oauth/authorize",
-            clientId: "23803",
-            redirectUri: "paperback://anilist-login",
-            responseType: {
-              type: "token"
-            },
-            onSuccess: async (token) => {
-              throw new Error(token);
-            }
-          })
         ])
       ];
     }
