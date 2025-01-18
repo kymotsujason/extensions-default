@@ -3189,6 +3189,53 @@ query($id: Int) {
             )
           })
         ]),
+        (0, import_types2.Section)(
+          {
+            id: "trackStatus",
+            header: "Manga Status",
+            footer: "Warning: Setting this to NONE will delete the listing from Anilist"
+          },
+          [
+            (0, import_types2.SelectRow)("status", {
+              value: this.anilistManga.mediaListEntry?.status ? [this.anilistManga.mediaListEntry.status] : ["Reading"],
+              title: "Status",
+              onValueChange: Application.Selector(
+                this,
+                //@ts-ignore
+                "statusDidChange"
+              ),
+              minItemCount: 0,
+              maxItemCount: 7,
+              options: [
+                { id: "NONE", title: "NONE" },
+                {
+                  id: "CURRENT",
+                  title: "Reading"
+                },
+                {
+                  id: "PLANNING",
+                  title: "Planned"
+                },
+                {
+                  id: "COMPLETED",
+                  title: "Completed"
+                },
+                {
+                  id: "DROPPED",
+                  title: "Dropped"
+                },
+                {
+                  id: "PAUSED",
+                  title: "On-Hold"
+                },
+                {
+                  id: "REPEATING",
+                  title: "Re-Reading"
+                }
+              ]
+            })
+          ]
+        ),
         (0, import_types2.Section)({ id: "manage", header: "Progress" }, []),
         (0, import_types2.Section)(
           {
