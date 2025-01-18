@@ -2995,7 +2995,7 @@ query($id: Int) {
     return JSON.parse(tokenBodyJSON);
   }
   function getUserInfo() {
-    return Application.getSecureState("userInfo");
+    return Application.getState("userInfo");
   }
   function isLoggedIn() {
     return getUserInfo() != void 0;
@@ -3003,11 +3003,11 @@ query($id: Int) {
   async function refreshUserInfo() {
     const accessToken = getAccessToken();
     if (accessToken == void 0) {
-      return Application.setSecureState(void 0, "userInfo");
+      return Application.setState(void 0, "userInfo");
     }
     const response = await makeRequest(userProfileQuery);
     const userInfo = AnilistResult(response.data).data?.Viewer;
-    Application.setSecureState(userInfo, "userInfo");
+    Application.setState(userInfo, "userInfo");
   }
   var SettingsForm = class extends import_types.Form {
     getSections() {
