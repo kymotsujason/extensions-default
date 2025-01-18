@@ -3073,7 +3073,7 @@ query($id: Int) {
                     this.reloadForm();
                   }
                   async refresh() {
-                    refreshUserInfo;
+                    refreshUserInfo();
                     this.reloadForm();
                   }
                 }()
@@ -3514,7 +3514,6 @@ query($id: Int) {
       };
     }
     async getMangaProgress(sourceMangaInfo) {
-      throw new Error(JSON.stringify(sourceMangaInfo));
       const variables = {
         id: +sourceMangaInfo.mangaId
       };
@@ -3554,7 +3553,7 @@ query($id: Int) {
           mangaProgressQuery,
           variables
         );
-        const anilistManga = response.data.data.Media;
+        const anilistManga = response.data.Media;
         if (!anilistManga?.mediaListEntry) {
           return void 0;
         } else {
