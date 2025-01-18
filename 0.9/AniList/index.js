@@ -3145,6 +3145,38 @@ query($id: Int) {
             title: "Username",
             value: getUserInfo()?.name?.toString()
           })
+        ]),
+        (0, import_types2.Section)("Manga Information", [
+          ...this.anilistManga.mediaListEntry != void 0 ? [
+            (0, import_types2.LabelRow)("id", {
+              title: "Entry ID",
+              value: this.anilistManga.mediaListEntry?.id?.toString()
+            })
+          ] : [],
+          (0, import_types2.LabelRow)("mediaId", {
+            title: "Manga ID",
+            value: this.anilistManga.id?.toString()
+          }),
+          (0, import_types2.LabelRow)("mangaTitle", {
+            title: "Title",
+            value: this.anilistManga.title?.userPreferred ?? "N/A"
+          }),
+          (0, import_types2.LabelRow)("mangaPopularity", {
+            value: this.anilistManga.popularity?.toString() ?? "N/A",
+            title: "Popularity"
+          }),
+          (0, import_types2.LabelRow)("mangaRating", {
+            value: this.anilistManga.averageScore?.toString() ?? "N/A",
+            title: "Rating"
+          }),
+          (0, import_types2.LabelRow)("mangaStatus", {
+            value: this.formatStatus(this.anilistManga.status),
+            title: "Status"
+          }),
+          (0, import_types2.LabelRow)("mangaIsAdult", {
+            value: this.anilistManga.isAdult ? "Yes" : "No",
+            title: "Is Adult"
+          })
         ])
       ];
     }
