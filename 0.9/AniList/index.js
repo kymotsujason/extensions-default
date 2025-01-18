@@ -3769,6 +3769,7 @@ query($id: Int) {
               progressVolumes: readAction.volumeNumber ? Math.floor(readAction.volumeNumber) : void 0
             };
           }
+          throw new Error(JSON.stringify(params));
           const response = await makeRequest(
             saveMangaProgressMutation,
             params
