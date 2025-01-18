@@ -1950,30 +1950,30 @@ var source = (() => {
       "use strict";
       init_buffer();
       Object.defineProperty(exports, "__esModule", { value: true });
-      exports.LabelRow = LabelRow3;
-      exports.InputRow = InputRow3;
-      exports.ToggleRow = ToggleRow3;
+      exports.LabelRow = LabelRow4;
+      exports.InputRow = InputRow4;
+      exports.ToggleRow = ToggleRow4;
       exports.SelectRow = SelectRow;
-      exports.ButtonRow = ButtonRow3;
-      exports.NavigationRow = NavigationRow3;
+      exports.ButtonRow = ButtonRow4;
+      exports.NavigationRow = NavigationRow4;
       exports.OAuthButtonRow = OAuthButtonRow2;
       exports.DeferredItem = DeferredItem;
-      function LabelRow3(id, props) {
+      function LabelRow4(id, props) {
         return { ...props, id, type: "labelRow", isHidden: props.isHidden ?? false };
       }
-      function InputRow3(id, props) {
+      function InputRow4(id, props) {
         return { ...props, id, type: "inputRow", isHidden: props.isHidden ?? false };
       }
-      function ToggleRow3(id, props) {
+      function ToggleRow4(id, props) {
         return { ...props, id, type: "toggleRow", isHidden: props.isHidden ?? false };
       }
       function SelectRow(id, props) {
         return { ...props, id, type: "selectRow", isHidden: props.isHidden ?? false };
       }
-      function ButtonRow3(id, props) {
+      function ButtonRow4(id, props) {
         return { ...props, id, type: "buttonRow", isHidden: props.isHidden ?? false };
       }
-      function NavigationRow3(id, props) {
+      function NavigationRow4(id, props) {
         return {
           ...props,
           id,
@@ -3140,8 +3140,14 @@ query($id: Int) {
   var LoginForm = class extends import_types3.Form {
     getSections() {
       return [
-        (0, import_types3.Section)("login", [
-          (0, import_types3.OAuthButtonRow)("anilistLogin", {
+        (0, import_types3.Section)("playground", [
+          (0, import_types3.NavigationRow)("playground", {
+            title: "SourceUI Playground",
+            form: new SourceUIPlaygroundForm3()
+          })
+        ]),
+        (0, import_types3.Section)("oAuthSection", [
+          (0, import_types3.OAuthButtonRow)("oAuthButton", {
             title: "Login with Anilist",
             authorizeEndpoint: "https://anilist.co/api/v2/oauth/authorize",
             clientId: "5459",
@@ -3154,6 +3160,73 @@ query($id: Int) {
           })
         ])
       ];
+    }
+  };
+  var State3 = class {
+    constructor(form, value) {
+      this.form = form;
+      this._value = value;
+    }
+    get value() {
+      return this._value;
+    }
+    get selector() {
+      return Application.Selector(this, "updateValue");
+    }
+    async updateValue(value) {
+      this._value = value;
+      this.form.reloadForm();
+    }
+  };
+  var SourceUIPlaygroundForm3 = class extends import_types3.Form {
+    constructor() {
+      super(...arguments);
+      this.inputValue = new State3(this, "");
+      this.rowsVisible = new State3(this, false);
+      this.items = [];
+    }
+    getSections() {
+      return [
+        (0, import_types3.Section)("hideStuff", [
+          (0, import_types3.ToggleRow)("toggle", {
+            title: "Toggles can hide rows",
+            value: this.rowsVisible.value,
+            onValueChange: this.rowsVisible.selector
+          })
+        ]),
+        ...(() => this.rowsVisible.value ? [
+          (0, import_types3.Section)("hiddenSection", [
+            (0, import_types3.InputRow)("input", {
+              title: "Dynamic Input",
+              value: this.inputValue.value,
+              onValueChange: this.inputValue.selector
+            }),
+            (0, import_types3.LabelRow)("boundLabel", {
+              title: "Bound label to input",
+              subtitle: "This label updates with the input",
+              value: this.inputValue.value
+            })
+          ]),
+          (0, import_types3.Section)("items", [
+            ...this.items.map(
+              (item) => (0, import_types3.LabelRow)(item, {
+                title: item
+              })
+            ),
+            (0, import_types3.ButtonRow)("addNewItem", {
+              title: "Add New Item",
+              onSelect: Application.Selector(
+                this,
+                "addNewItem"
+              )
+            })
+          ])
+        ] : [])()
+      ];
+    }
+    async addNewItem() {
+      this.items.push("Item " + (this.items.length + 1));
+      this.reloadForm();
     }
   };
 
