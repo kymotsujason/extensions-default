@@ -1932,7 +1932,7 @@ var source = (() => {
       init_buffer();
       Object.defineProperty(exports, "__esModule", { value: true });
       exports.Form = void 0;
-      var Form4 = class {
+      var Form5 = class {
         reloadForm() {
           const formId = this["__underlying_formId"];
           if (!formId)
@@ -1940,7 +1940,7 @@ var source = (() => {
           Application.formDidChange(formId);
         }
       };
-      exports.Form = Form4;
+      exports.Form = Form5;
     }
   });
 
@@ -1956,7 +1956,7 @@ var source = (() => {
       exports.SelectRow = SelectRow;
       exports.ButtonRow = ButtonRow3;
       exports.NavigationRow = NavigationRow3;
-      exports.OAuthButtonRow = OAuthButtonRow;
+      exports.OAuthButtonRow = OAuthButtonRow2;
       exports.DeferredItem = DeferredItem;
       function LabelRow3(id, props) {
         return { ...props, id, type: "labelRow", isHidden: props.isHidden ?? false };
@@ -1981,7 +1981,7 @@ var source = (() => {
           isHidden: props.isHidden ?? false
         };
       }
-      function OAuthButtonRow(id, props) {
+      function OAuthButtonRow2(id, props) {
         return {
           ...props,
           id,
@@ -2001,8 +2001,8 @@ var source = (() => {
       "use strict";
       init_buffer();
       Object.defineProperty(exports, "__esModule", { value: true });
-      exports.Section = Section3;
-      function Section3(params, items) {
+      exports.Section = Section4;
+      function Section4(params, items) {
         let info;
         if (typeof params === "string") {
           info = { id: params };
@@ -2792,7 +2792,7 @@ var source = (() => {
     AniListExtension: () => AniListExtension
   });
   init_buffer();
-  var import_types3 = __toESM(require_lib());
+  var import_types4 = __toESM(require_lib());
 
   // src/AniList/GraphQLQueries.ts
   init_buffer();
@@ -3134,6 +3134,34 @@ query($id: Int) {
     }
   };
 
+  // src/AniList/LoginForm.ts
+  init_buffer();
+  var import_types3 = __toESM(require_lib());
+  var LoginForm = class extends import_types3.Form {
+    constructor(accessToken) {
+      super();
+      this.accessToken = accessToken;
+    }
+    getSections() {
+      return [
+        (0, import_types3.Section)("login", [
+          (0, import_types3.OAuthButtonRow)("oAuthButton", {
+            title: "Login with Anilist",
+            authorizeEndpoint: "https://anilist.co/api/v2/oauth/authorize",
+            clientId: "paperback",
+            redirectUri: "paperback://anilist-login",
+            responseType: {
+              type: "token"
+            },
+            onSuccess: async (token) => {
+              await this.accessToken(token);
+            }
+          })
+        ])
+      ];
+    }
+  };
+
   // src/AniList/anilist-result.ts
   init_buffer();
   function AnilistResult(json) {
@@ -3151,7 +3179,7 @@ query($id: Int) {
 
   // src/AniList/main.ts
   var GRAPHQL_ENDPOINT = "https://graphql.anilist.co";
-  var AniListInterceptor = class extends import_types3.PaperbackInterceptor {
+  var AniListInterceptor = class extends import_types4.PaperbackInterceptor {
     async interceptRequest(request) {
       return request;
     }
@@ -3161,7 +3189,7 @@ query($id: Int) {
   };
   var AniListExtension = class {
     constructor() {
-      this.mainRateLimiter = new import_types3.BasicRateLimiter("main", {
+      this.mainRateLimiter = new import_types4.BasicRateLimiter("main", {
         numberOfRequests: 15,
         bufferInterval: 10,
         ignoreImages: true
@@ -3220,27 +3248,27 @@ query($id: Int) {
       const trending_now = {
         id: "trending-now",
         title: "Trending Now",
-        type: import_types3.DiscoverSectionType.prominentCarousel
+        type: import_types4.DiscoverSectionType.prominentCarousel
       };
       const all_time_popular = {
         id: "all-time-popular",
         title: "All Time Popular",
-        type: import_types3.DiscoverSectionType.simpleCarousel
+        type: import_types4.DiscoverSectionType.simpleCarousel
       };
       const popular_manga = {
         id: "popular-manga",
         title: "Popular Manga",
-        type: import_types3.DiscoverSectionType.simpleCarousel
+        type: import_types4.DiscoverSectionType.simpleCarousel
       };
       const popular_manhwa = {
         id: "popular-manhwa",
         title: "Popular Manhwa",
-        type: import_types3.DiscoverSectionType.simpleCarousel
+        type: import_types4.DiscoverSectionType.simpleCarousel
       };
       const top_100_manga = {
         id: "top-100-manga",
         title: "Top 100 Manga",
-        type: import_types3.DiscoverSectionType.simpleCarousel
+        type: import_types4.DiscoverSectionType.simpleCarousel
       };
       return [
         trending_now,
@@ -3378,7 +3406,7 @@ query($id: Int) {
         { id: "genres", title: "Genres", tags: genres },
         { id: "tags", title: "Tags", tags }
       ];
-      const contentRating = mangaDetails.isAdult ? import_types3.ContentRating.ADULT : genres.some((e) => e.id === "ecchi") ? import_types3.ContentRating.MATURE : import_types3.ContentRating.EVERYONE;
+      const contentRating = mangaDetails.isAdult ? import_types4.ContentRating.ADULT : genres.some((e) => e.id === "ecchi") ? import_types4.ContentRating.MATURE : import_types4.ContentRating.EVERYONE;
       const artworkUrls = [thumbnailUrl];
       return {
         mangaId,
@@ -3429,21 +3457,25 @@ query($id: Int) {
     }
     async getMangaProgressManagementForm(sourceMangaInfo) {
       const user = await this.userInfo.get();
-      const variables = {
-        id: +sourceMangaInfo.mangaId
-      };
-      const response = await this.makeRequest(
-        mangaProgressQuery,
-        variables
-      );
-      const anilistManga = AnilistResult(
-        // @ts-ignore
-        response.data
-      ).data?.Media;
-      if (!anilistManga?.mediaListEntry) {
-        return void 0;
+      if (user == null) {
+        return new LoginForm(this.accessToken.set);
       } else {
-        return new SourceForm(anilistManga);
+        const variables = {
+          id: +sourceMangaInfo.mangaId
+        };
+        const response = await this.makeRequest(
+          mangaProgressQuery,
+          variables
+        );
+        const anilistManga = AnilistResult(
+          // @ts-ignore
+          response.data
+        ).data?.Media;
+        if (!anilistManga?.mediaListEntry) {
+          return void 0;
+        } else {
+          return new SourceForm(anilistManga);
+        }
       }
     }
     async makeRequest(query, QueryVariables, search) {
