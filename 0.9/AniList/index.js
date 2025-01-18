@@ -1951,20 +1951,20 @@ var source = (() => {
       init_buffer();
       Object.defineProperty(exports, "__esModule", { value: true });
       exports.LabelRow = LabelRow3;
-      exports.InputRow = InputRow3;
-      exports.ToggleRow = ToggleRow3;
+      exports.InputRow = InputRow2;
+      exports.ToggleRow = ToggleRow2;
       exports.SelectRow = SelectRow2;
       exports.ButtonRow = ButtonRow3;
-      exports.NavigationRow = NavigationRow3;
+      exports.NavigationRow = NavigationRow2;
       exports.OAuthButtonRow = OAuthButtonRow2;
       exports.DeferredItem = DeferredItem2;
       function LabelRow3(id, props) {
         return { ...props, id, type: "labelRow", isHidden: props.isHidden ?? false };
       }
-      function InputRow3(id, props) {
+      function InputRow2(id, props) {
         return { ...props, id, type: "inputRow", isHidden: props.isHidden ?? false };
       }
-      function ToggleRow3(id, props) {
+      function ToggleRow2(id, props) {
         return { ...props, id, type: "toggleRow", isHidden: props.isHidden ?? false };
       }
       function SelectRow2(id, props) {
@@ -1973,7 +1973,7 @@ var source = (() => {
       function ButtonRow3(id, props) {
         return { ...props, id, type: "buttonRow", isHidden: props.isHidden ?? false };
       }
-      function NavigationRow3(id, props) {
+      function NavigationRow2(id, props) {
         return {
           ...props,
           id,
@@ -2959,6 +2959,41 @@ query($id: Int) {
             siteUrl
         }
     }`;
+  var getMangaProgressQuery = `query($id: Int) {
+        Media(id: $id) {
+            id
+            mediaListEntry {
+                id
+                status
+                progress
+                progressVolumes
+                repeat
+                private
+                hiddenFromStatusLists
+                score
+                notes
+            }
+            title {
+                romaji
+                english
+                native
+                userPreferred
+            }
+            coverImage {
+                extraLarge
+            }
+            bannerImage
+            averageScore
+            isAdult
+            popularity
+            status
+        }
+    }`;
+  var saveMangaProgressMutation = `mutation($id: Int, $mediaId: Int, $status: MediaListStatus, $score: Float, $progress: Int, $progressVolumes: Int, $repeat: Int, $notes: String, $private: Boolean, $hiddenFromStatusLists: Boolean) {
+        SaveMediaListEntry(id: $id, mediaId: $mediaId, status: $status, score: $score, progress: $progress, progressVolumes: $progressVolumes, repeat: $repeat, notes: $notes, private: $private, hiddenFromStatusLists: $hiddenFromStatusLists){
+            id
+        }
+    }`;
 
   // src/AniList/SettingsForm.ts
   init_buffer();
@@ -3136,6 +3171,7 @@ query($id: Int) {
   var SourceForm = class extends import_types2.Form {
     constructor(anilistManga) {
       super();
+      this.submitted = false;
       this.anilistManga = anilistManga;
     }
     getSections() {
@@ -3204,8 +3240,8 @@ query($id: Int) {
                 //@ts-ignore
                 "statusDidChange"
               ),
-              minItemCount: 0,
-              maxItemCount: 7,
+              minItemCount: 1,
+              maxItemCount: 1,
               options: [
                 { id: "NONE", title: "NONE" },
                 {
@@ -3266,6 +3302,17 @@ query($id: Int) {
               "hideFromStatusLists"
             )
           })
+        ]),
+        (0, import_types2.Section)("submit", [
+          (0, import_types2.ButtonRow)("submitButton", {
+            title: "Submit",
+            onSelect: Application.Selector(
+              this,
+              //@ts-ignore
+              "submit"
+            ),
+            isHidden: this.submitted
+          })
         ])
       ];
     }
@@ -3276,6 +3323,9 @@ query($id: Int) {
     async hideFromStatusLists(value) {
     }
     async updateNotes(value) {
+    }
+    async submit() {
+      this.submitted = true;
     }
     formatStatus(value) {
       switch (value) {
@@ -3308,6 +3358,21 @@ query($id: Int) {
       }
     }
   };
+
+  // src/AniList/anilist-result.ts
+  init_buffer();
+  function AnilistResult(json) {
+    const result = typeof json == "string" ? JSON.parse(json) : json;
+    if (result.errors?.length ?? 0 > 0) {
+      result.errors?.map((error) => {
+        console.log(`[ANILIST-ERROR(${error.status})] ${error.message}`);
+      });
+      throw new Error(
+        "Error while fetching data from Anilist, check logs for more info"
+      );
+    }
+    return result;
+  }
 
   // src/AniList/main.ts
   var AniListInterceptor = class extends import_types3.PaperbackInterceptor {
@@ -3569,6 +3634,67 @@ query($id: Int) {
         );
         const anilistManga = response.data.Media;
         return new SourceForm(anilistManga);
+      }
+    }
+    async processChapterReadActionQueue(actionQueue) {
+      refreshUserInfo();
+      const chapterReadActions = await actionQueue.queuedChapterReadActions();
+      const anilistMangaCache = {};
+      for (const readAction of chapterReadActions) {
+        try {
+          let anilistManga = anilistMangaCache[readAction.mangaId];
+          if (!anilistManga) {
+            const variables = {
+              id: +readAction.mangaId
+            };
+            const _response = await makeRequest(
+              getMangaProgressQuery,
+              variables
+            );
+            anilistManga = AnilistResult(
+              // @ts-ignore
+              _response.data
+            ).data?.Media;
+            anilistMangaCache[readAction.mangaId] = anilistManga;
+          }
+          if (anilistManga?.mediaListEntry) {
+            if (anilistManga.mediaListEntry.progress && anilistManga.mediaListEntry.progress >= Math.floor(readAction.chapterNumber)) {
+              await actionQueue.discardChapterReadAction(readAction);
+              continue;
+            }
+          }
+          let params = {};
+          if (Math.floor(readAction.chapterNumber) == 1 && !readAction.volumeNumber) {
+            params = {
+              mediaId: readAction.mangaId,
+              progress: 1,
+              progressVolumes: 1
+            };
+          } else {
+            params = {
+              mediaId: readAction.mangaId,
+              progress: Math.floor(readAction.chapterNumber),
+              progressVolumes: readAction.volumeNumber ? Math.floor(readAction.volumeNumber) : void 0
+            };
+          }
+          const response = await makeRequest(
+            saveMangaProgressMutation,
+            params
+          );
+          if (response.status < 400) {
+            await actionQueue.discardChapterReadAction(readAction);
+            anilistMangaCache[readAction.mangaId] = {
+              mediaListEntry: {
+                progress: Math.floor(readAction.chapterNumber),
+                progressVolumes: readAction.volumeNumber ? Math.floor(readAction.volumeNumber) : void 0
+              }
+            };
+          } else {
+            await actionQueue.retryChapterReadAction(readAction);
+          }
+        } catch (error) {
+          await actionQueue.retryChapterReadAction(readAction);
+        }
       }
     }
   };
