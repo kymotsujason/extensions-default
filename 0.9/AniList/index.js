@@ -3529,6 +3529,7 @@ query($id: Int) {
       };
     }
     async getMangaProgress(sourceMangaInfo) {
+      throw new Error(isLoggedIn().toString());
       const variables = {
         id: +sourceMangaInfo.mangaId
       };
