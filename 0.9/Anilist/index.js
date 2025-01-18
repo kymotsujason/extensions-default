@@ -2785,7 +2785,7 @@ var source = (() => {
     }
   });
 
-  // src/Anilist1/main.ts
+  // src/Anilist/main.ts
   var main_exports = {};
   __export(main_exports, {
     AniList: () => AniList,
@@ -2794,7 +2794,7 @@ var source = (() => {
   init_buffer();
   var import_types3 = __toESM(require_lib());
 
-  // src/Anilist1/GraphQLQueries.ts
+  // src/Anilist/GraphQLQueries.ts
   init_buffer();
   var discoverSectionQuery = `
 query ($page: Int, $sort: [MediaSort], $countryOfOrigin: CountryCode
@@ -3000,7 +3000,7 @@ query($id: Int) {
         }
     }`;
 
-  // src/Anilist1/SettingsForm.ts
+  // src/Anilist/SettingsForm.ts
   init_buffer();
   var import_types = __toESM(require_lib());
   var GRAPHQL_ENDPOINT = "https://graphql.anilist.co";
@@ -3170,7 +3170,7 @@ query($id: Int) {
     return json;
   }
 
-  // src/Anilist1/SourceForm.ts
+  // src/Anilist/SourceForm.ts
   init_buffer();
   var import_types2 = __toESM(require_lib());
   var SourceForm = class extends import_types2.Form {
@@ -3454,7 +3454,7 @@ query($id: Int) {
     }
   };
 
-  // src/Anilist1/anilist-result.ts
+  // src/Anilist/anilist-result.ts
   init_buffer();
   function AnilistResult(json) {
     const result = typeof json == "string" ? JSON.parse(json) : json;
@@ -3469,7 +3469,7 @@ query($id: Int) {
     return result;
   }
 
-  // src/Anilist1/main.ts
+  // src/Anilist/main.ts
   var AniListInterceptor = class extends import_types3.PaperbackInterceptor {
     async interceptRequest(request) {
       return request;
