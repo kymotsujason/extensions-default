@@ -3529,7 +3529,12 @@ query($id: Int) {
       };
     }
     async getMangaProgress(sourceMangaInfo) {
-      throw new Error(isLoggedIn().toString());
+      const accessToken = getAccessToken();
+      if (accessToken == void 0) {
+        throw new Error("access token not found");
+      }
+      const response = await makeRequest(userProfileQuery);
+      throw new Error(JSON.stringify(response));
       const variables = {
         id: +sourceMangaInfo.mangaId
       };
