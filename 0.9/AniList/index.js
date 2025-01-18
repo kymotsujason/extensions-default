@@ -3534,7 +3534,8 @@ query($id: Int) {
         throw new Error("access token not found");
       }
       const response = await makeRequest(userProfileQuery);
-      throw new Error(JSON.stringify(response));
+      const userInfo = AnilistResult2(response.data).data?.Viewer;
+      throw new Error(JSON.stringify(userInfo));
       const variables = {
         id: +sourceMangaInfo.mangaId
       };
