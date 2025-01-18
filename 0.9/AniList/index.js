@@ -3324,6 +3324,7 @@ query($id: Int) {
     async updateNotes(value) {
     }
     async submit() {
+      throw new Error("Not implemented");
     }
     formatStatus(value) {
       switch (value) {
