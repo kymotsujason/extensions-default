@@ -3418,7 +3418,9 @@ query($id: Int) {
           mutation
         );
       }
-      return;
+      throw new Error(
+        "Entry submitted, swipe this window down. Haven't figured out how to do it properly yet."
+      );
     }
     formatStatus(value) {
       switch (value) {
