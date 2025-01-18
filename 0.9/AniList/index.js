@@ -2998,7 +2998,7 @@ query($id: Int) {
     return Application.getSecureState("userInfo");
   }
   function isLoggedIn() {
-    return getUserInfo() != null;
+    return getUserInfo() != void 0;
   }
   async function refreshUserInfo() {
     const accessToken = getAccessToken();
@@ -3046,6 +3046,16 @@ query($id: Int) {
                           });
                         })
                       ),
+                      (0, import_types.Section)("refresh", [
+                        (0, import_types.ButtonRow)("refresh", {
+                          title: "Refresh User Info",
+                          onSelect: Application.Selector(
+                            this,
+                            // @ts-expect-error
+                            "refresh"
+                          )
+                        })
+                      ]),
                       (0, import_types.Section)("logout", [
                         (0, import_types.ButtonRow)("logout", {
                           title: "Logout",
@@ -3060,6 +3070,10 @@ query($id: Int) {
                   }
                   async logout() {
                     saveAccessToken(void 0);
+                    this.reloadForm();
+                  }
+                  async refresh() {
+                    refreshUserInfo;
                     this.reloadForm();
                   }
                 }()
