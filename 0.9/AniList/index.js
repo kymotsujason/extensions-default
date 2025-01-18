@@ -3141,7 +3141,7 @@ query($id: Int) {
     getSections() {
       return [
         (0, import_types3.Section)("login", [
-          (0, import_types3.OAuthButtonRow)("oAuthButton", {
+          (0, import_types3.OAuthButtonRow)("anilistLogin", {
             title: "Login with Anilist",
             authorizeEndpoint: "https://anilist.co/api/v2/oauth/authorize",
             clientId: "5459",
