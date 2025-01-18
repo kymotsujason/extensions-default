@@ -3667,7 +3667,6 @@ query($id: Int) {
       ];
       const contentRating = mangaDetails.isAdult ? import_types3.ContentRating.ADULT : genres.some((e) => e.id === "ecchi") ? import_types3.ContentRating.MATURE : import_types3.ContentRating.EVERYONE;
       const artworkUrls = [thumbnailUrl];
-      throw new Error("Anilist GraphQL API is not available.");
       return {
         mangaId,
         mangaInfo: {
@@ -3687,6 +3686,7 @@ query($id: Int) {
       };
     }
     async getMangaProgress(sourceMangaInfo) {
+      return void 0;
       const variables = {
         id: +sourceMangaInfo.mangaId
       };
