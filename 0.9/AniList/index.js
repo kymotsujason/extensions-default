@@ -3176,7 +3176,7 @@ query($id: Int) {
         "Content-Type": "application/json",
         Accept: "application/json",
         ...accessToken != null ? {
-          authorization: `Bearer ${accessToken}`
+          Authorization: `Bearer ${accessToken}`
         } : {}
       },
       body: JSON.stringify({
