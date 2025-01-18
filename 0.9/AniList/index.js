@@ -3547,15 +3547,7 @@ query($id: Int) {
       const lastReadVolumeNumber = mangaDetails.mediaListEntry.progressVolumes;
       const trackedListName = mangaDetails.mediaListEntry.status;
       const userRating = mangaDetails.mediaListEntry.score;
-      return {
-        sourceId,
-        mangaId,
-        lastReadChapterNumber,
-        lastReadVolumeNumber,
-        trackedListName,
-        //lastReadTime,
-        userRating
-      };
+      return sourceMangaInfo;
     }
     async getMangaProgressManagementForm(sourceMangaInfo) {
       if (!isLoggedIn()) {
