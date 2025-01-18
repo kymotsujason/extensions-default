@@ -3510,6 +3510,7 @@ query($id: Int) {
       ];
       const contentRating = mangaDetails.isAdult ? import_types3.ContentRating.ADULT : genres.some((e) => e.id === "ecchi") ? import_types3.ContentRating.MATURE : import_types3.ContentRating.EVERYONE;
       const artworkUrls = [thumbnailUrl];
+      throw new Error("Anilist API request failed");
       return {
         mangaId,
         mangaInfo: {
