@@ -1953,7 +1953,7 @@ var source = (() => {
       exports.LabelRow = LabelRow3;
       exports.InputRow = InputRow3;
       exports.ToggleRow = ToggleRow3;
-      exports.SelectRow = SelectRow;
+      exports.SelectRow = SelectRow2;
       exports.ButtonRow = ButtonRow3;
       exports.NavigationRow = NavigationRow3;
       exports.OAuthButtonRow = OAuthButtonRow2;
@@ -1967,7 +1967,7 @@ var source = (() => {
       function ToggleRow3(id, props) {
         return { ...props, id, type: "toggleRow", isHidden: props.isHidden ?? false };
       }
-      function SelectRow(id, props) {
+      function SelectRow2(id, props) {
         return { ...props, id, type: "selectRow", isHidden: props.isHidden ?? false };
       }
       function ButtonRow3(id, props) {
@@ -3012,12 +3012,6 @@ query($id: Int) {
   var SettingsForm = class extends import_types.Form {
     getSections() {
       return [
-        (0, import_types.Section)("playground", [
-          (0, import_types.NavigationRow)("playground", {
-            title: "SourceUI Playground",
-            form: new SourceUIPlaygroundForm()
-          })
-        ]),
         (0, import_types.Section)("oAuthSection", [
           (0, import_types.DeferredItem)(() => {
             if (getAccessToken()) {
@@ -3100,73 +3094,6 @@ query($id: Int) {
       saveAccessToken(value);
     }
   };
-  var State = class {
-    constructor(form, value) {
-      this.form = form;
-      this._value = value;
-    }
-    get value() {
-      return this._value;
-    }
-    get selector() {
-      return Application.Selector(this, "updateValue");
-    }
-    async updateValue(value) {
-      this._value = value;
-      this.form.reloadForm();
-    }
-  };
-  var SourceUIPlaygroundForm = class extends import_types.Form {
-    constructor() {
-      super(...arguments);
-      this.inputValue = new State(this, "");
-      this.rowsVisible = new State(this, false);
-      this.items = [];
-    }
-    getSections() {
-      return [
-        (0, import_types.Section)("hideStuff", [
-          (0, import_types.ToggleRow)("toggle", {
-            title: "Toggles can hide rows",
-            value: this.rowsVisible.value,
-            onValueChange: this.rowsVisible.selector
-          })
-        ]),
-        ...(() => this.rowsVisible.value ? [
-          (0, import_types.Section)("hiddenSection", [
-            (0, import_types.InputRow)("input", {
-              title: "Dynamic Input",
-              value: this.inputValue.value,
-              onValueChange: this.inputValue.selector
-            }),
-            (0, import_types.LabelRow)("boundLabel", {
-              title: "Bound label to input",
-              subtitle: "This label updates with the input",
-              value: this.inputValue.value
-            })
-          ]),
-          (0, import_types.Section)("items", [
-            ...this.items.map(
-              (item) => (0, import_types.LabelRow)(item, {
-                title: item
-              })
-            ),
-            (0, import_types.ButtonRow)("addNewItem", {
-              title: "Add New Item",
-              onSelect: Application.Selector(
-                this,
-                "addNewItem"
-              )
-            })
-          ])
-        ] : [])()
-      ];
-    }
-    async addNewItem() {
-      this.items.push("Item " + (this.items.length + 1));
-      this.reloadForm();
-    }
-  };
   async function makeRequest(query, QueryVariables, search) {
     const accessToken = getAccessToken()?.accessToken;
     const request = {
@@ -3207,90 +3134,135 @@ query($id: Int) {
   init_buffer();
   var import_types2 = __toESM(require_lib());
   var SourceForm = class extends import_types2.Form {
-    constructor(sourceMangaInfo) {
+    constructor(anilistManga) {
       super();
-      this.sourceMangaInfo = sourceMangaInfo;
+      this.anilistManga = anilistManga;
     }
     getSections() {
       return [
-        (0, import_types2.Section)("information", [
-          (0, import_types2.LabelRow)("title", {
-            title: "Title",
-            value: this.sourceMangaInfo.mediaListEntry?.id?.toString()
-          }),
-          (0, import_types2.NavigationRow)("information", {
-            title: "Source Form",
-            form: new SourceUIPlaygroundForm2()
-          })
-        ])
-      ];
-    }
-  };
-  var State2 = class {
-    constructor(form, value) {
-      this.form = form;
-      this._value = value;
-    }
-    get value() {
-      return this._value;
-    }
-    get selector() {
-      return Application.Selector(this, "updateValue");
-    }
-    async updateValue(value) {
-      this._value = value;
-      this.form.reloadForm();
-    }
-  };
-  var SourceUIPlaygroundForm2 = class extends import_types2.Form {
-    constructor() {
-      super(...arguments);
-      this.inputValue = new State2(this, "");
-      this.rowsVisible = new State2(this, false);
-      this.items = [];
-    }
-    getSections() {
-      return [
-        (0, import_types2.Section)("hideStuff", [
-          (0, import_types2.ToggleRow)("toggle", {
-            title: "Toggles can hide rows",
-            value: this.rowsVisible.value,
-            onValueChange: this.rowsVisible.selector
+        (0, import_types2.Section)("User Information", [
+          (0, import_types2.LabelRow)("username", {
+            title: "Username",
+            value: getUserInfo()?.name?.toString()
           })
         ]),
-        ...(() => this.rowsVisible.value ? [
-          (0, import_types2.Section)("hiddenSection", [
-            (0, import_types2.InputRow)("input", {
-              title: "Dynamic Input",
-              value: this.inputValue.value,
-              onValueChange: this.inputValue.selector
-            }),
-            (0, import_types2.LabelRow)("boundLabel", {
-              title: "Bound label to input",
-              subtitle: "This label updates with the input",
-              value: this.inputValue.value
+        (0, import_types2.Section)("Manga Information", [
+          ...this.anilistManga.mediaListEntry != null ? [
+            (0, import_types2.LabelRow)("id", {
+              title: "Entry ID",
+              value: this.anilistManga.mediaListEntry?.id?.toString()
             })
-          ]),
-          (0, import_types2.Section)("items", [
-            ...this.items.map(
-              (item) => (0, import_types2.LabelRow)(item, {
-                title: item
-              })
-            ),
-            (0, import_types2.ButtonRow)("addNewItem", {
-              title: "Add New Item",
-              onSelect: Application.Selector(
+          ] : [],
+          (0, import_types2.LabelRow)("mediaId", {
+            title: "Manga ID",
+            value: this.anilistManga.id?.toString()
+          }),
+          (0, import_types2.LabelRow)("mangaTitle", {
+            title: "Title",
+            value: this.anilistManga.title?.userPreferred ?? "N/A"
+          }),
+          (0, import_types2.LabelRow)("mangaPopularity", {
+            value: this.anilistManga.popularity?.toString() ?? "N/A",
+            title: "Popularity"
+          }),
+          (0, import_types2.LabelRow)("mangaRating", {
+            value: this.anilistManga.averageScore?.toString() ?? "N/A",
+            title: "Rating"
+          }),
+          (0, import_types2.LabelRow)("mangaStatus", {
+            value: this.formatStatus(this.anilistManga.status),
+            title: "Status"
+          }),
+          (0, import_types2.LabelRow)("mangaIsAdult", {
+            value: this.anilistManga.isAdult ? "Yes" : "No",
+            title: "Is Adult"
+          })
+        ]),
+        (0, import_types2.Section)(
+          {
+            id: "trackStatus",
+            header: "Manga Status",
+            footer: "Warning: Setting this to NONE will delete the listing from Anilist"
+          },
+          [
+            (0, import_types2.SelectRow)("status", {
+              value: this.anilistManga.mediaListEntry?.status ? [
+                this.formatStatus(
+                  this.anilistManga.mediaListEntry.status
+                )
+              ] : ["Reading"],
+              title: "Status",
+              onValueChange: Application.Selector(
                 this,
-                "addNewItem"
-              )
+                //@ts-ignore
+                "statusDidChange"
+              ),
+              minItemCount: 0,
+              maxItemCount: 1,
+              options: [
+                { id: "none", title: this.formatStatus("NONE") },
+                {
+                  id: "current",
+                  title: this.formatStatus("CURRENT")
+                },
+                {
+                  id: "planning",
+                  title: this.formatStatus("PLANNING")
+                },
+                {
+                  id: "completed",
+                  title: this.formatStatus("COMPLETED")
+                },
+                {
+                  id: "dropped",
+                  title: this.formatStatus("DROPPED")
+                },
+                {
+                  id: "paused",
+                  title: this.formatStatus("PAUSED")
+                },
+                {
+                  id: "repeating",
+                  title: this.formatStatus("REPEATING")
+                }
+              ]
             })
-          ])
-        ] : [])()
+          ]
+        ),
+        (0, import_types2.Section)({ id: "manage", header: "Progress" }, [])
       ];
     }
-    async addNewItem() {
-      this.items.push("Item " + (this.items.length + 1));
-      this.reloadForm();
+    async statusDidChange(value) {
+    }
+    formatStatus(value) {
+      switch (value) {
+        case "CURRENT":
+          return "Reading";
+        case "PLANNING":
+          return "Planned";
+        case "COMPLETED":
+          return "Completed";
+        case "DROPPED":
+          return "Dropped";
+        case "PAUSED":
+          return "On-Hold";
+        case "REPEATING":
+          return "Re-Reading";
+        case "FINISHED":
+          return "Finished";
+        case "RELEASING":
+          return "Releasing";
+        case "NOT_YET_RELEASED":
+          return "Not Yet Released";
+        case "CANCELLED":
+          return "Cancelled";
+        case "HIATUS":
+          return "Hiatus";
+        case "NONE":
+          return "None";
+        default:
+          return "N/A";
+      }
     }
   };
 
