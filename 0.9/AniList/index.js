@@ -3537,7 +3537,7 @@ query($id: Int) {
         vara
       );
       const anilistManga = response.data.Media;
-      return anilistManga?.mediaListEntry;
+      throw new Error(anilistManga?.mediaListEntry);
       const variables = {
         id: +sourceMangaInfo.mangaId
       };
