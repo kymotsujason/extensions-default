@@ -3304,14 +3304,21 @@ query($id: Int) {
           })
         ]),
         (0, import_types2.Section)("submit", [
-          (0, import_types2.ButtonRow)("submitButton", {
+          this.submitted ? (0, import_types2.ButtonRow)("submitButton", {
+            title: "Submit",
+            onSelect: Application.Selector(
+              this,
+              //@ts-ignore
+              "submit"
+            )
+          }) : (0, import_types2.ButtonRow)("submitButton", {
             title: "Submit",
             onSelect: Application.Selector(
               this,
               //@ts-ignore
               "submit"
             ),
-            isHidden: this.submitted
+            isHidden: true
           })
         ])
       ];
