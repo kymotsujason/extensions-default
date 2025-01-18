@@ -3529,6 +3529,15 @@ query($id: Int) {
       };
     }
     async getMangaProgress(sourceMangaInfo) {
+      const vara = {
+        id: +sourceMangaInfo.mangaId
+      };
+      const response = await makeRequest(
+        mangaProgressQuery,
+        vara
+      );
+      const anilistManga = response.data.Media;
+      return anilistManga?.mediaListEntry;
       const variables = {
         id: +sourceMangaInfo.mangaId
       };
