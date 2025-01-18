@@ -3177,6 +3177,95 @@ query($id: Int) {
             value: this.anilistManga.isAdult ? "Yes" : "No",
             title: "Is Adult"
           })
+        ]),
+        (0, import_types2.Section)({ id: "mangaNotes", header: "Notes" }, [
+          (0, import_types2.InputRow)("notes", {
+            title: "Notes",
+            value: this.anilistManga.mediaListEntry?.notes ?? "",
+            onValueChange: Application.Selector(
+              this,
+              //@ts-ignore
+              "updateNotes"
+            )
+          })
+        ]),
+        (0, import_types2.Section)(
+          {
+            id: "trackStatus",
+            header: "Manga Status",
+            footer: "Warning: Setting this to NONE will delete the listing from Anilist"
+          },
+          [
+            (0, import_types2.SelectRow)("status", {
+              value: ["Reading"],
+              title: "Status",
+              onValueChange: Application.Selector(
+                this,
+                //@ts-ignore
+                "statusDidChange"
+              ),
+              minItemCount: 0,
+              maxItemCount: 1,
+              options: [
+                { id: "NONE", title: "NONE" },
+                {
+                  id: "CURRENT",
+                  title: "Reading"
+                },
+                {
+                  id: "PLANNING",
+                  title: "Planned"
+                },
+                {
+                  id: "COMPLETED",
+                  title: "Completed"
+                },
+                {
+                  id: "DROPPED",
+                  title: "Dropped"
+                },
+                {
+                  id: "PAUSED",
+                  title: "On-Hold"
+                },
+                {
+                  id: "REPEATING",
+                  title: "Re-Reading"
+                }
+              ]
+            })
+          ]
+        ),
+        (0, import_types2.Section)({ id: "manage", header: "Progress" }, []),
+        (0, import_types2.Section)(
+          {
+            id: "rateSection",
+            header: "Rating",
+            footer: "This uses your rating preference set on AniList"
+          },
+          []
+        ),
+        (0, import_types2.Section)({ id: "privacy_settings", header: "Privacy Settings" }, [
+          (0, import_types2.ToggleRow)("private", {
+            title: "Private",
+            //@ts-ignore
+            value: false,
+            onValueChange: Application.Selector(
+              this,
+              //@ts-ignore
+              "changePrivacy"
+            )
+          }),
+          (0, import_types2.ToggleRow)("hiddenFromStatusLists", {
+            title: "Hide From Status List",
+            //@ts-ignore
+            value: false,
+            onValueChange: Application.Selector(
+              this,
+              //@ts-ignore
+              "hideFromStatusLists"
+            )
+          })
         ])
       ];
     }
