@@ -3529,15 +3529,6 @@ query($id: Int) {
       };
     }
     async getMangaProgress(sourceMangaInfo) {
-      const vara = {
-        id: +sourceMangaInfo.mangaId
-      };
-      const response = await makeRequest(
-        mangaProgressQuery,
-        vara
-      );
-      const anilistManga = response.data.Media;
-      throw new Error(JSON.stringify(response.data));
       const variables = {
         id: +sourceMangaInfo.mangaId
       };
@@ -3549,7 +3540,7 @@ query($id: Int) {
       if (!mangaDetails?.mediaListEntry) {
         return void 0;
       }
-      const sourceId = "Manganato";
+      const sourceId = "Anilist";
       const mangaId = sourceMangaInfo.mangaId;
       const lastReadChapterNumber = mangaDetails.mediaListEntry.progress ?? 0;
       const lastReadVolumeNumber = mangaDetails.mediaListEntry.progressVolumes;
