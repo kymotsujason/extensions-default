@@ -3515,7 +3515,7 @@ query($id: Int) {
     }
     async getMangaProgressManagementForm(sourceMangaInfo) {
       const user = await this.userInfo.get();
-      if (user == null) {
+      if (user !== null) {
         return new LoginForm(sourceMangaInfo);
       } else {
         const variables = {
