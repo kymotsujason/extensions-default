@@ -3326,6 +3326,7 @@ query($id: Int) {
     }
     async submit() {
       this.submitted = true;
+      this.reloadForm();
     }
     formatStatus(value) {
       switch (value) {
