@@ -3149,7 +3149,6 @@ query($id: Int) {
             title: "Login with Anilist",
             authorizeEndpoint: "https://anilist.co/api/v2/oauth/authorize",
             clientId: "paperback",
-            redirectUri: "paperback://anilist-login",
             responseType: {
               type: "token"
             },
