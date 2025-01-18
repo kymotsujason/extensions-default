@@ -1957,7 +1957,7 @@ var source = (() => {
       exports.ButtonRow = ButtonRow4;
       exports.NavigationRow = NavigationRow4;
       exports.OAuthButtonRow = OAuthButtonRow2;
-      exports.DeferredItem = DeferredItem;
+      exports.DeferredItem = DeferredItem2;
       function LabelRow4(id, props) {
         return { ...props, id, type: "labelRow", isHidden: props.isHidden ?? false };
       }
@@ -1989,7 +1989,7 @@ var source = (() => {
           isHidden: props.isHidden ?? false
         };
       }
-      function DeferredItem(work) {
+      function DeferredItem2(work) {
         return work();
       }
     }
@@ -3144,6 +3144,22 @@ query($id: Int) {
           (0, import_types3.NavigationRow)("playground", {
             title: "SourceUI Playground",
             form: new SourceUIPlaygroundForm3()
+          })
+        ]),
+        (0, import_types3.Section)("oAuthSection", [
+          (0, import_types3.DeferredItem)(() => {
+            return (0, import_types3.OAuthButtonRow)("oAuthButton", {
+              title: "Login with Anilist",
+              authorizeEndpoint: "https://anilist.co/api/v2/oauth/authorize",
+              clientId: "23803",
+              redirectUri: "paperback://anilist-login",
+              responseType: {
+                type: "token"
+              },
+              onSuccess: async (token) => {
+                throw new Error(token);
+              }
+            });
           })
         ])
       ];
