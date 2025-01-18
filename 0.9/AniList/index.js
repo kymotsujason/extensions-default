@@ -2946,6 +2946,19 @@ query($id: Int) {
             status
         }
     }`;
+  var userProfileQuery = `{
+        Viewer {
+            id
+            name
+            avatar {
+                large
+            }
+            mediaListOptions {
+                scoreFormat
+            }
+            siteUrl
+        }
+    }`;
 
   // src/AniList/SettingsForm.ts
   init_buffer();
@@ -2962,6 +2975,7 @@ query($id: Int) {
   }
   function saveAccessToken(accessToken) {
     Application.setSecureState(accessToken, "access_token");
+    refreshUserInfo();
     if (!accessToken)
       return void 0;
     return {
@@ -2981,7 +2995,19 @@ query($id: Int) {
     return JSON.parse(tokenBodyJSON);
   }
   function getUserInfo() {
-    return Application.getState("userInfo");
+    return Application.getSecureState("userInfo");
+  }
+  function isLoggedIn() {
+    return getUserInfo() != null;
+  }
+  async function refreshUserInfo() {
+    const accessToken = getUserInfo();
+    if (accessToken == null) {
+      return Application.setSecureState(void 0, "userInfo");
+    }
+    const response = await makeRequest(userProfileQuery);
+    const userInfo = AnilistResult(response.data).data?.Viewer;
+    Application.setSecureState(userInfo, "userInfo");
   }
   var SettingsForm = class extends import_types.Form {
     getSections() {
@@ -3518,8 +3544,7 @@ query($id: Int) {
       };
     }
     async getMangaProgressManagementForm(sourceMangaInfo) {
-      const user = getUserInfo();
-      if (user == null) {
+      if (!isLoggedIn()) {
         return this.getSettingsForm();
       } else {
         const variables = {
