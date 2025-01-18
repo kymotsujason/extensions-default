@@ -2994,6 +2994,11 @@ query($id: Int) {
             id
         }
     }`;
+  var deleteMangaProgressMutation = `mutation($id: Int) {
+        DeleteMediaListEntry(id: $id){
+            deleted
+        }
+    }`;
 
   // src/AniList/SettingsForm.ts
   init_buffer();
@@ -3175,7 +3180,11 @@ query($id: Int) {
         status: ["CURRENT"],
         privacy: false,
         hideFromStatus: false,
-        notes: ""
+        notes: "",
+        chapter: "0",
+        volume: "0",
+        read: "0",
+        rating: "0"
       };
       this.anilistManga = anilistManga;
     }
@@ -3238,7 +3247,7 @@ query($id: Int) {
           },
           [
             (0, import_types2.SelectRow)("status", {
-              value: this.anilistManga.mediaListEntry?.status ? [this.anilistManga.mediaListEntry.status] : ["CURRENT"],
+              value: this.anilistManga.mediaListEntry?.status ? [this.anilistManga.mediaListEntry.status] : this.changes.status,
               title: "Status",
               onValueChange: Application.Selector(
                 this,
@@ -3277,14 +3286,52 @@ query($id: Int) {
             })
           ]
         ),
-        (0, import_types2.Section)({ id: "manage", header: "Progress" }, []),
+        (0, import_types2.Section)({ id: "manage", header: "Progress" }, [
+          (0, import_types2.InputRow)("progress", {
+            title: "Chapter",
+            value: (this.anilistManga.mediaListEntry?.progress ?? this.changes.chapter).toString(),
+            onValueChange: Application.Selector(
+              this,
+              //@ts-ignore
+              "updateChapter"
+            )
+          }),
+          (0, import_types2.InputRow)("progressVolumes", {
+            title: "Volume",
+            value: (this.anilistManga.mediaListEntry?.progressVolumes ?? this.changes.volume).toString(),
+            onValueChange: Application.Selector(
+              this,
+              //@ts-ignore
+              "updateVolume"
+            )
+          }),
+          (0, import_types2.InputRow)("repeat", {
+            title: "Times Re-Read",
+            value: (this.anilistManga.mediaListEntry?.repeat != void 0 ? this.anilistManga.mediaListEntry?.repeat : this.changes.read).toString(),
+            onValueChange: Application.Selector(
+              this,
+              //@ts-ignore
+              "updateRead"
+            )
+          })
+        ]),
         (0, import_types2.Section)(
           {
             id: "rateSection",
             header: "Rating",
             footer: "This uses your rating preference set on AniList"
           },
-          []
+          [
+            (0, import_types2.InputRow)("score", {
+              title: "Score",
+              value: (this.anilistManga.mediaListEntry?.score ?? this.changes.rating).toString(),
+              onValueChange: Application.Selector(
+                this,
+                //@ts-ignore
+                "updateRating"
+              )
+            })
+          ]
         ),
         (0, import_types2.Section)({ id: "privacy_settings", header: "Privacy Settings" }, [
           (0, import_types2.ToggleRow)("private", {
@@ -3330,11 +3377,47 @@ query($id: Int) {
     async hideFromStatusLists(value) {
       this.changes.hideFromStatus = value;
     }
-    async updateNotes(value) {
-      this.changes.notes = value;
+    async updateChapter(value) {
+      this.changes.chapter = value;
+    }
+    async updateVolume(value) {
+      this.changes.volume = value;
+    }
+    async updateRead(value) {
+      this.changes.read = value;
+    }
+    async updateRating(value) {
+      this.changes.rating = value;
     }
     async submit() {
-      throw new Error(JSON.stringify(this.changes));
+      const id = this.anilistManga.mediaListEntry?.id ? Number(this.anilistManga.mediaListEntry?.id) : void 0;
+      const mediaId = Number(this.anilistManga.id);
+      if (this.changes.status[0] === "NONE" && id != null) {
+        let mutation = {
+          id
+        };
+        await makeRequest(
+          deleteMangaProgressMutation,
+          mutation
+        );
+      } else {
+        let mutation = {
+          id,
+          mediaId,
+          status: this.changes.status[0],
+          notes: this.changes.notes,
+          progress: parseInt(this.changes.chapter),
+          progressVolumes: parseInt(this.changes.volume),
+          repeat: parseInt(this.changes.read),
+          private: this.changes.privacy,
+          hiddenFromStatusLists: this.changes.hideFromStatus,
+          score: Number(this.changes.rating)
+        };
+        await makeRequest(
+          saveMangaProgressMutation,
+          mutation
+        );
+      }
     }
     formatStatus(value) {
       switch (value) {
