@@ -3322,19 +3322,15 @@ query($id: Int) {
       ];
     }
     async statusDidChange(value) {
-      throw new Error(value);
-      this.changes.status = [value];
+      this.changes.status = value;
     }
     async changePrivacy(value) {
-      throw new Error(value.toString());
       this.changes.privacy = value;
     }
     async hideFromStatusLists(value) {
-      throw new Error(value.toString());
       this.changes.hideFromStatus = value;
     }
     async updateNotes(value) {
-      throw new Error(value);
       this.changes.notes = value;
     }
     async submit() {
