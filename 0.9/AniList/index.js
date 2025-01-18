@@ -3138,10 +3138,6 @@ query($id: Int) {
   init_buffer();
   var import_types3 = __toESM(require_lib());
   var LoginForm = class extends import_types3.Form {
-    constructor(accessToken) {
-      super();
-      this.accessToken = accessToken;
-    }
     getSections() {
       return [
         (0, import_types3.Section)("login", [
@@ -3153,7 +3149,7 @@ query($id: Int) {
               type: "token"
             },
             onSuccess: async (token) => {
-              await this.accessToken(token);
+              throw new Error(token);
             }
           })
         ])
@@ -3457,7 +3453,7 @@ query($id: Int) {
     async getMangaProgressManagementForm(sourceMangaInfo) {
       const user = await this.userInfo.get();
       if (user == null) {
-        return new LoginForm(this.accessToken.set);
+        return new LoginForm();
       } else {
         const variables = {
           id: +sourceMangaInfo.mangaId
