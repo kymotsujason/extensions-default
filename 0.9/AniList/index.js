@@ -3145,127 +3145,6 @@ query($id: Int) {
             title: "Username",
             value: getUserInfo()?.name?.toString()
           })
-        ]),
-        (0, import_types2.Section)("Manga Information", [
-          ...this.anilistManga.mediaListEntry != null ? [
-            (0, import_types2.LabelRow)("id", {
-              title: "Entry ID",
-              value: this.anilistManga.mediaListEntry?.id?.toString()
-            })
-          ] : [],
-          (0, import_types2.LabelRow)("mediaId", {
-            title: "Manga ID",
-            value: this.anilistManga.id?.toString()
-          }),
-          (0, import_types2.LabelRow)("mangaTitle", {
-            title: "Title",
-            value: this.anilistManga.title?.userPreferred ?? "N/A"
-          }),
-          (0, import_types2.LabelRow)("mangaPopularity", {
-            value: this.anilistManga.popularity?.toString() ?? "N/A",
-            title: "Popularity"
-          }),
-          (0, import_types2.LabelRow)("mangaRating", {
-            value: this.anilistManga.averageScore?.toString() ?? "N/A",
-            title: "Rating"
-          }),
-          (0, import_types2.LabelRow)("mangaStatus", {
-            value: this.anilistManga.status,
-            title: "Status"
-          }),
-          (0, import_types2.LabelRow)("mangaIsAdult", {
-            value: this.anilistManga.isAdult ? "Yes" : "No",
-            title: "Is Adult"
-          })
-        ]),
-        (0, import_types2.Section)({ id: "mangaNotes", header: "Notes" }, [
-          (0, import_types2.InputRow)("notes", {
-            title: "Notes",
-            value: this.anilistManga.mediaListEntry?.notes ?? "",
-            onValueChange: Application.Selector(
-              this,
-              //@ts-ignore
-              "updateNotes"
-            )
-          })
-        ]),
-        (0, import_types2.Section)(
-          {
-            id: "trackStatus",
-            header: "Manga Status",
-            footer: "Warning: Setting this to NONE will delete the listing from Anilist"
-          },
-          [
-            (0, import_types2.SelectRow)("status", {
-              value: this.anilistManga.mediaListEntry?.status ? [this.anilistManga.mediaListEntry.status] : ["Reading"],
-              title: "Status",
-              onValueChange: Application.Selector(
-                this,
-                //@ts-ignore
-                "statusDidChange"
-              ),
-              minItemCount: 0,
-              maxItemCount: 1,
-              options: [
-                { id: "NONE", title: "NONE" },
-                {
-                  id: "CURRENT",
-                  title: "Reading"
-                },
-                {
-                  id: "PLANNING",
-                  title: "Planned"
-                },
-                {
-                  id: "COMPLETED",
-                  title: "Completed"
-                },
-                {
-                  id: "DROPPED",
-                  title: "Dropped"
-                },
-                {
-                  id: "PAUSED",
-                  title: "On-Hold"
-                },
-                {
-                  id: "REPEATING",
-                  title: "Re-Reading"
-                }
-              ]
-            })
-          ]
-        ),
-        (0, import_types2.Section)({ id: "manage", header: "Progress" }, []),
-        (0, import_types2.Section)(
-          {
-            id: "rateSection",
-            header: "Rating",
-            footer: "This uses your rating preference set on AniList"
-          },
-          []
-        ),
-        (0, import_types2.Section)({ id: "privacy_settings", header: "Privacy Settings" }, [
-          (0, import_types2.ToggleRow)("private", {
-            title: "Private",
-            //@ts-ignore
-            value: this.anilistManga.mediaListEntry?.private != void 0 ? this.anilistManga.mediaListEntry.private : false,
-            onValueChange: Application.Selector(
-              this,
-              //@ts-ignore
-              "changePrivacy"
-            )
-          }),
-          (0, import_types2.ToggleRow)("hiddenFromStatusLists", {
-            title: "Hide From Status List",
-            //@ts-ignore
-            value: this.anilistManga.mediaListEntry?.hiddenFromStatusLists != void 0 ? this.anilistManga.mediaListEntry.hiddenFromStatusLists : false,
-            onValueChange: Application.Selector(
-              this,
-              //@ts-ignore
-              "hideFromStatusLists"
-            )
-          })
         ])
       ];
     }
@@ -3538,7 +3417,6 @@ query($id: Int) {
       );
       const mangaDetails = json.data.Media;
       if (!mangaDetails?.mediaListEntry) {
-        throw new Error(JSON.stringify(mangaDetails));
         return void 0;
       }
       const sourceId = "Anilist";
