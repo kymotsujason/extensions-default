@@ -3147,7 +3147,7 @@ query($id: Int) {
           })
         ]),
         (0, import_types2.Section)("Manga Information", [
-          ...this.anilistManga.mediaListEntry != void 0 ? [
+          ...this.anilistManga.mediaListEntry != null ? [
             (0, import_types2.LabelRow)("id", {
               title: "Entry ID",
               value: this.anilistManga.mediaListEntry?.id?.toString()
@@ -3189,53 +3189,6 @@ query($id: Int) {
             )
           })
         ]),
-        (0, import_types2.Section)(
-          {
-            id: "trackStatus",
-            header: "Manga Status",
-            footer: "Warning: Setting this to NONE will delete the listing from Anilist"
-          },
-          [
-            (0, import_types2.SelectRow)("status", {
-              value: ["Reading"],
-              title: "Status",
-              onValueChange: Application.Selector(
-                this,
-                //@ts-ignore
-                "statusDidChange"
-              ),
-              minItemCount: 0,
-              maxItemCount: 1,
-              options: [
-                { id: "NONE", title: "NONE" },
-                {
-                  id: "CURRENT",
-                  title: "Reading"
-                },
-                {
-                  id: "PLANNING",
-                  title: "Planned"
-                },
-                {
-                  id: "COMPLETED",
-                  title: "Completed"
-                },
-                {
-                  id: "DROPPED",
-                  title: "Dropped"
-                },
-                {
-                  id: "PAUSED",
-                  title: "On-Hold"
-                },
-                {
-                  id: "REPEATING",
-                  title: "Re-Reading"
-                }
-              ]
-            })
-          ]
-        ),
         (0, import_types2.Section)({ id: "manage", header: "Progress" }, []),
         (0, import_types2.Section)(
           {
@@ -3249,7 +3202,7 @@ query($id: Int) {
           (0, import_types2.ToggleRow)("private", {
             title: "Private",
             //@ts-ignore
-            value: false,
+            value: this.anilistManga.mediaListEntry?.private != void 0 ? this.anilistManga.mediaListEntry.private : false,
             onValueChange: Application.Selector(
               this,
               //@ts-ignore
@@ -3259,7 +3212,7 @@ query($id: Int) {
           (0, import_types2.ToggleRow)("hiddenFromStatusLists", {
             title: "Hide From Status List",
             //@ts-ignore
-            value: false,
+            value: this.anilistManga.mediaListEntry?.hiddenFromStatusLists != void 0 ? this.anilistManga.mediaListEntry.hiddenFromStatusLists : false,
             onValueChange: Application.Selector(
               this,
               //@ts-ignore
