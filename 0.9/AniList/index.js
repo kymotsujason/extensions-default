@@ -3197,7 +3197,7 @@ query($id: Int) {
           },
           [
             (0, import_types2.SelectRow)("status", {
-              value: this.anilistManga.mediaListEntry?.status ? [this.anilistManga.mediaListEntry.status] : ["Reading"],
+              value: ["Reading"],
               title: "Status",
               onValueChange: Application.Selector(
                 this,
