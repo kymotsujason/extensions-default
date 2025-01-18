@@ -3148,7 +3148,7 @@ query($id: Int) {
           (0, import_types3.OAuthButtonRow)("oAuthButton", {
             title: "Login with Anilist",
             authorizeEndpoint: "https://anilist.co/api/v2/oauth/authorize",
-            clientId: "paperback",
+            clientId: "5459",
             responseType: {
               type: "token"
             },
