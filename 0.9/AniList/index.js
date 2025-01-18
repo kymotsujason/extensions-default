@@ -3366,6 +3366,9 @@ query($id: Int) {
       };
     }
     async getMangaProgressManagementForm(sourceMangaInfo) {
+      throw new Error(
+        `Issssue ${Application.getState("ratings")}`
+      );
       return new SourceForm(sourceMangaInfo);
     }
     async makeRequest(query, QueryVariables, search) {
