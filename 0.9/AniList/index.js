@@ -3541,7 +3541,6 @@ query($id: Int) {
         throw new Error(JSON.stringify(mangaDetails));
         return void 0;
       }
-      throw new Error("Not implemented");
       const sourceId = "Anilist";
       const mangaId = sourceMangaInfo.mangaId;
       const lastReadChapterNumber = mangaDetails.mediaListEntry.progress ?? 0;
@@ -3549,6 +3548,7 @@ query($id: Int) {
       const trackedListName = mangaDetails.mediaListEntry.status;
       const lastReadTime = void 0;
       const userRating = mangaDetails.mediaListEntry.score;
+      throw new Error("Not implemented");
       return {
         sourceId,
         mangaId,
