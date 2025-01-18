@@ -3538,6 +3538,7 @@ query($id: Int) {
       );
       const mangaDetails = json.data.Media;
       if (!mangaDetails?.mediaListEntry) {
+        throw new Error(JSON.stringify(mangaDetails));
         return void 0;
       }
       const sourceId = "Anilist";
