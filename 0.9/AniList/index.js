@@ -3529,7 +3529,6 @@ query($id: Int) {
       };
     }
     async getMangaProgress(sourceMangaInfo) {
-      throw new Error("Not implemented");
       const variables = {
         id: +sourceMangaInfo.mangaId
       };
@@ -3542,6 +3541,7 @@ query($id: Int) {
         throw new Error(JSON.stringify(mangaDetails));
         return void 0;
       }
+      throw new Error("Not implemented");
       const sourceId = "Anilist";
       const mangaId = sourceMangaInfo.mangaId;
       const lastReadChapterNumber = mangaDetails.mediaListEntry.progress ?? 0;
