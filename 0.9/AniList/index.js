@@ -3006,7 +3006,7 @@ query($id: Int) {
       return Application.setState(void 0, "userInfo");
     }
     const response = await makeRequest(userProfileQuery);
-    const userInfo = AnilistResult(response.data).data?.Viewer;
+    const userInfo = response.data.Viewer;
     Application.setState(userInfo, "userInfo");
   }
   var SettingsForm = class extends import_types.Form {
@@ -3294,21 +3294,6 @@ query($id: Int) {
     }
   };
 
-  // src/AniList/anilist-result.ts
-  init_buffer();
-  function AnilistResult2(json) {
-    const result = typeof json == "string" ? JSON.parse(json) : json;
-    if (result.errors?.length ?? 0 > 0) {
-      result.errors?.map((error) => {
-        console.log(`[ANILIST-ERROR(${error.status})] ${error.message}`);
-      });
-      throw new Error(
-        "Error while fetching data from Anilist, check logs for more info"
-      );
-    }
-    return result;
-  }
-
   // src/AniList/main.ts
   var AniListInterceptor = class extends import_types3.PaperbackInterceptor {
     async interceptRequest(request) {
@@ -3529,13 +3514,7 @@ query($id: Int) {
       };
     }
     async getMangaProgress(sourceMangaInfo) {
-      const accessToken = getAccessToken();
-      if (accessToken == void 0) {
-        throw new Error("access token not found");
-      }
-      const response = await makeRequest(userProfileQuery);
-      const userInfo = response.data.Viewer;
-      throw new Error(JSON.stringify(userInfo));
+      throw new Error(JSON.stringify(sourceMangaInfo));
       const variables = {
         id: +sourceMangaInfo.mangaId
       };
@@ -3575,10 +3554,7 @@ query($id: Int) {
           mangaProgressQuery,
           variables
         );
-        const anilistManga = AnilistResult2(
-          // @ts-ignore
-          response.data
-        ).data?.Media;
+        const anilistManga = response.data.data.Media;
         if (!anilistManga?.mediaListEntry) {
           return void 0;
         } else {
