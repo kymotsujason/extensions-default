@@ -2788,8 +2788,8 @@ var source = (() => {
   // src/Anilist/main.ts
   var main_exports = {};
   __export(main_exports, {
-    AniList: () => AniList,
-    AniListExtension: () => AniListExtension
+    AniListExtension: () => AniListExtension,
+    Anilist: () => Anilist
   });
   init_buffer();
   var import_types3 = __toESM(require_lib());
@@ -3793,7 +3793,7 @@ query($id: Int) {
       }
     }
   };
-  var AniList = new AniListExtension();
+  var Anilist = new AniListExtension();
   return __toCommonJS(main_exports);
 })();
 /*! Bundled license information:
