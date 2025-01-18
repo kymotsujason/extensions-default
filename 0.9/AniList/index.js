@@ -3001,8 +3001,8 @@ query($id: Int) {
     return getUserInfo() != null;
   }
   async function refreshUserInfo() {
-    const accessToken = getUserInfo();
-    if (accessToken == null) {
+    const accessToken = getAccessToken();
+    if (accessToken == void 0) {
       return Application.setSecureState(void 0, "userInfo");
     }
     const response = await makeRequest(userProfileQuery);
