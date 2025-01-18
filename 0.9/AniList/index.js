@@ -3186,11 +3186,7 @@ query($id: Int) {
           },
           [
             (0, import_types2.SelectRow)("status", {
-              value: this.anilistManga.mediaListEntry?.status ? [
-                this.formatStatus(
-                  this.anilistManga.mediaListEntry.status
-                )
-              ] : ["Reading"],
+              value: this.anilistManga.mediaListEntry?.status ? [this.anilistManga.mediaListEntry.status] : ["Reading"],
               title: "Status",
               onValueChange: Application.Selector(
                 this,
@@ -3200,30 +3196,30 @@ query($id: Int) {
               minItemCount: 0,
               maxItemCount: 1,
               options: [
-                { id: "none", title: this.formatStatus("NONE") },
+                { id: "NONE", title: "NONE" },
                 {
-                  id: "current",
-                  title: this.formatStatus("CURRENT")
+                  id: "CURRENT",
+                  title: "Reading"
                 },
                 {
-                  id: "planning",
-                  title: this.formatStatus("PLANNING")
+                  id: "PLANNING",
+                  title: "Planned"
                 },
                 {
-                  id: "completed",
-                  title: this.formatStatus("COMPLETED")
+                  id: "COMPLETED",
+                  title: "Completed"
                 },
                 {
-                  id: "dropped",
-                  title: this.formatStatus("DROPPED")
+                  id: "DROPPED",
+                  title: "Dropped"
                 },
                 {
-                  id: "paused",
-                  title: this.formatStatus("PAUSED")
+                  id: "PAUSED",
+                  title: "On-Hold"
                 },
                 {
-                  id: "repeating",
-                  title: this.formatStatus("REPEATING")
+                  id: "REPEATING",
+                  title: "Re-Reading"
                 }
               ]
             })
