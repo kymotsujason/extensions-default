@@ -3178,6 +3178,17 @@ query($id: Int) {
             title: "Is Adult"
           })
         ]),
+        (0, import_types2.Section)({ id: "mangaNotes", header: "Notes" }, [
+          (0, import_types2.InputRow)("notes", {
+            title: "Notes",
+            value: this.anilistManga.mediaListEntry?.notes ?? "",
+            onValueChange: Application.Selector(
+              this,
+              //@ts-ignore
+              "updateNotes"
+            )
+          })
+        ]),
         (0, import_types2.Section)(
           {
             id: "trackStatus",
@@ -3253,17 +3264,6 @@ query($id: Int) {
               this,
               //@ts-ignore
               "hideFromStatusLists"
-            )
-          })
-        ]),
-        (0, import_types2.Section)({ id: "mangaNotes", header: "Notes" }, [
-          (0, import_types2.InputRow)("notes", {
-            title: "Notes",
-            value: this.anilistManga.mediaListEntry?.notes ?? "",
-            onValueChange: Application.Selector(
-              this,
-              //@ts-ignore
-              "updateNotes"
             )
           })
         ])
