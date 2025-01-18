@@ -3547,7 +3547,6 @@ query($id: Int) {
       const lastReadVolumeNumber = mangaDetails.mediaListEntry.progressVolumes;
       const trackedListName = mangaDetails.mediaListEntry.status;
       const userRating = mangaDetails.mediaListEntry.score;
-      throw new Error(JSON.stringify(mangaDetails));
       return {
         sourceId,
         mangaId,
