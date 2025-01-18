@@ -3248,7 +3248,7 @@ query($id: Int) {
           (0, import_types2.ToggleRow)("hiddenFromStatusLists", {
             title: "Hide From Status List",
             //@ts-ignore
-            value: this.anilistManga.mediaListEntry?.hiddenFromStatusLists != void 0 ? this.anilistManga.mediaListEntry : false,
+            value: this.anilistManga.mediaListEntry?.hiddenFromStatusLists != void 0 ? this.anilistManga.mediaListEntry.hiddenFromStatusLists : false,
             onValueChange: Application.Selector(
               this,
               //@ts-ignore
