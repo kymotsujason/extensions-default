@@ -3547,7 +3547,15 @@ query($id: Int) {
       const lastReadVolumeNumber = mangaDetails.mediaListEntry.progressVolumes;
       const trackedListName = mangaDetails.mediaListEntry.status;
       const userRating = mangaDetails.mediaListEntry.score;
-      return sourceMangaInfo;
+      return {
+        sourceId,
+        mangaId,
+        lastReadChapterNumber,
+        lastReadVolumeNumber,
+        trackedListName,
+        //lastReadTime,
+        userRating
+      };
     }
     async getMangaProgressManagementForm(sourceMangaInfo) {
       if (!isLoggedIn()) {
@@ -3561,11 +3569,7 @@ query($id: Int) {
           variables
         );
         const anilistManga = response.data.Media;
-        if (!anilistManga?.mediaListEntry) {
-          return void 0;
-        } else {
-          return new SourceForm(anilistManga);
-        }
+        return new SourceForm(anilistManga);
       }
     }
   };
