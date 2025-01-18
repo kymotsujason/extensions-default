@@ -3170,7 +3170,7 @@ query($id: Int) {
             title: "Rating"
           }),
           (0, import_types2.LabelRow)("mangaStatus", {
-            value: this.formatStatus(this.anilistManga.status),
+            value: this.anilistManga.status,
             title: "Status"
           }),
           (0, import_types2.LabelRow)("mangaIsAdult", {
