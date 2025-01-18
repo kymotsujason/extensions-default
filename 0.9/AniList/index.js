@@ -3242,7 +3242,6 @@ query($id: Int) {
   };
   var AniListExtension = class {
     constructor() {
-      this.stateManager = App.createSourceStateManager();
       this.mainRateLimiter = new import_types4.BasicRateLimiter("main", {
         numberOfRequests: 15,
         bufferInterval: 10,
@@ -3250,12 +3249,10 @@ query($id: Int) {
       });
       this.accessToken = {
         get: async () => {
-          return this.stateManager.keychain.retrieve(
-            "access_token"
-          );
+          return Application.getState("access_token");
         },
         set: async (token) => {
-          await this.stateManager.keychain.store("access_token", token);
+          Application.setState(token, "access_token");
           await this.userInfo.refresh();
         },
         isValid: async () => {
@@ -3264,7 +3261,7 @@ query($id: Int) {
       };
       this.userInfo = {
         get: async () => {
-          return this.stateManager.retrieve("userInfo");
+          return Application.getState("userInfo");
         },
         isLoggedIn: async () => {
           return await this.userInfo.get() != null;
@@ -3272,11 +3269,11 @@ query($id: Int) {
         refresh: async () => {
           const accessToken = await this.accessToken.get();
           if (accessToken == null) {
-            return this.stateManager.store("userInfo", void 0);
+            return Application.setState(void 0, "userInfo");
           }
           const response = await this.makeRequest(userProfileQuery);
           const userInfo = AnilistResult(response.data).data?.Viewer;
-          await this.stateManager.store("userInfo", userInfo);
+          Application.setState(userInfo, "userInfo");
         }
       };
       this.mainInterceptor = new AniListInterceptor("main");
