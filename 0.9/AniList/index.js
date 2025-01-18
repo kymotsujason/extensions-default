@@ -3171,7 +3171,6 @@ query($id: Int) {
   var SourceForm = class extends import_types2.Form {
     constructor(anilistManga) {
       super();
-      this.submitted = false;
       this.anilistManga = anilistManga;
     }
     getSections() {
@@ -3304,14 +3303,7 @@ query($id: Int) {
           })
         ]),
         (0, import_types2.Section)("submit", [
-          this.submitted ? (0, import_types2.ButtonRow)("submitButton", {
-            title: "Submit",
-            onSelect: Application.Selector(
-              this,
-              //@ts-ignore
-              "submit"
-            )
-          }) : (0, import_types2.ButtonRow)("submitButton", {
+          (0, import_types2.ButtonRow)("submitButton", {
             title: "Submit",
             onSelect: Application.Selector(
               this,
@@ -3332,8 +3324,6 @@ query($id: Int) {
     async updateNotes(value) {
     }
     async submit() {
-      this.submitted = true;
-      this.reloadForm();
     }
     formatStatus(value) {
       switch (value) {
