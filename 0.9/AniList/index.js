@@ -1932,7 +1932,7 @@ var source = (() => {
       init_buffer();
       Object.defineProperty(exports, "__esModule", { value: true });
       exports.Form = void 0;
-      var Form5 = class {
+      var Form4 = class {
         reloadForm() {
           const formId = this["__underlying_formId"];
           if (!formId)
@@ -1940,7 +1940,7 @@ var source = (() => {
           Application.formDidChange(formId);
         }
       };
-      exports.Form = Form5;
+      exports.Form = Form4;
     }
   });
 
@@ -1950,30 +1950,30 @@ var source = (() => {
       "use strict";
       init_buffer();
       Object.defineProperty(exports, "__esModule", { value: true });
-      exports.LabelRow = LabelRow4;
-      exports.InputRow = InputRow4;
-      exports.ToggleRow = ToggleRow4;
+      exports.LabelRow = LabelRow3;
+      exports.InputRow = InputRow3;
+      exports.ToggleRow = ToggleRow3;
       exports.SelectRow = SelectRow;
-      exports.ButtonRow = ButtonRow4;
-      exports.NavigationRow = NavigationRow4;
+      exports.ButtonRow = ButtonRow3;
+      exports.NavigationRow = NavigationRow3;
       exports.OAuthButtonRow = OAuthButtonRow2;
-      exports.DeferredItem = DeferredItem;
-      function LabelRow4(id, props) {
+      exports.DeferredItem = DeferredItem2;
+      function LabelRow3(id, props) {
         return { ...props, id, type: "labelRow", isHidden: props.isHidden ?? false };
       }
-      function InputRow4(id, props) {
+      function InputRow3(id, props) {
         return { ...props, id, type: "inputRow", isHidden: props.isHidden ?? false };
       }
-      function ToggleRow4(id, props) {
+      function ToggleRow3(id, props) {
         return { ...props, id, type: "toggleRow", isHidden: props.isHidden ?? false };
       }
       function SelectRow(id, props) {
         return { ...props, id, type: "selectRow", isHidden: props.isHidden ?? false };
       }
-      function ButtonRow4(id, props) {
+      function ButtonRow3(id, props) {
         return { ...props, id, type: "buttonRow", isHidden: props.isHidden ?? false };
       }
-      function NavigationRow4(id, props) {
+      function NavigationRow3(id, props) {
         return {
           ...props,
           id,
@@ -1989,7 +1989,7 @@ var source = (() => {
           isHidden: props.isHidden ?? false
         };
       }
-      function DeferredItem(work) {
+      function DeferredItem2(work) {
         return work();
       }
     }
@@ -2001,8 +2001,8 @@ var source = (() => {
       "use strict";
       init_buffer();
       Object.defineProperty(exports, "__esModule", { value: true });
-      exports.Section = Section4;
-      function Section4(params, items) {
+      exports.Section = Section3;
+      function Section3(params, items) {
         let info;
         if (typeof params === "string") {
           info = { id: params };
@@ -2792,7 +2792,7 @@ var source = (() => {
     AniListExtension: () => AniListExtension
   });
   init_buffer();
-  var import_types4 = __toESM(require_lib());
+  var import_types3 = __toESM(require_lib());
 
   // src/AniList/GraphQLQueries.ts
   init_buffer();
@@ -2946,23 +2946,43 @@ query($id: Int) {
             status
         }
     }`;
-  var userProfileQuery = `{
-        Viewer {
-            id
-            name
-            avatar {
-                large
-            }
-            mediaListOptions {
-                scoreFormat
-            }
-            siteUrl
-        }
-    }`;
 
   // src/AniList/SettingsForm.ts
   init_buffer();
   var import_types = __toESM(require_lib());
+  var GRAPHQL_ENDPOINT = "https://graphql.anilist.co";
+  function getAccessToken() {
+    const accessToken = Application.getSecureState("access_token");
+    if (!accessToken)
+      return void 0;
+    return {
+      accessToken,
+      tokenBody: parseAccessToken(accessToken)
+    };
+  }
+  function saveAccessToken(accessToken) {
+    Application.setSecureState(accessToken, "access_token");
+    if (!accessToken)
+      return void 0;
+    return {
+      accessToken,
+      tokenBody: parseAccessToken(accessToken)
+    };
+  }
+  function parseAccessToken(accessToken) {
+    if (!accessToken)
+      return void 0;
+    const tokenBodyBase64 = accessToken.split(".")[1];
+    if (!tokenBodyBase64)
+      return void 0;
+    const tokenBodyJSON = Buffer2.from(tokenBodyBase64, "base64").toString(
+      "ascii"
+    );
+    return JSON.parse(tokenBodyJSON);
+  }
+  function getUserInfo() {
+    return Application.getState("userInfo");
+  }
   var SettingsForm = class extends import_types.Form {
     getSections() {
       return [
@@ -2971,8 +2991,73 @@ query($id: Int) {
             title: "SourceUI Playground",
             form: new SourceUIPlaygroundForm()
           })
+        ]),
+        (0, import_types.Section)("oAuthSection", [
+          (0, import_types.DeferredItem)(() => {
+            if (getAccessToken()) {
+              return (0, import_types.NavigationRow)("sessionInfo", {
+                title: "Session Info",
+                form: new class extends import_types.Form {
+                  getSections() {
+                    const accessToken = getAccessToken();
+                    if (!accessToken)
+                      return [
+                        (0, import_types.Section)("introspect", [
+                          (0, import_types.LabelRow)("logged_out", {
+                            title: "LOGGED OUT"
+                          })
+                        ])
+                      ];
+                    return [
+                      (0, import_types.Section)(
+                        "introspect",
+                        Object.keys(
+                          accessToken.tokenBody
+                        ).map((key) => {
+                          return (0, import_types.LabelRow)(key, {
+                            title: key,
+                            value: `${accessToken.tokenBody[key]}`
+                          });
+                        })
+                      ),
+                      (0, import_types.Section)("logout", [
+                        (0, import_types.ButtonRow)("logout", {
+                          title: "Logout",
+                          onSelect: Application.Selector(
+                            this,
+                            // @ts-expect-error
+                            "logout"
+                          )
+                        })
+                      ])
+                    ];
+                  }
+                  async logout() {
+                    saveAccessToken(void 0);
+                    this.reloadForm();
+                  }
+                }()
+              });
+            } else {
+              return (0, import_types.OAuthButtonRow)("oAuthButton", {
+                title: "Login with Anilist",
+                authorizeEndpoint: "https://anilist.co/api/v2/oauth/authorize",
+                clientId: "5459",
+                responseType: {
+                  type: "token"
+                },
+                onSuccess: Application.Selector(
+                  this,
+                  "oauthDidSucceed"
+                )
+              });
+            }
+          })
         ])
       ];
+    }
+    async oauthDidSucceed(value) {
+      saveAccessToken(value);
     }
   };
   var State = class {
@@ -3042,6 +3127,41 @@ query($id: Int) {
       this.reloadForm();
     }
   };
+  async function makeRequest(query, QueryVariables, search) {
+    const accessToken = getAccessToken()?.accessToken;
+    const request = {
+      url: GRAPHQL_ENDPOINT,
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        ...accessToken != null ? {
+          authorization: `Bearer ${accessToken}`
+        } : {}
+      },
+      body: JSON.stringify({
+        query,
+        variables: QueryVariables
+      })
+    };
+    const [_, buffer] = await Application.scheduleRequest(request);
+    const data = Application.arrayBufferToUTF8String(buffer);
+    const json = JSON.parse(data);
+    if (json == void 0) {
+      throw new Error(
+        `Failed to parse JSON for the ${typeof search === void 0 ? "title" : typeof search === "string" ? 'given search "' + search + '"' : "section " + search}: ${json}`
+      );
+    } else if (typeof json === "object" && json != null && "errors" in json && json.errors != null && Array.isArray(json.errors)) {
+      for (const error of json.errors) {
+        if (typeof error === "object" && error != null && "status" in error && error.status != null && "message" in error && error.message != null) {
+          throw new Error(
+            `AniList returned an error: [${error.status}] ${error.message}`
+          );
+        }
+      }
+    }
+    return json;
+  }
 
   // src/AniList/SourceForm.ts
   init_buffer();
@@ -3134,109 +3254,9 @@ query($id: Int) {
     }
   };
 
-  // src/AniList/LoginForm.ts
-  init_buffer();
-  var import_types3 = __toESM(require_lib());
-  var LoginForm = class extends import_types3.Form {
-    getSections() {
-      return [
-        (0, import_types3.Section)("playground", [
-          (0, import_types3.NavigationRow)("playground", {
-            title: "SourceUI Playground",
-            form: new SourceUIPlaygroundForm3()
-          })
-        ]),
-        (0, import_types3.Section)("oAuthSection", [
-          (0, import_types3.OAuthButtonRow)("oAuthButton", {
-            title: "Login with Anilist",
-            authorizeEndpoint: "https://anilist.co/api/v2/oauth/authorize",
-            clientId: "5459",
-            responseType: {
-              type: "token"
-            },
-            onSuccess: Application.Selector(
-              this,
-              "oauthDidSucceed"
-            )
-          })
-        ])
-      ];
-    }
-    async oauthDidSucceed(value) {
-      throw new Error(value);
-    }
-  };
-  var State3 = class {
-    constructor(form, value) {
-      this.form = form;
-      this._value = value;
-    }
-    get value() {
-      return this._value;
-    }
-    get selector() {
-      return Application.Selector(this, "updateValue");
-    }
-    async updateValue(value) {
-      this._value = value;
-      this.form.reloadForm();
-    }
-  };
-  var SourceUIPlaygroundForm3 = class extends import_types3.Form {
-    constructor() {
-      super(...arguments);
-      this.inputValue = new State3(this, "");
-      this.rowsVisible = new State3(this, false);
-      this.items = [];
-    }
-    getSections() {
-      return [
-        (0, import_types3.Section)("hideStuff", [
-          (0, import_types3.ToggleRow)("toggle", {
-            title: "Toggles can hide rows",
-            value: this.rowsVisible.value,
-            onValueChange: this.rowsVisible.selector
-          })
-        ]),
-        ...(() => this.rowsVisible.value ? [
-          (0, import_types3.Section)("hiddenSection", [
-            (0, import_types3.InputRow)("input", {
-              title: "Dynamic Input",
-              value: this.inputValue.value,
-              onValueChange: this.inputValue.selector
-            }),
-            (0, import_types3.LabelRow)("boundLabel", {
-              title: "Bound label to input",
-              subtitle: "This label updates with the input",
-              value: this.inputValue.value
-            })
-          ]),
-          (0, import_types3.Section)("items", [
-            ...this.items.map(
-              (item) => (0, import_types3.LabelRow)(item, {
-                title: item
-              })
-            ),
-            (0, import_types3.ButtonRow)("addNewItem", {
-              title: "Add New Item",
-              onSelect: Application.Selector(
-                this,
-                "addNewItem"
-              )
-            })
-          ])
-        ] : [])()
-      ];
-    }
-    async addNewItem() {
-      this.items.push("Item " + (this.items.length + 1));
-      this.reloadForm();
-    }
-  };
-
   // src/AniList/anilist-result.ts
   init_buffer();
-  function AnilistResult(json) {
+  function AnilistResult2(json) {
     const result = typeof json == "string" ? JSON.parse(json) : json;
     if (result.errors?.length ?? 0 > 0) {
       result.errors?.map((error) => {
@@ -3250,8 +3270,7 @@ query($id: Int) {
   }
 
   // src/AniList/main.ts
-  var GRAPHQL_ENDPOINT = "https://graphql.anilist.co";
-  var AniListInterceptor = class extends import_types4.PaperbackInterceptor {
+  var AniListInterceptor = class extends import_types3.PaperbackInterceptor {
     async interceptRequest(request) {
       return request;
     }
@@ -3261,40 +3280,11 @@ query($id: Int) {
   };
   var AniListExtension = class {
     constructor() {
-      this.mainRateLimiter = new import_types4.BasicRateLimiter("main", {
+      this.mainRateLimiter = new import_types3.BasicRateLimiter("main", {
         numberOfRequests: 15,
         bufferInterval: 10,
         ignoreImages: true
       });
-      this.accessToken = {
-        get: async () => {
-          return Application.getState("access_token");
-        },
-        set: async (token) => {
-          Application.setState(token, "access_token");
-          await this.userInfo.refresh();
-        },
-        isValid: async () => {
-          return await this.accessToken.get() != null;
-        }
-      };
-      this.userInfo = {
-        get: async () => {
-          return Application.getState("userInfo");
-        },
-        isLoggedIn: async () => {
-          return await this.userInfo.get() != null;
-        },
-        refresh: async () => {
-          const accessToken = await this.accessToken.get();
-          if (accessToken == null) {
-            return Application.setState(void 0, "userInfo");
-          }
-          const response = await this.makeRequest(userProfileQuery);
-          const userInfo = AnilistResult(response.data).data?.Viewer;
-          Application.setState(userInfo, "userInfo");
-        }
-      };
       this.mainInterceptor = new AniListInterceptor("main");
     }
     async initialise() {
@@ -3320,27 +3310,27 @@ query($id: Int) {
       const trending_now = {
         id: "trending-now",
         title: "Trending Now",
-        type: import_types4.DiscoverSectionType.prominentCarousel
+        type: import_types3.DiscoverSectionType.prominentCarousel
       };
       const all_time_popular = {
         id: "all-time-popular",
         title: "All Time Popular",
-        type: import_types4.DiscoverSectionType.simpleCarousel
+        type: import_types3.DiscoverSectionType.simpleCarousel
       };
       const popular_manga = {
         id: "popular-manga",
         title: "Popular Manga",
-        type: import_types4.DiscoverSectionType.simpleCarousel
+        type: import_types3.DiscoverSectionType.simpleCarousel
       };
       const popular_manhwa = {
         id: "popular-manhwa",
         title: "Popular Manhwa",
-        type: import_types4.DiscoverSectionType.simpleCarousel
+        type: import_types3.DiscoverSectionType.simpleCarousel
       };
       const top_100_manga = {
         id: "top-100-manga",
         title: "Top 100 Manga",
-        type: import_types4.DiscoverSectionType.simpleCarousel
+        type: import_types3.DiscoverSectionType.simpleCarousel
       };
       return [
         trending_now,
@@ -3381,7 +3371,7 @@ query($id: Int) {
     }
     async getItems(query, queryVariables, metadata, search) {
       const items = [];
-      const json = await this.makeRequest(
+      const json = await makeRequest(
         query,
         queryVariables,
         search
@@ -3404,7 +3394,7 @@ query($id: Int) {
       const variables = {
         id: +mangaId
       };
-      const json = await this.makeRequest(
+      const json = await makeRequest(
         titleViewQuery,
         variables
       );
@@ -3478,7 +3468,7 @@ query($id: Int) {
         { id: "genres", title: "Genres", tags: genres },
         { id: "tags", title: "Tags", tags }
       ];
-      const contentRating = mangaDetails.isAdult ? import_types4.ContentRating.ADULT : genres.some((e) => e.id === "ecchi") ? import_types4.ContentRating.MATURE : import_types4.ContentRating.EVERYONE;
+      const contentRating = mangaDetails.isAdult ? import_types3.ContentRating.ADULT : genres.some((e) => e.id === "ecchi") ? import_types3.ContentRating.MATURE : import_types3.ContentRating.EVERYONE;
       const artworkUrls = [thumbnailUrl];
       return {
         mangaId,
@@ -3502,7 +3492,7 @@ query($id: Int) {
       const variables = {
         id: +sourceMangaInfo.mangaId
       };
-      const json = await this.makeRequest(
+      const json = await makeRequest(
         mangaProgressQuery,
         variables
       );
@@ -3528,18 +3518,18 @@ query($id: Int) {
       };
     }
     async getMangaProgressManagementForm(sourceMangaInfo) {
-      const user = await this.userInfo.get();
+      const user = getUserInfo();
       if (user == null) {
-        return new LoginForm();
+        return this.getSettingsForm();
       } else {
         const variables = {
           id: +sourceMangaInfo.mangaId
         };
-        const response = await this.makeRequest(
+        const response = await makeRequest(
           mangaProgressQuery,
           variables
         );
-        const anilistManga = AnilistResult(
+        const anilistManga = AnilistResult2(
           // @ts-ignore
           response.data
         ).data?.Media;
@@ -3549,37 +3539,6 @@ query($id: Int) {
           return new SourceForm(anilistManga);
         }
       }
-    }
-    async makeRequest(query, QueryVariables, search) {
-      const request = {
-        url: GRAPHQL_ENDPOINT,
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json"
-        },
-        body: JSON.stringify({
-          query,
-          variables: QueryVariables
-        })
-      };
-      const [_, buffer] = await Application.scheduleRequest(request);
-      const data = Application.arrayBufferToUTF8String(buffer);
-      const json = JSON.parse(data);
-      if (json == void 0) {
-        throw new Error(
-          `Failed to parse JSON for the ${typeof search === void 0 ? "title" : typeof search === "string" ? 'given search "' + search + '"' : "section " + search}: ${json}`
-        );
-      } else if (typeof json === "object" && json != null && "errors" in json && json.errors != null && Array.isArray(json.errors)) {
-        for (const error of json.errors) {
-          if (typeof error === "object" && error != null && "status" in error && error.status != null && "message" in error && error.message != null) {
-            throw new Error(
-              `AniList returned an error: [${error.status}] ${error.message}`
-            );
-          }
-        }
-      }
-      return json;
     }
   };
   var AniList = new AniListExtension();
