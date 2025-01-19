@@ -3013,9 +3013,9 @@ query($id: Int) {
       tokenBody: parseAccessToken(accessToken)
     };
   }
-  function saveAccessToken(accessToken) {
+  async function saveAccessToken(accessToken) {
     Application.setSecureState(accessToken, "access_token");
-    refreshUserInfo();
+    await refreshUserInfo();
     if (!accessToken)
       return void 0;
     return {
@@ -3038,15 +3038,16 @@ query($id: Int) {
     return Application.getState("userInfo");
   }
   function isLoggedIn() {
-    return getUserInfo() != void 0;
+    return getUserInfo() !== void 0;
   }
   async function refreshUserInfo() {
     const accessToken = getAccessToken();
-    if (accessToken == void 0) {
-      return Application.setState(void 0, "userInfo");
+    if (accessToken === void 0) {
+      Application.setState(void 0, "userInfo");
+      return;
     }
     const response = await makeRequest(userProfileQuery);
-    const userInfo = response.data.Viewer;
+    const userInfo = response?.data?.Viewer;
     Application.setState(userInfo, "userInfo");
   }
   var SettingsForm = class extends import_types.Form {
@@ -3057,77 +3058,7 @@ query($id: Int) {
             if (getAccessToken()) {
               return (0, import_types.NavigationRow)("sessionInfo", {
                 title: "Session Info",
-                form: new class extends import_types.Form {
-                  getSections() {
-                    const accessToken = getAccessToken();
-                    const userInfo = getUserInfo();
-                    if (!accessToken)
-                      return [
-                        (0, import_types.Section)("introspect", [
-                          (0, import_types.LabelRow)("logged_out", {
-                            title: "LOGGED OUT"
-                          })
-                        ])
-                      ];
-                    return [
-                      (0, import_types.Section)(
-                        "introspect",
-                        Object.keys(
-                          accessToken.tokenBody
-                        ).map((key) => {
-                          return (0, import_types.LabelRow)(key, {
-                            title: key,
-                            value: `${accessToken.tokenBody[key]}`
-                          });
-                        })
-                      ),
-                      (0, import_types.Section)("userinfo", [
-                        (0, import_types.LabelRow)("trackertest", {
-                          title: "Tracker Test",
-                          value: `${Application.getState(
-                            "trackerTest"
-                          )}`
-                        }),
-                        (0, import_types.LabelRow)("id", {
-                          title: "ID",
-                          value: `${userInfo?.id}`
-                        }),
-                        (0, import_types.LabelRow)("name", {
-                          title: "Name",
-                          value: `${userInfo?.name}`
-                        })
-                      ]),
-                      (0, import_types.Section)("refresh", [
-                        (0, import_types.ButtonRow)("refresh", {
-                          title: "Refresh User Info",
-                          onSelect: Application.Selector(
-                            this,
-                            // @ts-expect-error
-                            "refresh"
-                          )
-                        })
-                      ]),
-                      (0, import_types.Section)("logout", [
-                        (0, import_types.ButtonRow)("logout", {
-                          title: "Logout",
-                          onSelect: Application.Selector(
-                            this,
-                            // @ts-expect-error
-                            "logout"
-                          )
-                        })
-                      ])
-                    ];
-                  }
-                  async logout() {
-                    saveAccessToken(void 0);
-                    this.reloadForm();
-                  }
-                  async refresh() {
-                    await refreshUserInfo();
-                    this.reloadForm();
-                  }
-                }()
+                form: new SessionInfoForm()
               });
             } else {
               return (0, import_types.OAuthButtonRow)("oAuthButton", {
@@ -3139,6 +3070,7 @@ query($id: Int) {
                 },
                 onSuccess: Application.Selector(
                   this,
+                  // @ts-expect-error
                   "oauthDidSucceed"
                 )
               });
@@ -3148,10 +3080,69 @@ query($id: Int) {
       ];
     }
     async oauthDidSucceed(value) {
-      saveAccessToken(value);
+      await saveAccessToken(value);
+      this.reloadForm();
     }
   };
-  async function makeRequest(query, QueryVariables, search) {
+  var SessionInfoForm = class extends import_types.Form {
+    getSections() {
+      const accessToken = getAccessToken();
+      const userInfo = getUserInfo();
+      if (!accessToken) {
+        return [
+          (0, import_types.Section)("introspect", [
+            (0, import_types.LabelRow)("logged_out", {
+              title: "LOGGED OUT"
+            })
+          ])
+        ];
+      }
+      return [
+        (0, import_types.Section)(
+          "introspect",
+          Object.keys(accessToken.tokenBody).map((key) => {
+            return (0, import_types.LabelRow)(key, {
+              title: key,
+              value: `${accessToken.tokenBody[key]}`
+            });
+          })
+        ),
+        (0, import_types.Section)("userinfo", [
+          (0, import_types.LabelRow)("id", {
+            title: "ID",
+            value: `${userInfo?.id}`
+          }),
+          (0, import_types.LabelRow)("name", {
+            title: "Name",
+            value: `${userInfo?.name}`
+          })
+        ]),
+        (0, import_types.Section)("refresh", [
+          (0, import_types.ButtonRow)("refresh", {
+            title: "Refresh User Info",
+            // @ts-expect-error
+            onSelect: Application.Selector(this, "refresh")
+          })
+        ]),
+        (0, import_types.Section)("logout", [
+          (0, import_types.ButtonRow)("logout", {
+            title: "Logout",
+            // @ts-expect-error
+            onSelect: Application.Selector(this, "logout")
+          })
+        ])
+      ];
+    }
+    async logout() {
+      await saveAccessToken(void 0);
+      this.reloadForm();
+    }
+    async refresh() {
+      await refreshUserInfo();
+      this.reloadForm();
+    }
+  };
+  async function makeRequest(query, variables, search) {
     const accessToken = getAccessToken()?.accessToken;
     const request = {
       url: GRAPHQL_ENDPOINT,
@@ -3159,30 +3150,22 @@ query($id: Int) {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        ...accessToken != null ? {
-          Authorization: `Bearer ${accessToken}`
-        } : {}
+        ...accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
       },
       body: JSON.stringify({
         query,
-        variables: QueryVariables
+        variables
       })
     };
-    const [_, buffer] = await Application.scheduleRequest(request);
+    const [response, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
     const json = JSON.parse(data);
-    if (json == void 0) {
-      throw new Error(
-        `Failed to parse JSON for the ${typeof search === void 0 ? "title" : typeof search === "string" ? 'given search "' + search + '"' : "section " + search}: ${json}`
-      );
-    } else if (typeof json === "object" && json != null && "errors" in json && json.errors != null && Array.isArray(json.errors)) {
-      for (const error of json.errors) {
-        if (typeof error === "object" && error != null && "status" in error && error.status != null && "message" in error && error.message != null) {
-          throw new Error(
-            `AniList returned an error: [${error.status}] ${error.message}`
-          );
-        }
-      }
+    if (!json) {
+      throw new Error("Failed to parse AniList response JSON");
+    } else if (json.errors && Array.isArray(json.errors)) {
+      const errorMessages = json.errors.map((error) => `[${error.status}] ${error.message}`).join("\n");
+      throw new Error(`AniList returned errors:
+${errorMessages}`);
     }
     return json;
   }
