@@ -3174,6 +3174,9 @@ query($id: Int) {
           ]
         ),
         (0, import_types2.Section)({ id: "manage", header: "Progress" }, [
+          (0, import_types2.LabelRow)("progresslabel", {
+            title: "Chapter"
+          }),
           (0, import_types2.InputRow)("progress", {
             title: "Chapter",
             value: (this.anilistManga.mediaListEntry?.progress ?? this.changes.chapter).toString(),
@@ -3183,6 +3186,9 @@ query($id: Int) {
               "updateChapter"
             )
           }),
+          (0, import_types2.LabelRow)("progressVolumeslabel", {
+            title: "Volume"
+          }),
           (0, import_types2.InputRow)("progressVolumes", {
             title: "Volume",
             value: (this.anilistManga.mediaListEntry?.progressVolumes ?? this.changes.volume).toString(),
@@ -3191,6 +3197,9 @@ query($id: Int) {
               //@ts-ignore
               "updateVolume"
             )
+          }),
+          (0, import_types2.LabelRow)("repeatlabel", {
+            title: "Times Re-Read"
           }),
           (0, import_types2.InputRow)("repeat", {
             title: "Times Re-Read",
@@ -3209,6 +3218,9 @@ query($id: Int) {
             footer: "This uses your rating preference set on AniList"
           },
           [
+            (0, import_types2.LabelRow)("scorelabel", {
+              title: "Score"
+            }),
             (0, import_types2.InputRow)("score", {
               title: "Score",
               value: (this.anilistManga.mediaListEntry?.score ?? this.changes.rating).toString(),
