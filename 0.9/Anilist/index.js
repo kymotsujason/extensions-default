@@ -4083,6 +4083,7 @@ query($id: Int) {
       };
     }
     async getMangaProgress(sourceMangaInfo) {
+      await Application.setState("test", "trackerTest");
       const variables = {
         id: +sourceMangaInfo.mangaId
       };
