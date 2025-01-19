@@ -2923,9 +2923,6 @@ query($id: Int) {
     Application.setState(userInfo, "userInfo");
   }
   var SettingsForm = class extends import_types.Form {
-    get requiresExplicitSubmission() {
-      return true;
-    }
     getSections() {
       return [
         (0, import_types.Section)("oAuthSection", [
@@ -3075,6 +3072,9 @@ query($id: Int) {
         rating: "0"
       };
       this.anilistManga = anilistManga;
+    }
+    get requiresExplicitSubmission() {
+      return true;
     }
     getSections() {
       return [
