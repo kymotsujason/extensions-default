@@ -3066,8 +3066,8 @@ query($id: Int) {
         privacy: false,
         hideFromStatus: false,
         notes: "",
-        chapter: "0",
-        volume: "0",
+        chapter: "1",
+        volume: "1",
         read: "0",
         rating: "0"
       };
@@ -4019,7 +4019,7 @@ query($id: Int) {
             anilistMangaCache[readAction.sourceManga.mangaId] = anilistManga;
           }
           if (anilistManga?.mediaListEntry) {
-            if (anilistManga.mediaListEntry.progress != null && anilistManga.mediaListEntry.progress != void 0 && anilistManga.mediaListEntry.progress >= Math.floor(readAction.readChapter.chapNum)) {
+            if (anilistManga.mediaListEntry.progress == void 0 || anilistManga.mediaListEntry.progress >= Math.floor(readAction.readChapter.chapNum)) {
               result.successfulItems.push(readAction.id);
               continue;
             }
