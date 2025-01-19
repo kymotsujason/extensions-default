@@ -3082,6 +3082,12 @@ query($id: Int) {
                         })
                       ),
                       (0, import_types.Section)("userinfo", [
+                        (0, import_types.LabelRow)("asd", {
+                          title: "asd",
+                          value: `${Application.getState(
+                            "trackerTest"
+                          )}`
+                        }),
                         (0, import_types.LabelRow)("id", {
                           title: "ID",
                           value: `${userInfo?.id}`
@@ -4125,10 +4131,11 @@ query($id: Int) {
       const anilistMangaCache = {};
       for (const readAction of chapterReadActions) {
         try {
-          let anilistManga = anilistMangaCache[readAction.sourceMangaId];
+          let anilistManga = anilistMangaCache[readAction.mangaId];
+          Application.setState(JSON.stringify(readAction), "trackerTest");
           if (!anilistManga) {
             const variables = {
-              id: +readAction.sourceMangaId
+              id: +readAction.mangaId
             };
             const _response = await makeRequest(
               getMangaProgressQuery,
@@ -4138,7 +4145,7 @@ query($id: Int) {
               // @ts-ignore
               _response.data
             ).data?.Media;
-            anilistMangaCache[readAction.sourceMangaId] = anilistManga;
+            anilistMangaCache[readAction.mangaId] = anilistManga;
           }
           if (anilistManga?.mediaListEntry) {
             if (anilistManga.mediaListEntry.progress && anilistManga.mediaListEntry.progress >= Math.floor(readAction.chapterNumber)) {
@@ -4149,13 +4156,13 @@ query($id: Int) {
           let params = {};
           if (Math.floor(readAction.chapterNumber) == 1 && !readAction.volumeNumber) {
             params = {
-              mediaId: readAction.sourceMangaId,
+              mediaId: readAction.mangaId,
               progress: 1,
               progressVolumes: 1
             };
           } else {
             params = {
-              mediaId: readAction.sourceMangaId,
+              mediaId: readAction.mangaId,
               progress: Math.floor(readAction.chapterNumber),
               progressVolumes: readAction.volumeNumber ? Math.floor(readAction.volumeNumber) : void 0
             };
@@ -4169,7 +4176,7 @@ query($id: Int) {
             response.data.Media.mediaListEntry != null
           ) {
             await actionQueue.discardChapterReadAction(readAction);
-            anilistMangaCache[readAction.sourceMangaId] = {
+            anilistMangaCache[readAction.mangaId] = {
               mediaListEntry: {
                 progress: Math.floor(readAction.chapterNumber),
                 progressVolumes: readAction.volumeNumber ? Math.floor(readAction.volumeNumber) : void 0
