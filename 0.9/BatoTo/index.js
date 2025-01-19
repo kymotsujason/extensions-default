@@ -25446,7 +25446,7 @@ Type: ${row["type"]}`
 
   // src/BatoTo/main.ts
   var BATO_DOMAIN = "https://batocomic.org";
-  var BatoToExtension = class _BatoToExtension extends import__2.Source {
+  var BatoToExtension = class extends import__2.Source {
     constructor() {
       super(...arguments);
       this.requestManager = App.createRequestManager({
@@ -25569,7 +25569,9 @@ Type: ${row["type"]}`
       let request;
       if (query.title) {
         request = App.createRequest({
-          url: `${BATO_DOMAIN}/search?word=${encodeURI(query.title ?? "")}&page=${page}`,
+          url: `${BATO_DOMAIN}/search?word=${encodeURI(
+            query.title ?? ""
+          )}&page=${page}`,
           method: "GET"
         });
       } else {
@@ -25602,24 +25604,23 @@ Type: ${row["type"]}`
       const $3 = this.cheerio.load(response.data);
       return parseThumbnailUrl($3);
     }
-    CloudFlareError(status) {
-      if (status == 503 || status == 403) {
-        throw new Error(
-          `CLOUDFLARE BYPASS ERROR:
-Please go to the homepage of <${_BatoToExtension.name}> and press the cloud icon.`
-        );
-      }
-    }
-    async getCloudflareBypassRequestAsync() {
-      return App.createRequest({
-        url: BATO_DOMAIN,
-        method: "GET",
-        headers: {
-          referer: `${BATO_DOMAIN}/`,
-          "user-agent": await this.requestManager.getDefaultUserAgent()
-        }
-      });
-    }
+    //   CloudFlareError(status: number): void {
+    //     if (status == 503 || status == 403) {
+    //       throw new Error(
+    //         `CLOUDFLARE BYPASS ERROR:\nPlease go to the homepage of <${BatoToExtension.name}> and press the cloud icon.`,
+    //       );
+    //     }
+    //   }
+    //   async getCloudflareBypassRequestAsync(): Promise<Request> {
+    //     return App.createRequest({
+    //       url: BATO_DOMAIN,
+    //       method: "GET",
+    //       headers: {
+    //         referer: `${BATO_DOMAIN}/`,
+    //         "user-agent": await this.requestManager.getDefaultUserAgent(),
+    //       },
+    //     });
+    //   }
   };
   var BatoTo = (0, import__2.CompatWrapper)(
     { registerHomeSectionsInInitialise: true },

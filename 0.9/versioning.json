@@ -1,5 +1,5 @@
 {
-  "buildTime": "2025-01-19T06:19:55.167Z",
+  "buildTime": "2025-01-19T06:57:35.288Z",
   "builtWith": {
     "toolchain": "1.0.0-alpha.27",
     "types": "1.0.0-alpha.27"
@@ -34,10 +34,6 @@
           "name": "Celarye",
           "website": "https://celarye.dev",
           "github": "https://github.com/Celarye"
-        },
-        {
-          "name": "kymotsujason",
-          "github": "https://github.com/kymotsujason"
         }
       ],
       "id": "Anilist"
@@ -52,15 +48,10 @@
         {
           "name": "Paperback Community",
           "website": "https://github.com/paperback-community"
-        },
-        {
-          "name": "kymotsujason",
-          "website": "https://github.com/kymotsujason"
         }
       ],
       "badges": [],
       "capabilities": [
-        8,
         1,
         4,
         64,
@@ -109,10 +100,6 @@
         {
           "name": "Paperback Community",
           "website": "https://github.com/paperback-community"
-        },
-        {
-          "name": "kymotsujason",
-          "website": "https://github.com/kymotsujason"
         }
       ],
       "badges": [],
@@ -136,15 +123,10 @@
         {
           "name": "Batmeow",
           "website": "https://github.com/Batmeow"
-        },
-        {
-          "name": "kymotsujason",
-          "website": "https://github.com/kymotsujason"
         }
       ],
       "badges": [],
       "capabilities": [
-        8,
         1,
         4,
         64,
@@ -162,15 +144,10 @@
         {
           "name": "Netsky",
           "website": "http://github.com/TheNetsky"
-        },
-        {
-          "name": "kymotsujason",
-          "website": "https://github.com/kymotsujason"
         }
       ],
       "badges": [],
       "capabilities": [
-        8,
         1,
         4,
         64,
