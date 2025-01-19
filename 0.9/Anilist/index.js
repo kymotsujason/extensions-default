@@ -4131,7 +4131,7 @@ query($id: Int) {
       const anilistMangaCache = {};
       for (const readAction of chapterReadActions) {
         await Application.setState(
-          JSON.stringify(readAction),
+          "JSON.stringify(readAction)",
           "trackerTest"
         );
         try {
