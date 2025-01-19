@@ -4077,6 +4077,16 @@ query($id: Int) {
       };
     }
     async getMangaProgress(sourceMangaInfo) {
+      let params = {
+        mediaId: sourceMangaInfo.mangaId,
+        progress: 1,
+        progressVolumes: 1
+      };
+      const response = await makeRequest(
+        saveMangaProgressMutation,
+        params
+      );
+      throw new Error(JSON.stringify(response));
       const variables = {
         id: +sourceMangaInfo.mangaId
       };
