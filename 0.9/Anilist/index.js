@@ -3807,7 +3807,6 @@ query($id: Int) {
           );
           if (
             // @ts-ignore
-            response.status < 400 || // @ts-ignore
             response.data.Media.mediaListEntry != null
           ) {
             await actionQueue.discardChapterReadAction(readAction);
