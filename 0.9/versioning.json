@@ -1,8 +1,8 @@
 {
-  "buildTime": "2025-01-19T09:06:28.039Z",
+  "buildTime": "2025-01-19T11:46:14.571Z",
   "builtWith": {
-    "toolchain": "1.0.0-alpha.27",
-    "types": "1.0.0-alpha.27"
+    "toolchain": "1.0.0-alpha.33",
+    "types": "1.0.0-alpha.33"
   },
   "repository": {
     "description": "An extension repository for Paperback",
