@@ -4130,9 +4130,12 @@ query($id: Int) {
       const chapterReadActions = await actionQueue.queuedChapterReadActions();
       const anilistMangaCache = {};
       for (const readAction of chapterReadActions) {
+        await Application.setState(
+          JSON.stringify(readAction),
+          "trackerTest"
+        );
         try {
           let anilistManga = anilistMangaCache[readAction.mangaId];
-          Application.setState(JSON.stringify(readAction), "trackerTest");
           if (!anilistManga) {
             const variables = {
               id: +readAction.mangaId
