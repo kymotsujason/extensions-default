@@ -4126,16 +4126,15 @@ query($id: Int) {
       }
     }
     async processChapterReadActionQueue(actionQueue) {
-      await Application.setState("is this working1", "trackerTest");
       await refreshUserInfo();
-      await Application.setState("is this working2", "trackerTest");
       const chapterReadActions = await actionQueue.queuedChapterReadActions();
       const anilistMangaCache = {};
+      Object.keys(chapterReadActions).forEach((readAction) => {
+        Application.setState(JSON.stringify(readAction), "trackerTest");
+      });
+      await Application.setState("success finally", "trackerTest");
       for (const readAction of chapterReadActions) {
-        await Application.setState(
-          "JSON.stringify(readAction)",
-          "trackerTest"
-        );
+        await Application.setState("success finally", "trackerTest");
         try {
           let anilistManga = anilistMangaCache[readAction.mangaId];
           if (!anilistManga) {
