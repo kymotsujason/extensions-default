@@ -4019,7 +4019,7 @@ query($id: Int) {
             anilistMangaCache[readAction.sourceManga.mangaId] = anilistManga;
           }
           if (anilistManga?.mediaListEntry) {
-            if (anilistManga.mediaListEntry.progress && anilistManga.mediaListEntry.progress >= Math.floor(readAction.readChapter.chapNum)) {
+            if (anilistManga.mediaListEntry.progress != null && anilistManga.mediaListEntry.progress != void 0 && anilistManga.mediaListEntry.progress >= Math.floor(readAction.readChapter.chapNum)) {
               result.successfulItems.push(readAction.id);
               continue;
             }
@@ -4047,14 +4047,15 @@ query($id: Int) {
             response.data.Media.mediaListEntry != null
           ) {
             result.successfulItems.push(readAction.id);
-            anilistMangaCache[readAction.sourceManga.mangaId] = {
-              mediaListEntry: {
+            if (anilistManga) {
+              anilistManga.mediaListEntry = {
                 progress: Math.floor(
                   readAction.readChapter.chapNum
                 ),
                 progressVolumes: readAction.readChapter.volume ? Math.floor(readAction.readChapter.volume) : void 0
-              }
-            };
+              };
+              anilistMangaCache[readAction.sourceManga.mangaId] = anilistManga;
+            }
           } else {
             result.failedItems.push(readAction.id);
           }
