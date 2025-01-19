@@ -3055,38 +3055,7 @@ query($id: Int) {
         (0, import_types.Section)("oAuthSection", [
           (0, import_types.DeferredItem)(() => {
             if (getAccessToken()) {
-              return (0, import_types.NavigationRow)(
-                "TrackedMangaChapterReadActionObject",
-                {
-                  title: "Tracked Manga Chapter Read Queue",
-                  form: new class extends import_types.Form {
-                    getSections() {
-                      const accessToken = getAccessToken();
-                      if (!accessToken)
-                        return [
-                          (0, import_types.Section)("introspect", [
-                            (0, import_types.LabelRow)("logged_out", {
-                              title: "LOGGED OUT"
-                            })
-                          ])
-                        ];
-                      return [
-                        (0, import_types.Section)(
-                          "introspect",
-                          Object.keys(
-                            accessToken.tokenBody
-                          ).map((key) => {
-                            return (0, import_types.LabelRow)(key, {
-                              title: key,
-                              value: `${accessToken.tokenBody[key]}`
-                            });
-                          })
-                        )
-                      ];
-                    }
-                  }()
-                }
-              ), (0, import_types.NavigationRow)("sessionInfo", {
+              return (0, import_types.NavigationRow)("sessionInfo", {
                 title: "Session Info",
                 form: new class extends import_types.Form {
                   getSections() {
@@ -3123,15 +3092,21 @@ query($id: Int) {
                         }),
                         (0, import_types.LabelRow)("options", {
                           title: "Options",
-                          value: `${userInfo?.options}`
+                          value: `${JSON.stringify(
+                            userInfo?.options
+                          )}`
                         }),
                         (0, import_types.LabelRow)("mediaListOptions", {
                           title: "Media List Options",
-                          value: `${userInfo?.mediaListOptions}`
+                          value: `${JSON.stringify(
+                            userInfo?.mediaListOptions
+                          )}`
                         }),
                         (0, import_types.LabelRow)("avatar", {
                           title: "Avatar",
-                          value: `${userInfo?.avatar}`
+                          value: `${JSON.stringify(
+                            userInfo?.avatar
+                          )}`
                         })
                       ]),
                       (0, import_types.Section)("refresh", [
@@ -3750,6 +3725,7 @@ query($id: Int) {
         mangaProgressQuery,
         variables
       );
+      throw new Error(JSON.stringify(json));
       const mangaDetails = json.data.Media;
       if (!mangaDetails?.mediaListEntry) {
         return void 0;
@@ -3786,7 +3762,7 @@ query($id: Int) {
       }
     }
     async processChapterReadActionQueue(actionQueue) {
-      refreshUserInfo();
+      await refreshUserInfo();
       const chapterReadActions = await actionQueue.queuedChapterReadActions();
       const anilistMangaCache = {};
       for (const readAction of chapterReadActions) {
@@ -3839,15 +3815,9 @@ query($id: Int) {
               }
             };
           } else {
-            throw new Error(
-              `Failed to save progress for manga ${readAction.mangaId}`
-            );
             await actionQueue.retryChapterReadAction(readAction);
           }
         } catch (error) {
-          throw new Error(
-            `Failed to save progress for manga ${readAction.mangaId}`
-          );
           await actionQueue.retryChapterReadAction(readAction);
         }
       }
