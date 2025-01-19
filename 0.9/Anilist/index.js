@@ -4121,6 +4121,9 @@ query($id: Int) {
     }
     async processChapterReadActionQueue(actionQueue) {
       await refreshUserInfo();
+      console.log(
+        "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
+      );
       const chapterReadActions = await actionQueue.queuedChapterReadActions();
       const anilistMangaCache = {};
       for (const readAction of chapterReadActions) {
