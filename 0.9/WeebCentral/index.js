@@ -18451,31 +18451,32 @@ Type: ${row["type"]}`
       }
       return time;
     }
-    // async getCloudflareBypassRequestAsync() {
-    // 	return App.createRequest({
-    // 		url: this.baseUrl,
-    // 		method: "GET",
-    // 		headers: {
-    // 			"user-agent": await this.requestManager.getDefaultUserAgent(),
-    // 			referer: `${this.baseUrl}/`,
-    // 			origin: `${this.baseUrl}/`,
-    // 		},
-    // 	});
-    // }
-    // checkResponseError(response: Response): void {
-    // 	const status = response.status;
-    // 	switch (status) {
-    // 		case 403:
-    // 		case 503:
-    // 			throw new Error(
-    // 				`CLOUDFLARE BYPASS ERROR:\nPlease go to the homepage of <${this.baseUrl}> and press the cloud icon.`
-    // 			);
-    // 		case 404:
-    // 			throw new Error(
-    // 				`The requested page ${response.request.url} was not found!`
-    // 			);
-    // 	}
-    // }
+    async getCloudflareBypassRequestAsync() {
+      return App.createRequest({
+        url: this.baseUrl,
+        method: "GET",
+        headers: {
+          "user-agent": await this.requestManager.getDefaultUserAgent(),
+          referer: `${this.baseUrl}/`,
+          origin: `${this.baseUrl}/`
+        }
+      });
+    }
+    checkResponseError(response) {
+      const status = response.status;
+      switch (status) {
+        case 403:
+        case 503:
+          throw new Error(
+            `CLOUDFLARE BYPASS ERROR:
+Please go to the homepage of <${this.baseUrl}> and press the cloud icon.`
+          );
+        case 404:
+          throw new Error(
+            `The requested page ${response.request.url} was not found!`
+          );
+      }
+    }
   };
   var WeebCentral = (0, import__2.CompatWrapper)(
     { registerHomeSectionsInInitialise: true },
