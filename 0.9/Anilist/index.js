@@ -3698,6 +3698,7 @@ query($id: Int) {
       }
     }
     async processChapterReadActionQueue(actionQueue) {
+      throw new Error("processChapterReadActionQueue not implemented");
       await refreshUserInfo();
       const chapterReadActions = await actionQueue.queuedChapterReadActions();
       const anilistMangaCache = {};
