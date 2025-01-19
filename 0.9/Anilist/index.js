@@ -3084,7 +3084,7 @@ query($id: Int) {
                       (0, import_types.Section)("userinfo", [
                         (0, import_types.LabelRow)("asd", {
                           title: "asd",
-                          value: `${accessToken}`
+                          value: `${accessToken.accessToken}`
                         }),
                         (0, import_types.LabelRow)("id", {
                           title: "ID",
