@@ -1951,7 +1951,7 @@ var source = (() => {
       init_buffer();
       Object.defineProperty(exports, "__esModule", { value: true });
       exports.LabelRow = LabelRow3;
-      exports.InputRow = InputRow2;
+      exports.InputRow = InputRow3;
       exports.ToggleRow = ToggleRow2;
       exports.SelectRow = SelectRow2;
       exports.ButtonRow = ButtonRow3;
@@ -1961,7 +1961,7 @@ var source = (() => {
       function LabelRow3(id, props) {
         return { ...props, id, type: "labelRow", isHidden: props.isHidden ?? false };
       }
-      function InputRow2(id, props) {
+      function InputRow3(id, props) {
         return { ...props, id, type: "inputRow", isHidden: props.isHidden ?? false };
       }
       function ToggleRow2(id, props) {
@@ -3075,9 +3075,14 @@ query($id: Int) {
                         Object.keys(
                           accessToken.tokenBody
                         ).map((key) => {
-                          return (0, import_types.LabelRow)(key, {
+                          return (0, import_types.InputRow)(key, {
                             title: key,
-                            value: `${accessToken.tokenBody[key]}`
+                            value: `${accessToken.tokenBody[key]}`,
+                            onValueChange: Application.Selector(
+                              this,
+                              // @ts-expect-error
+                              "asd"
+                            )
                           });
                         })
                       ),
@@ -4121,9 +4126,6 @@ query($id: Int) {
     }
     async processChapterReadActionQueue(actionQueue) {
       await refreshUserInfo();
-      console.log(
-        "@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"
-      );
       const chapterReadActions = await actionQueue.queuedChapterReadActions();
       const anilistMangaCache = {};
       for (const readAction of chapterReadActions) {
