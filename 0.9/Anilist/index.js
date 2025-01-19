@@ -3183,6 +3183,19 @@ query($id: Int) {
     const [_, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
     const json = JSON.parse(data);
+    if (json == void 0) {
+      throw new Error(
+        `Failed to parse JSON for the ${typeof search === void 0 ? "title" : typeof search === "string" ? 'given search "' + search + '"' : "section " + search}: ${json}`
+      );
+    } else if (typeof json === "object" && json != null && "errors" in json && json.errors != null && Array.isArray(json.errors)) {
+      for (const error of json.errors) {
+        if (typeof error === "object" && error != null && "status" in error && error.status != null && "message" in error && error.message != null) {
+          throw new Error(
+            `AniList returned an error: [${error.status}] ${error.message}`
+          );
+        }
+      }
+    }
     return json;
   }
 
@@ -3712,7 +3725,6 @@ query($id: Int) {
         mangaProgressQuery,
         variables
       );
-      throw new Error(JSON.stringify(json));
       const mangaDetails = json.data.Media;
       if (!mangaDetails?.mediaListEntry) {
         return void 0;
@@ -3793,7 +3805,11 @@ query($id: Int) {
             saveMangaProgressMutation,
             params
           );
-          if (response.status < 400) {
+          if (
+            // @ts-ignore
+            response.status < 400 || // @ts-ignore
+            response.data.Media.mediaListEntry != null
+          ) {
             await actionQueue.discardChapterReadAction(readAction);
             anilistMangaCache[readAction.mangaId] = {
               mediaListEntry: {
