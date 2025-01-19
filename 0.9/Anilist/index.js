@@ -3082,8 +3082,8 @@ query($id: Int) {
                         })
                       ),
                       (0, import_types.Section)("userinfo", [
-                        (0, import_types.LabelRow)("asd", {
-                          title: "asd",
+                        (0, import_types.LabelRow)("trackertest", {
+                          title: "Tracker Test",
                           value: `${Application.getState(
                             "trackerTest"
                           )}`
@@ -4127,13 +4127,12 @@ query($id: Int) {
     }
     async processChapterReadActionQueue(actionQueue) {
       await refreshUserInfo();
-      Application.setState("stage1", "trackerTest");
+      Application.setState("refreshed user info", "trackerTest");
       const chapterReadActions = await actionQueue.queuedChapterReadActions();
-      Application.setState("stage12", "trackerTest");
+      Application.setState("grabbed action", "trackerTest");
       const anilistMangaCache = {};
-      Application.setState("stage123", "trackerTest");
       for (const readAction of chapterReadActions) {
-        await Application.setState("success finally", "trackerTest");
+        await Application.setState("loop through actions", "trackerTest");
         try {
           let anilistManga = anilistMangaCache[readAction.mangaId];
           if (!anilistManga) {
