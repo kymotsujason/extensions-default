@@ -3197,10 +3197,10 @@ ${errorMessages}`);
           })
         ]),
         (0, import_types2.Section)("Manga Information", [
-          ...this.anilistManga.mediaListEntry != null ? [
+          ...this.anilistManga.mediaListEntry ? [
             (0, import_types2.LabelRow)("id", {
               title: "Entry ID",
-              value: this.anilistManga.mediaListEntry?.id?.toString()
+              value: this.anilistManga.mediaListEntry.id?.toString()
             })
           ] : [],
           (0, import_types2.LabelRow)("mediaId", {
@@ -3232,56 +3232,30 @@ ${errorMessages}`);
           (0, import_types2.InputRow)("notes", {
             title: "Notes",
             value: this.anilistManga.mediaListEntry?.notes ?? "",
-            onValueChange: Application.Selector(
-              this,
-              //@ts-ignore
-              "updateNotes"
-            )
+            onValueChange: this.updateNotes.bind(this)
           })
         ]),
         (0, import_types2.Section)(
           {
             id: "trackStatus",
             header: "Manga Status",
-            footer: "Warning: Setting this to NONE will delete the listing from Anilist"
+            footer: "Warning: Setting this to NONE will delete the listing from AniList"
           },
           [
             (0, import_types2.SelectRow)("status", {
               value: this.anilistManga.mediaListEntry?.status ? [this.anilistManga.mediaListEntry.status] : this.changes.status,
               title: "Status",
-              onValueChange: Application.Selector(
-                this,
-                //@ts-ignore
-                "statusDidChange"
-              ),
+              onValueChange: this.statusDidChange.bind(this),
               minItemCount: 1,
               maxItemCount: 1,
               options: [
                 { id: "NONE", title: "NONE" },
-                {
-                  id: "CURRENT",
-                  title: "Reading"
-                },
-                {
-                  id: "PLANNING",
-                  title: "Planned"
-                },
-                {
-                  id: "COMPLETED",
-                  title: "Completed"
-                },
-                {
-                  id: "DROPPED",
-                  title: "Dropped"
-                },
-                {
-                  id: "PAUSED",
-                  title: "On-Hold"
-                },
-                {
-                  id: "REPEATING",
-                  title: "Re-Reading"
-                }
+                { id: "CURRENT", title: "Reading" },
+                { id: "PLANNING", title: "Planned" },
+                { id: "COMPLETED", title: "Completed" },
+                { id: "DROPPED", title: "Dropped" },
+                { id: "PAUSED", title: "On-Hold" },
+                { id: "REPEATING", title: "Re-Reading" }
               ]
             })
           ]
@@ -3289,30 +3263,18 @@ ${errorMessages}`);
         (0, import_types2.Section)({ id: "manage", header: "Progress" }, [
           (0, import_types2.InputRow)("progress", {
             title: "Chapter",
-            value: (this.anilistManga.mediaListEntry?.progress ?? this.changes.chapter).toString(),
-            onValueChange: Application.Selector(
-              this,
-              //@ts-ignore
-              "updateChapter"
-            )
+            value: (this.anilistManga.mediaListEntry?.progress ?? this.changes.chapter).toString() || "0",
+            onValueChange: this.updateChapter.bind(this)
           }),
           (0, import_types2.InputRow)("progressVolumes", {
             title: "Volume",
-            value: (this.anilistManga.mediaListEntry?.progressVolumes ?? this.changes.volume).toString(),
-            onValueChange: Application.Selector(
-              this,
-              //@ts-ignore
-              "updateVolume"
-            )
+            value: (this.anilistManga.mediaListEntry?.progressVolumes ?? this.changes.volume).toString() || "0",
+            onValueChange: this.updateVolume.bind(this)
           }),
           (0, import_types2.InputRow)("repeat", {
             title: "Times Re-Read",
-            value: (this.anilistManga.mediaListEntry?.repeat != void 0 ? this.anilistManga.mediaListEntry?.repeat : this.changes.read).toString(),
-            onValueChange: Application.Selector(
-              this,
-              //@ts-ignore
-              "updateRead"
-            )
+            value: (this.anilistManga.mediaListEntry?.repeat ?? this.changes.read).toString() || "0",
+            onValueChange: this.updateRead.bind(this)
           })
         ]),
         (0, import_types2.Section)(
@@ -3324,49 +3286,33 @@ ${errorMessages}`);
           [
             (0, import_types2.InputRow)("score", {
               title: "Score",
-              value: (this.anilistManga.mediaListEntry?.score ?? this.changes.rating).toString(),
-              onValueChange: Application.Selector(
-                this,
-                //@ts-ignore
-                "updateRating"
-              )
+              value: (this.anilistManga.mediaListEntry?.score ?? this.changes.rating).toString() || "0",
+              onValueChange: this.updateRating.bind(this)
             })
           ]
         ),
         (0, import_types2.Section)({ id: "privacy_settings", header: "Privacy Settings" }, [
           (0, import_types2.ToggleRow)("private", {
             title: "Private",
-            //@ts-ignore
-            value: this.anilistManga.mediaListEntry?.private != void 0 ? this.anilistManga.mediaListEntry.private : false,
-            onValueChange: Application.Selector(
-              this,
-              //@ts-ignore
-              "changePrivacy"
-            )
+            value: this.anilistManga.mediaListEntry?.private ?? this.changes.privacy,
+            onValueChange: this.changePrivacy.bind(this)
           }),
           (0, import_types2.ToggleRow)("hiddenFromStatusLists", {
             title: "Hide From Status List",
-            //@ts-ignore
-            value: this.anilistManga.mediaListEntry?.hiddenFromStatusLists != void 0 ? this.anilistManga.mediaListEntry.hiddenFromStatusLists : false,
-            onValueChange: Application.Selector(
-              this,
-              //@ts-ignore
-              "hideFromStatusLists"
-            )
+            value: this.anilistManga.mediaListEntry?.hiddenFromStatusLists ?? this.changes.hideFromStatus,
+            onValueChange: this.hideFromStatusLists.bind(this)
           })
         ]),
         (0, import_types2.Section)("submit", [
           (0, import_types2.ButtonRow)("submitButton", {
             title: "Submit",
-            onSelect: Application.Selector(
-              this,
-              //@ts-ignore
-              "submit"
-            ),
-            isHidden: true
+            onSelect: this.submit.bind(this)
           })
         ])
       ];
+    }
+    async updateNotes(value) {
+      this.changes.notes = value;
     }
     async statusDidChange(value) {
       this.changes.status = value;
@@ -3390,67 +3336,51 @@ ${errorMessages}`);
       this.changes.rating = value;
     }
     async submit() {
-      const id = this.anilistManga.mediaListEntry?.id ? Number(this.anilistManga.mediaListEntry?.id) : void 0;
+      const id = this.anilistManga.mediaListEntry?.id ? Number(this.anilistManga.mediaListEntry.id) : void 0;
       const mediaId = Number(this.anilistManga.id);
       if (this.changes.status[0] === "NONE" && id != null) {
-        let mutation = {
-          id
-        };
+        const mutation = { id };
         await makeRequest(
           deleteMangaProgressMutation,
           mutation
         );
       } else {
-        let mutation = {
+        const mutation = {
           id,
           mediaId,
           status: this.changes.status[0],
           notes: this.changes.notes,
-          progress: parseInt(this.changes.chapter),
-          progressVolumes: parseInt(this.changes.volume),
-          repeat: parseInt(this.changes.read),
+          progress: parseInt(this.changes.chapter, 10) || void 0,
+          progressVolumes: parseInt(this.changes.volume, 10) || void 0,
+          repeat: parseInt(this.changes.read, 10) || void 0,
           private: this.changes.privacy,
           hiddenFromStatusLists: this.changes.hideFromStatus,
-          score: Number(this.changes.rating)
+          score: parseFloat(this.changes.rating) || void 0
         };
         await makeRequest(
           saveMangaProgressMutation,
           mutation
         );
       }
-      throw new Error(
-        "Entry submitted, swipe this window down. Haven't figured out how to do it properly yet."
-      );
+      this.reloadForm();
+      throw new Error("Entry submitted successfully.");
     }
     formatStatus(value) {
-      switch (value) {
-        case "CURRENT":
-          return "Reading";
-        case "PLANNING":
-          return "Planned";
-        case "COMPLETED":
-          return "Completed";
-        case "DROPPED":
-          return "Dropped";
-        case "PAUSED":
-          return "On-Hold";
-        case "REPEATING":
-          return "Re-Reading";
-        case "FINISHED":
-          return "Finished";
-        case "RELEASING":
-          return "Releasing";
-        case "NOT_YET_RELEASED":
-          return "Not Yet Released";
-        case "CANCELLED":
-          return "Cancelled";
-        case "HIATUS":
-          return "Hiatus";
-        case "NONE":
-          return "None";
-        default:
-          return "N/A";
-      }
+      const statusMap = {
+        CURRENT: "Reading",
+        PLANNING: "Planned",
+        COMPLETED: "Completed",
+        DROPPED: "Dropped",
+        PAUSED: "On-Hold",
+        REPEATING: "Re-Reading",
+        FINISHED: "Finished",
+        RELEASING: "Releasing",
+        NOT_YET_RELEASED: "Not Yet Released",
+        CANCELLED: "Cancelled",
+        HIATUS: "Hiatus",
+        NONE: "None"
+      };
+      return value ? statusMap[value] || "N/A" : "N/A";
     }
   };
 
