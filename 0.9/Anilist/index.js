@@ -2959,36 +2959,6 @@ query($id: Int) {
             siteUrl
         }
     }`;
-  var getMangaProgressQuery = `query($id: Int) {
-        Media(id: $id) {
-            id
-            mediaListEntry {
-                id
-                status
-                progress
-                progressVolumes
-                repeat
-                private
-                hiddenFromStatusLists
-                score
-                notes
-            }
-            title {
-                romaji
-                english
-                native
-                userPreferred
-            }
-            coverImage {
-                extraLarge
-            }
-            bannerImage
-            averageScore
-            isAdult
-            popularity
-            status
-        }
-    }`;
   var saveMangaProgressMutation = `mutation($id: Int, $mediaId: Int, $status: MediaListStatus, $score: Float, $progress: Int, $progressVolumes: Int, $repeat: Int, $notes: String, $private: Boolean, $hiddenFromStatusLists: Boolean) {
         SaveMediaListEntry(id: $id, mediaId: $mediaId, status: $status, score: $score, progress: $progress, progressVolumes: $progressVolumes, repeat: $repeat, notes: $notes, private: $private, hiddenFromStatusLists: $hiddenFromStatusLists){
             id
@@ -3089,24 +3059,6 @@ query($id: Int) {
                         (0, import_types.LabelRow)("name", {
                           title: "Name",
                           value: `${userInfo?.name}`
-                        }),
-                        (0, import_types.LabelRow)("options", {
-                          title: "Options",
-                          value: `${JSON.stringify(
-                            userInfo?.options
-                          )}`
-                        }),
-                        (0, import_types.LabelRow)("mediaListOptions", {
-                          title: "Media List Options",
-                          value: `${JSON.stringify(
-                            userInfo?.mediaListOptions
-                          )}`
-                        }),
-                        (0, import_types.LabelRow)("avatar", {
-                          title: "Avatar",
-                          value: `${JSON.stringify(
-                            userInfo?.avatar
-                          )}`
                         })
                       ]),
                       (0, import_types.Section)("refresh", [
@@ -3483,21 +3435,6 @@ query($id: Int) {
     }
   };
 
-  // src/Anilist/anilist-result.ts
-  init_buffer();
-  function AnilistResult(json) {
-    const result = typeof json == "string" ? JSON.parse(json) : json;
-    if (result.errors?.length ?? 0 > 0) {
-      result.errors?.map((error) => {
-        console.log(`[ANILIST-ERROR(${error.status})] ${error.message}`);
-      });
-      throw new Error(
-        "Error while fetching data from Anilist, check logs for more info"
-      );
-    }
-    return result;
-  }
-
   // src/Anilist/main.ts
   var AniListInterceptor = class extends import_types3.PaperbackInterceptor {
     async interceptRequest(request) {
@@ -3766,59 +3703,7 @@ query($id: Int) {
       const anilistMangaCache = {};
       for (const readAction of chapterReadActions) {
         try {
-          let anilistManga = anilistMangaCache[readAction.mangaId];
-          if (!anilistManga) {
-            const variables = {
-              id: +readAction.mangaId
-            };
-            const _response = await makeRequest(
-              getMangaProgressQuery,
-              variables
-            );
-            anilistManga = AnilistResult(
-              // @ts-ignore
-              _response.data
-            ).data?.Media;
-            anilistMangaCache[readAction.mangaId] = anilistManga;
-          }
-          if (anilistManga?.mediaListEntry) {
-            if (anilistManga.mediaListEntry.progress && anilistManga.mediaListEntry.progress >= Math.floor(readAction.chapterNumber)) {
-              await actionQueue.discardChapterReadAction(readAction);
-              continue;
-            }
-          }
-          let params = {};
-          if (Math.floor(readAction.chapterNumber) == 1 && !readAction.volumeNumber) {
-            params = {
-              mediaId: readAction.mangaId,
-              progress: 1,
-              progressVolumes: 1
-            };
-          } else {
-            params = {
-              mediaId: readAction.mangaId,
-              progress: Math.floor(readAction.chapterNumber),
-              progressVolumes: readAction.volumeNumber ? Math.floor(readAction.volumeNumber) : void 0
-            };
-          }
-          const response = await makeRequest(
-            saveMangaProgressMutation,
-            params
-          );
-          if (
-            // @ts-ignore
-            response.data.Media.mediaListEntry != null
-          ) {
-            await actionQueue.discardChapterReadAction(readAction);
-            anilistMangaCache[readAction.mangaId] = {
-              mediaListEntry: {
-                progress: Math.floor(readAction.chapterNumber),
-                progressVolumes: readAction.volumeNumber ? Math.floor(readAction.volumeNumber) : void 0
-              }
-            };
-          } else {
-            await actionQueue.retryChapterReadAction(readAction);
-          }
+          await actionQueue.discardChapterReadAction(readAction);
         } catch (error) {
           await actionQueue.retryChapterReadAction(readAction);
         }
