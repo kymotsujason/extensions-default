@@ -3232,7 +3232,8 @@ ${errorMessages}`);
           (0, import_types2.InputRow)("notes", {
             title: "Notes",
             value: this.anilistManga.mediaListEntry?.notes ?? "",
-            onValueChange: this.updateNotes.bind(this)
+            // @ts-expect-error
+            onValueChange: Application.Selector(this, "updateNotes")
           })
         ]),
         (0, import_types2.Section)(
@@ -3245,7 +3246,11 @@ ${errorMessages}`);
             (0, import_types2.SelectRow)("status", {
               value: this.anilistManga.mediaListEntry?.status ? [this.anilistManga.mediaListEntry.status] : this.changes.status,
               title: "Status",
-              onValueChange: this.statusDidChange.bind(this),
+              onValueChange: Application.Selector(
+                this,
+                // @ts-expect-error
+                "statusDidChange"
+              ),
               minItemCount: 1,
               maxItemCount: 1,
               options: [
@@ -3264,17 +3269,20 @@ ${errorMessages}`);
           (0, import_types2.InputRow)("progress", {
             title: "Chapter",
             value: (this.anilistManga.mediaListEntry?.progress ?? this.changes.chapter).toString() || "0",
-            onValueChange: this.updateChapter.bind(this)
+            // @ts-expect-error
+            onValueChange: Application.Selector(this, "updateChapter")
           }),
           (0, import_types2.InputRow)("progressVolumes", {
             title: "Volume",
             value: (this.anilistManga.mediaListEntry?.progressVolumes ?? this.changes.volume).toString() || "0",
-            onValueChange: this.updateVolume.bind(this)
+            // @ts-expect-error
+            onValueChange: Application.Selector(this, "updateVolume")
           }),
           (0, import_types2.InputRow)("repeat", {
             title: "Times Re-Read",
             value: (this.anilistManga.mediaListEntry?.repeat ?? this.changes.read).toString() || "0",
-            onValueChange: this.updateRead.bind(this)
+            // @ts-expect-error
+            onValueChange: Application.Selector(this, "updateRead")
           })
         ]),
         (0, import_types2.Section)(
@@ -3287,7 +3295,11 @@ ${errorMessages}`);
             (0, import_types2.InputRow)("score", {
               title: "Score",
               value: (this.anilistManga.mediaListEntry?.score ?? this.changes.rating).toString() || "0",
-              onValueChange: this.updateRating.bind(this)
+              onValueChange: Application.Selector(
+                this,
+                // @ts-expect-error
+                "updateRating"
+              )
             })
           ]
         ),
@@ -3295,18 +3307,24 @@ ${errorMessages}`);
           (0, import_types2.ToggleRow)("private", {
             title: "Private",
             value: this.anilistManga.mediaListEntry?.private ?? this.changes.privacy,
-            onValueChange: this.changePrivacy.bind(this)
+            // @ts-expect-error
+            onValueChange: Application.Selector(this, "changePrivacy")
           }),
           (0, import_types2.ToggleRow)("hiddenFromStatusLists", {
             title: "Hide From Status List",
             value: this.anilistManga.mediaListEntry?.hiddenFromStatusLists ?? this.changes.hideFromStatus,
-            onValueChange: this.hideFromStatusLists.bind(this)
+            onValueChange: Application.Selector(
+              this,
+              // @ts-expect-error
+              "hideFromStatusLists"
+            )
           })
         ]),
         (0, import_types2.Section)("submit", [
           (0, import_types2.ButtonRow)("submitButton", {
             title: "Submit",
-            onSelect: this.submit.bind(this)
+            // @ts-expect-error
+            onSelect: Application.Selector(this, "submit")
           })
         ])
       ];
