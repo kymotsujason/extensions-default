@@ -1855,7 +1855,7 @@ var source = (() => {
       exports.InputRow = InputRow2;
       exports.ToggleRow = ToggleRow2;
       exports.SelectRow = SelectRow2;
-      exports.ButtonRow = ButtonRow3;
+      exports.ButtonRow = ButtonRow2;
       exports.NavigationRow = NavigationRow2;
       exports.OAuthButtonRow = OAuthButtonRow2;
       exports.DeferredItem = DeferredItem2;
@@ -1871,7 +1871,7 @@ var source = (() => {
       function SelectRow2(id, props) {
         return { ...props, id, type: "selectRow", isHidden: props.isHidden ?? false };
       }
-      function ButtonRow3(id, props) {
+      function ButtonRow2(id, props) {
         return { ...props, id, type: "buttonRow", isHidden: props.isHidden ?? false };
       }
       function NavigationRow2(id, props) {
@@ -3254,17 +3254,6 @@ query($id: Int) {
               "hideFromStatusLists"
             )
           })
-        ]),
-        (0, import_types2.Section)("submit", [
-          (0, import_types2.ButtonRow)("submitButton", {
-            title: "Submit",
-            onSelect: Application.Selector(
-              this,
-              //@ts-ignore
-              "submit"
-            ),
-            isHidden: true
-          })
         ])
       ];
     }
@@ -3908,6 +3897,7 @@ query($id: Int) {
       let exitLoop;
       for (const staff of mangaDetails.staff.edges) {
         switch (staff.role) {
+          // @ts-expect-error
           case staff.role.startsWith("Story & Art"):
             artist = void 0;
             exitLoop = true;

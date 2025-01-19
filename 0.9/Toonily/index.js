@@ -24174,6 +24174,7 @@ Type: ${row["type"]}`
         );
       }
       const variables = extractVariableValues(
+        // @ts-expect-error
         $2(selector).get()[0].children[0].data
       );
       if (!("chapter_data" in variables) || !("wpmangaprotectornonce" in variables)) {
