@@ -3013,9 +3013,9 @@ query($id: Int) {
       tokenBody: parseAccessToken(accessToken)
     };
   }
-  async function saveAccessToken(accessToken) {
+  function saveAccessToken(accessToken) {
     Application.setSecureState(accessToken, "access_token");
-    await refreshUserInfo();
+    refreshUserInfo();
     if (!accessToken)
       return void 0;
     return {
@@ -3038,16 +3038,15 @@ query($id: Int) {
     return Application.getState("userInfo");
   }
   function isLoggedIn() {
-    return getUserInfo() !== void 0;
+    return getUserInfo() != void 0;
   }
   async function refreshUserInfo() {
     const accessToken = getAccessToken();
-    if (accessToken === void 0) {
-      Application.setState(void 0, "userInfo");
-      return;
+    if (accessToken == void 0) {
+      return Application.setState(void 0, "userInfo");
     }
     const response = await makeRequest(userProfileQuery);
-    const userInfo = response?.data?.Viewer;
+    const userInfo = response.data.Viewer;
     Application.setState(userInfo, "userInfo");
   }
   var SettingsForm = class extends import_types.Form {
@@ -3058,7 +3057,77 @@ query($id: Int) {
             if (getAccessToken()) {
               return (0, import_types.NavigationRow)("sessionInfo", {
                 title: "Session Info",
-                form: new SessionInfoForm()
+                form: new class extends import_types.Form {
+                  getSections() {
+                    const accessToken = getAccessToken();
+                    const userInfo = getUserInfo();
+                    if (!accessToken)
+                      return [
+                        (0, import_types.Section)("introspect", [
+                          (0, import_types.LabelRow)("logged_out", {
+                            title: "LOGGED OUT"
+                          })
+                        ])
+                      ];
+                    return [
+                      (0, import_types.Section)(
+                        "introspect",
+                        Object.keys(
+                          accessToken.tokenBody
+                        ).map((key) => {
+                          return (0, import_types.LabelRow)(key, {
+                            title: key,
+                            value: `${accessToken.tokenBody[key]}`
+                          });
+                        })
+                      ),
+                      (0, import_types.Section)("userinfo", [
+                        (0, import_types.LabelRow)("trackertest", {
+                          title: "Tracker Test",
+                          value: `${Application.getState(
+                            "trackerTest"
+                          )}`
+                        }),
+                        (0, import_types.LabelRow)("id", {
+                          title: "ID",
+                          value: `${userInfo?.id}`
+                        }),
+                        (0, import_types.LabelRow)("name", {
+                          title: "Name",
+                          value: `${userInfo?.name}`
+                        })
+                      ]),
+                      (0, import_types.Section)("refresh", [
+                        (0, import_types.ButtonRow)("refresh", {
+                          title: "Refresh User Info",
+                          onSelect: Application.Selector(
+                            this,
+                            // @ts-expect-error
+                            "refresh"
+                          )
+                        })
+                      ]),
+                      (0, import_types.Section)("logout", [
+                        (0, import_types.ButtonRow)("logout", {
+                          title: "Logout",
+                          onSelect: Application.Selector(
+                            this,
+                            // @ts-expect-error
+                            "logout"
+                          )
+                        })
+                      ])
+                    ];
+                  }
+                  async logout() {
+                    saveAccessToken(void 0);
+                    this.reloadForm();
+                  }
+                  async refresh() {
+                    await refreshUserInfo();
+                    this.reloadForm();
+                  }
+                }()
               });
             } else {
               return (0, import_types.OAuthButtonRow)("oAuthButton", {
@@ -3070,7 +3139,6 @@ query($id: Int) {
                 },
                 onSuccess: Application.Selector(
                   this,
-                  // @ts-expect-error
                   "oauthDidSucceed"
                 )
               });
@@ -3080,69 +3148,10 @@ query($id: Int) {
       ];
     }
     async oauthDidSucceed(value) {
-      await saveAccessToken(value);
-      this.reloadForm();
+      saveAccessToken(value);
     }
   };
-  var SessionInfoForm = class extends import_types.Form {
-    getSections() {
-      const accessToken = getAccessToken();
-      const userInfo = getUserInfo();
-      if (!accessToken) {
-        return [
-          (0, import_types.Section)("introspect", [
-            (0, import_types.LabelRow)("logged_out", {
-              title: "LOGGED OUT"
-            })
-          ])
-        ];
-      }
-      return [
-        (0, import_types.Section)(
-          "introspect",
-          Object.keys(accessToken.tokenBody).map((key) => {
-            return (0, import_types.LabelRow)(key, {
-              title: key,
-              value: `${accessToken.tokenBody[key]}`
-            });
-          })
-        ),
-        (0, import_types.Section)("userinfo", [
-          (0, import_types.LabelRow)("id", {
-            title: "ID",
-            value: `${userInfo?.id}`
-          }),
-          (0, import_types.LabelRow)("name", {
-            title: "Name",
-            value: `${userInfo?.name}`
-          })
-        ]),
-        (0, import_types.Section)("refresh", [
-          (0, import_types.ButtonRow)("refresh", {
-            title: "Refresh User Info",
-            // @ts-expect-error
-            onSelect: Application.Selector(this, "refresh")
-          })
-        ]),
-        (0, import_types.Section)("logout", [
-          (0, import_types.ButtonRow)("logout", {
-            title: "Logout",
-            // @ts-expect-error
-            onSelect: Application.Selector(this, "logout")
-          })
-        ])
-      ];
-    }
-    async logout() {
-      await saveAccessToken(void 0);
-      this.reloadForm();
-    }
-    async refresh() {
-      await refreshUserInfo();
-      this.reloadForm();
-    }
-  };
-  async function makeRequest(query, variables, search) {
+  async function makeRequest(query, QueryVariables, search) {
     const accessToken = getAccessToken()?.accessToken;
     const request = {
       url: GRAPHQL_ENDPOINT,
@@ -3150,22 +3159,30 @@ query($id: Int) {
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        ...accessToken ? { Authorization: `Bearer ${accessToken}` } : {}
+        ...accessToken != null ? {
+          Authorization: `Bearer ${accessToken}`
+        } : {}
       },
       body: JSON.stringify({
         query,
-        variables
+        variables: QueryVariables
       })
     };
-    const [response, buffer] = await Application.scheduleRequest(request);
+    const [_, buffer] = await Application.scheduleRequest(request);
     const data = Application.arrayBufferToUTF8String(buffer);
     const json = JSON.parse(data);
-    if (!json) {
-      throw new Error("Failed to parse AniList response JSON");
-    } else if (json.errors && Array.isArray(json.errors)) {
-      const errorMessages = json.errors.map((error) => `[${error.status}] ${error.message}`).join("\n");
-      throw new Error(`AniList returned errors:
-${errorMessages}`);
+    if (json == void 0) {
+      throw new Error(
+        `Failed to parse JSON for the ${typeof search === void 0 ? "title" : typeof search === "string" ? 'given search "' + search + '"' : "section " + search}: ${json}`
+      );
+    } else if (typeof json === "object" && json != null && "errors" in json && json.errors != null && Array.isArray(json.errors)) {
+      for (const error of json.errors) {
+        if (typeof error === "object" && error != null && "status" in error && error.status != null && "message" in error && error.message != null) {
+          throw new Error(
+            `AniList returned an error: [${error.status}] ${error.message}`
+          );
+        }
+      }
     }
     return json;
   }
@@ -3197,10 +3214,10 @@ ${errorMessages}`);
           })
         ]),
         (0, import_types2.Section)("Manga Information", [
-          ...this.anilistManga.mediaListEntry ? [
+          ...this.anilistManga.mediaListEntry != null ? [
             (0, import_types2.LabelRow)("id", {
               title: "Entry ID",
-              value: this.anilistManga.mediaListEntry.id?.toString()
+              value: this.anilistManga.mediaListEntry?.id?.toString()
             })
           ] : [],
           (0, import_types2.LabelRow)("mediaId", {
@@ -3232,15 +3249,18 @@ ${errorMessages}`);
           (0, import_types2.InputRow)("notes", {
             title: "Notes",
             value: this.anilistManga.mediaListEntry?.notes ?? "",
-            // @ts-expect-error
-            onValueChange: Application.Selector(this, "updateNotes")
+            onValueChange: Application.Selector(
+              this,
+              //@ts-ignore
+              "updateNotes"
+            )
           })
         ]),
         (0, import_types2.Section)(
           {
             id: "trackStatus",
             header: "Manga Status",
-            footer: "Warning: Setting this to NONE will delete the listing from AniList"
+            footer: "Warning: Setting this to NONE will delete the listing from Anilist"
           },
           [
             (0, import_types2.SelectRow)("status", {
@@ -3248,19 +3268,37 @@ ${errorMessages}`);
               title: "Status",
               onValueChange: Application.Selector(
                 this,
-                // @ts-expect-error
+                //@ts-ignore
                 "statusDidChange"
               ),
               minItemCount: 1,
               maxItemCount: 1,
               options: [
                 { id: "NONE", title: "NONE" },
-                { id: "CURRENT", title: "Reading" },
-                { id: "PLANNING", title: "Planned" },
-                { id: "COMPLETED", title: "Completed" },
-                { id: "DROPPED", title: "Dropped" },
-                { id: "PAUSED", title: "On-Hold" },
-                { id: "REPEATING", title: "Re-Reading" }
+                {
+                  id: "CURRENT",
+                  title: "Reading"
+                },
+                {
+                  id: "PLANNING",
+                  title: "Planned"
+                },
+                {
+                  id: "COMPLETED",
+                  title: "Completed"
+                },
+                {
+                  id: "DROPPED",
+                  title: "Dropped"
+                },
+                {
+                  id: "PAUSED",
+                  title: "On-Hold"
+                },
+                {
+                  id: "REPEATING",
+                  title: "Re-Reading"
+                }
               ]
             })
           ]
@@ -3268,21 +3306,30 @@ ${errorMessages}`);
         (0, import_types2.Section)({ id: "manage", header: "Progress" }, [
           (0, import_types2.InputRow)("progress", {
             title: "Chapter",
-            value: (this.anilistManga.mediaListEntry?.progress ?? this.changes.chapter).toString() || "0",
-            // @ts-expect-error
-            onValueChange: Application.Selector(this, "updateChapter")
+            value: (this.anilistManga.mediaListEntry?.progress ?? this.changes.chapter).toString(),
+            onValueChange: Application.Selector(
+              this,
+              //@ts-ignore
+              "updateChapter"
+            )
           }),
           (0, import_types2.InputRow)("progressVolumes", {
             title: "Volume",
-            value: (this.anilistManga.mediaListEntry?.progressVolumes ?? this.changes.volume).toString() || "0",
-            // @ts-expect-error
-            onValueChange: Application.Selector(this, "updateVolume")
+            value: (this.anilistManga.mediaListEntry?.progressVolumes ?? this.changes.volume).toString(),
+            onValueChange: Application.Selector(
+              this,
+              //@ts-ignore
+              "updateVolume"
+            )
           }),
           (0, import_types2.InputRow)("repeat", {
             title: "Times Re-Read",
-            value: (this.anilistManga.mediaListEntry?.repeat ?? this.changes.read).toString() || "0",
-            // @ts-expect-error
-            onValueChange: Application.Selector(this, "updateRead")
+            value: (this.anilistManga.mediaListEntry?.repeat != void 0 ? this.anilistManga.mediaListEntry?.repeat : this.changes.read).toString(),
+            onValueChange: Application.Selector(
+              this,
+              //@ts-ignore
+              "updateRead"
+            )
           })
         ]),
         (0, import_types2.Section)(
@@ -3294,10 +3341,10 @@ ${errorMessages}`);
           [
             (0, import_types2.InputRow)("score", {
               title: "Score",
-              value: (this.anilistManga.mediaListEntry?.score ?? this.changes.rating).toString() || "0",
+              value: (this.anilistManga.mediaListEntry?.score ?? this.changes.rating).toString(),
               onValueChange: Application.Selector(
                 this,
-                // @ts-expect-error
+                //@ts-ignore
                 "updateRating"
               )
             })
@@ -3306,16 +3353,21 @@ ${errorMessages}`);
         (0, import_types2.Section)({ id: "privacy_settings", header: "Privacy Settings" }, [
           (0, import_types2.ToggleRow)("private", {
             title: "Private",
-            value: this.anilistManga.mediaListEntry?.private ?? this.changes.privacy,
-            // @ts-expect-error
-            onValueChange: Application.Selector(this, "changePrivacy")
+            //@ts-ignore
+            value: this.anilistManga.mediaListEntry?.private != void 0 ? this.anilistManga.mediaListEntry.private : false,
+            onValueChange: Application.Selector(
+              this,
+              //@ts-ignore
+              "changePrivacy"
+            )
           }),
           (0, import_types2.ToggleRow)("hiddenFromStatusLists", {
             title: "Hide From Status List",
-            value: this.anilistManga.mediaListEntry?.hiddenFromStatusLists ?? this.changes.hideFromStatus,
+            //@ts-ignore
+            value: this.anilistManga.mediaListEntry?.hiddenFromStatusLists != void 0 ? this.anilistManga.mediaListEntry.hiddenFromStatusLists : false,
             onValueChange: Application.Selector(
               this,
-              // @ts-expect-error
+              //@ts-ignore
               "hideFromStatusLists"
             )
           })
@@ -3323,14 +3375,15 @@ ${errorMessages}`);
         (0, import_types2.Section)("submit", [
           (0, import_types2.ButtonRow)("submitButton", {
             title: "Submit",
-            // @ts-expect-error
-            onSelect: Application.Selector(this, "submit")
+            onSelect: Application.Selector(
+              this,
+              //@ts-ignore
+              "submit"
+            ),
+            isHidden: true
           })
         ])
       ];
-    }
-    async updateNotes(value) {
-      this.changes.notes = value;
     }
     async statusDidChange(value) {
       this.changes.status = value;
@@ -3354,51 +3407,67 @@ ${errorMessages}`);
       this.changes.rating = value;
     }
     async submit() {
-      const id = this.anilistManga.mediaListEntry?.id ? Number(this.anilistManga.mediaListEntry.id) : void 0;
+      const id = this.anilistManga.mediaListEntry?.id ? Number(this.anilistManga.mediaListEntry?.id) : void 0;
       const mediaId = Number(this.anilistManga.id);
       if (this.changes.status[0] === "NONE" && id != null) {
-        const mutation = { id };
+        let mutation = {
+          id
+        };
         await makeRequest(
           deleteMangaProgressMutation,
           mutation
         );
       } else {
-        const mutation = {
+        let mutation = {
           id,
           mediaId,
           status: this.changes.status[0],
           notes: this.changes.notes,
-          progress: parseInt(this.changes.chapter, 10) || void 0,
-          progressVolumes: parseInt(this.changes.volume, 10) || void 0,
-          repeat: parseInt(this.changes.read, 10) || void 0,
+          progress: parseInt(this.changes.chapter),
+          progressVolumes: parseInt(this.changes.volume),
+          repeat: parseInt(this.changes.read),
           private: this.changes.privacy,
           hiddenFromStatusLists: this.changes.hideFromStatus,
-          score: parseFloat(this.changes.rating) || void 0
+          score: Number(this.changes.rating)
         };
         await makeRequest(
           saveMangaProgressMutation,
           mutation
         );
       }
-      this.reloadForm();
-      throw new Error("Entry submitted successfully.");
+      throw new Error(
+        "Entry submitted, swipe this window down. Haven't figured out how to do it properly yet."
+      );
     }
     formatStatus(value) {
-      const statusMap = {
-        CURRENT: "Reading",
-        PLANNING: "Planned",
-        COMPLETED: "Completed",
-        DROPPED: "Dropped",
-        PAUSED: "On-Hold",
-        REPEATING: "Re-Reading",
-        FINISHED: "Finished",
-        RELEASING: "Releasing",
-        NOT_YET_RELEASED: "Not Yet Released",
-        CANCELLED: "Cancelled",
-        HIATUS: "Hiatus",
-        NONE: "None"
-      };
-      return value ? statusMap[value] || "N/A" : "N/A";
+      switch (value) {
+        case "CURRENT":
+          return "Reading";
+        case "PLANNING":
+          return "Planned";
+        case "COMPLETED":
+          return "Completed";
+        case "DROPPED":
+          return "Dropped";
+        case "PAUSED":
+          return "On-Hold";
+        case "REPEATING":
+          return "Re-Reading";
+        case "FINISHED":
+          return "Finished";
+        case "RELEASING":
+          return "Releasing";
+        case "NOT_YET_RELEASED":
+          return "Not Yet Released";
+        case "CANCELLED":
+          return "Cancelled";
+        case "HIATUS":
+          return "Hiatus";
+        case "NONE":
+          return "None";
+        default:
+          return "N/A";
+      }
     }
   };
 
