@@ -18365,9 +18365,10 @@ Type: ${row["type"]}`
       const LIMIT = 32;
       const offset = metadata?.offset ?? 0;
       let searchParams = "";
+      const regex = /[^A-Za-z0-9'-]+/g;
       if (query.title) {
         searchParams = searchParams.concat(
-          encodeURI(`&text=${query.title ?? ""}`)
+          encodeURI(`&text=${query.title.replace(regex, "") ?? ""}`)
         );
       } else {
         for (const tag of query.includedTags) {
