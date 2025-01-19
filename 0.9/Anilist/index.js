@@ -4075,7 +4075,11 @@ query($id: Int) {
       }
     }
     async processChapterReadActionQueue(actionQueue) {
-      throw new Error("This isn't working");
+      await refreshUserInfo();
+      const chapterReadActions = await actionQueue.queuedChapterReadActions();
+      for (const readAction of chapterReadActions) {
+        await actionQueue.discardChapterReadAction(readAction);
+      }
     }
   };
   var Anilist = new AniListExtension();
