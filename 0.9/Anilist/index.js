@@ -1951,7 +1951,7 @@ var source = (() => {
       init_buffer();
       Object.defineProperty(exports, "__esModule", { value: true });
       exports.LabelRow = LabelRow3;
-      exports.InputRow = InputRow3;
+      exports.InputRow = InputRow2;
       exports.ToggleRow = ToggleRow2;
       exports.SelectRow = SelectRow2;
       exports.ButtonRow = ButtonRow3;
@@ -1961,7 +1961,7 @@ var source = (() => {
       function LabelRow3(id, props) {
         return { ...props, id, type: "labelRow", isHidden: props.isHidden ?? false };
       }
-      function InputRow3(id, props) {
+      function InputRow2(id, props) {
         return { ...props, id, type: "inputRow", isHidden: props.isHidden ?? false };
       }
       function ToggleRow2(id, props) {
@@ -3075,18 +3075,17 @@ query($id: Int) {
                         Object.keys(
                           accessToken.tokenBody
                         ).map((key) => {
-                          return (0, import_types.InputRow)(key, {
+                          return (0, import_types.LabelRow)(key, {
                             title: key,
-                            value: `${accessToken.tokenBody[key]}`,
-                            onValueChange: Application.Selector(
-                              this,
-                              // @ts-expect-error
-                              "asd"
-                            )
+                            value: `${accessToken.tokenBody[key]}`
                           });
                         })
                       ),
                       (0, import_types.Section)("userinfo", [
+                        (0, import_types.LabelRow)("asd", {
+                          title: "asd",
+                          value: `${accessToken}`
+                        }),
                         (0, import_types.LabelRow)("id", {
                           title: "ID",
                           value: `${userInfo?.id}`
