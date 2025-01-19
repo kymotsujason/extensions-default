@@ -4129,10 +4129,7 @@ query($id: Int) {
       await refreshUserInfo();
       const chapterReadActions = await actionQueue.queuedChapterReadActions();
       const anilistMangaCache = {};
-      Object.keys(chapterReadActions).forEach((readAction) => {
-        Application.setState(JSON.stringify(readAction), "trackerTest");
-      });
-      await Application.setState("success finally", "trackerTest");
+      Application.setState("stage123", "trackerTest");
       for (const readAction of chapterReadActions) {
         await Application.setState("success finally", "trackerTest");
         try {
