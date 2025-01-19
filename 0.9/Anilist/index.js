@@ -4083,7 +4083,6 @@ query($id: Int) {
       };
     }
     async getMangaProgress(sourceMangaInfo) {
-      await Application.setState("test", "trackerTest");
       const variables = {
         id: +sourceMangaInfo.mangaId
       };
@@ -4127,7 +4126,9 @@ query($id: Int) {
       }
     }
     async processChapterReadActionQueue(actionQueue) {
+      await Application.setState("is this working1", "trackerTest");
       await refreshUserInfo();
+      await Application.setState("is this working2", "trackerTest");
       const chapterReadActions = await actionQueue.queuedChapterReadActions();
       const anilistMangaCache = {};
       for (const readAction of chapterReadActions) {
