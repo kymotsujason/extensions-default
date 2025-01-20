@@ -4018,6 +4018,12 @@ query($id: Int) {
               _response.data
             ).data?.Media;
             anilistMangaCache[readAction.sourceManga.mangaId] = anilistManga;
+            Application.setState(
+              `${_response.data} - ${Math.floor(
+                readAction.readChapter.chapNum
+              )}`,
+              "testTracker"
+            );
           }
           if (anilistManga?.mediaListEntry) {
             if (anilistManga.mediaListEntry.progress == void 0 || anilistManga.mediaListEntry.progress >= Math.floor(readAction.readChapter.chapNum)) {
@@ -4025,12 +4031,6 @@ query($id: Int) {
               continue;
             }
           }
-          Application.setState(
-            `${anilistManga?.mediaListEntry?.progress} - ${Math.floor(
-              readAction.readChapter.chapNum
-            )}`,
-            "testTracker"
-          );
           let params = {
             mediaId: readAction.sourceManga.mangaId,
             progress: Math.floor(readAction.readChapter.chapNum),
