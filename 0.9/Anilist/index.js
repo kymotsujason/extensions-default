@@ -4019,7 +4019,8 @@ query($id: Int) {
             ).data?.Media;
             anilistMangaCache[readAction.sourceManga.mangaId] = anilistManga;
             Application.setState(
-              `${_response.data} - ${Math.floor(
+              // @ts-expect-error
+              `${JSON.stringify(_response.data)} - ${Math.floor(
                 readAction.readChapter.chapNum
               )}`,
               "testTracker"
