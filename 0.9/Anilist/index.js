@@ -3342,21 +3342,6 @@ query($id: Int) {
     }
   };
 
-  // src/Anilist/anilist-result.ts
-  init_buffer();
-  function AnilistResult(json) {
-    const result = typeof json == "string" ? JSON.parse(json) : json;
-    if (result.errors?.length ?? 0 > 0) {
-      result.errors?.map((error) => {
-        console.log(`[ANILIST-ERROR(${error.status})] ${error.message}`);
-      });
-      throw new Error(
-        "Error while fetching data from Anilist, check logs for more info"
-      );
-    }
-    return result;
-  }
-
   // src/Anilist/RelevanceScore.ts
   init_buffer();
 
@@ -4013,10 +3998,7 @@ query($id: Int) {
               getMangaProgressQuery,
               variables
             );
-            anilistManga = AnilistResult(
-              // @ts-ignore
-              _response.data
-            ).data?.Media;
+            anilistManga = _response.data.Media;
             anilistMangaCache[readAction.sourceManga.mangaId] = anilistManga;
             Application.setState(
               `${JSON.stringify(anilistManga)} - ${Math.floor(
