@@ -2666,7 +2666,11 @@ var source = (() => {
   var main_exports = {};
   __export(main_exports, {
     AniListExtension: () => AniListExtension,
-    Anilist: () => Anilist
+    Anilist: () => Anilist,
+    getAccessToken: () => getAccessToken,
+    getUserInfo: () => getUserInfo,
+    isLoggedIn: () => isLoggedIn,
+    parseAccessToken: () => parseAccessToken
   });
   init_buffer();
   var import_types3 = __toESM(require_lib());
@@ -2880,48 +2884,6 @@ query($id: Int) {
   // src/Anilist/SettingsForm.ts
   init_buffer();
   var import_types = __toESM(require_lib());
-  var GRAPHQL_ENDPOINT = "https://graphql.anilist.co";
-  function getAccessToken() {
-    const accessToken = Application.getSecureState("access_token");
-    if (!accessToken) return void 0;
-    return {
-      accessToken,
-      tokenBody: parseAccessToken(accessToken)
-    };
-  }
-  function saveAccessToken(accessToken) {
-    Application.setSecureState(accessToken, "access_token");
-    refreshUserInfo();
-    if (!accessToken) return void 0;
-    return {
-      accessToken,
-      tokenBody: parseAccessToken(accessToken)
-    };
-  }
-  function parseAccessToken(accessToken) {
-    if (!accessToken) return void 0;
-    const tokenBodyBase64 = accessToken.split(".")[1];
-    if (!tokenBodyBase64) return void 0;
-    const tokenBodyJSON = Buffer2.from(tokenBodyBase64, "base64").toString(
-      "ascii"
-    );
-    return JSON.parse(tokenBodyJSON);
-  }
-  function getUserInfo() {
-    return Application.getState("userInfo");
-  }
-  function isLoggedIn() {
-    return getUserInfo() != void 0;
-  }
-  async function refreshUserInfo() {
-    const accessToken = getAccessToken();
-    if (accessToken == void 0) {
-      return Application.setState(void 0, "userInfo");
-    }
-    const response = await makeRequest(userProfileQuery);
-    const userInfo = response.data.Viewer;
-    Application.setState(userInfo, "userInfo");
-  }
   var SettingsForm = class extends import_types.Form {
     getSections() {
       return [
@@ -2964,16 +2926,6 @@ query($id: Int) {
                           value: `${userInfo?.name}`
                         })
                       ]),
-                      (0, import_types.Section)("refresh", [
-                        (0, import_types.ButtonRow)("refresh", {
-                          title: "Refresh User Info",
-                          onSelect: Application.Selector(
-                            this,
-                            // @ts-expect-error
-                            "refresh"
-                          )
-                        })
-                      ]),
                       (0, import_types.Section)("logout", [
                         (0, import_types.ButtonRow)("logout", {
                           title: "Logout",
@@ -2987,12 +2939,11 @@ query($id: Int) {
                     ];
                   }
                   async logout() {
-                    saveAccessToken(void 0);
-                    await refreshUserInfo();
-                    this.reloadForm();
-                  }
-                  async refresh() {
-                    await refreshUserInfo();
+                    Application.setSecureState(
+                      void 0,
+                      "access_token"
+                    );
+                    Application.setState(void 0, "userInfo");
                     this.reloadForm();
                   }
                 }()
@@ -3016,50 +2967,15 @@ query($id: Int) {
       ];
     }
     async oauthDidSucceed(value) {
-      saveAccessToken(value);
+      Application.setSecureState(value, "access_token");
     }
   };
-  async function makeRequest(query, QueryVariables, search) {
-    const accessToken = getAccessToken()?.accessToken;
-    const request = {
-      url: GRAPHQL_ENDPOINT,
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-        ...accessToken != null ? {
-          Authorization: `Bearer ${accessToken}`
-        } : {}
-      },
-      body: JSON.stringify({
-        query,
-        variables: QueryVariables
-      })
-    };
-    const [_, buffer] = await Application.scheduleRequest(request);
-    const data = Application.arrayBufferToUTF8String(buffer);
-    const json = JSON.parse(data);
-    if (json == void 0) {
-      throw new Error(
-        `Failed to parse JSON for the ${typeof search === void 0 ? "title" : typeof search === "string" ? 'given search "' + search + '"' : "section " + search}: ${json}`
-      );
-    } else if (typeof json === "object" && json != null && "errors" in json && json.errors != null && Array.isArray(json.errors)) {
-      for (const error of json.errors) {
-        if (typeof error === "object" && error != null && "status" in error && error.status != null && "message" in error && error.message != null) {
-          throw new Error(
-            `AniList returned an error: [${error.status}] ${error.message}`
-          );
-        }
-      }
-    }
-    return json;
-  }
 
   // src/Anilist/SourceForm.ts
   init_buffer();
   var import_types2 = __toESM(require_lib());
   var SourceForm = class extends import_types2.Form {
-    constructor(anilistManga) {
+    constructor(anilistManga, makeRequest) {
       super();
       this.changes = {
         status: ["CURRENT"],
@@ -3072,6 +2988,7 @@ query($id: Int) {
         rating: "0"
       };
       this.anilistManga = anilistManga;
+      this.makeRequest = makeRequest;
     }
     get requiresExplicitSubmission() {
       return true;
@@ -3285,7 +3202,7 @@ query($id: Int) {
         let mutation = {
           id
         };
-        await makeRequest(
+        await this.makeRequest(
           deleteMangaProgressMutation,
           mutation
         );
@@ -3302,7 +3219,7 @@ query($id: Int) {
           hiddenFromStatusLists: this.changes.hideFromStatus,
           score: Number(this.changes.rating)
         };
-        await makeRequest(
+        await this.makeRequest(
           saveMangaProgressMutation,
           mutation
         );
@@ -3710,6 +3627,30 @@ query($id: Int) {
   };
 
   // src/Anilist/main.ts
+  var GRAPHQL_ENDPOINT = "https://graphql.anilist.co";
+  function getAccessToken() {
+    const accessToken = Application.getSecureState("access_token");
+    if (!accessToken) return void 0;
+    return {
+      accessToken,
+      tokenBody: parseAccessToken(accessToken)
+    };
+  }
+  function parseAccessToken(accessToken) {
+    if (!accessToken) return void 0;
+    const tokenBodyBase64 = accessToken.split(".")[1];
+    if (!tokenBodyBase64) return void 0;
+    const tokenBodyJSON = Buffer2.from(tokenBodyBase64, "base64").toString(
+      "ascii"
+    );
+    return JSON.parse(tokenBodyJSON);
+  }
+  function getUserInfo() {
+    return Application.getState("userInfo");
+  }
+  function isLoggedIn() {
+    return getUserInfo() != void 0;
+  }
   var AniListInterceptor = class extends import_types3.PaperbackInterceptor {
     async interceptRequest(request) {
       return request;
@@ -3730,6 +3671,24 @@ query($id: Int) {
     async initialise() {
       this.mainRateLimiter.registerInterceptor();
       this.mainInterceptor.registerInterceptor();
+    }
+    saveAccessToken(accessToken) {
+      Application.setSecureState(accessToken, "access_token");
+      this.refreshUserInfo();
+      if (!accessToken) return void 0;
+      return {
+        accessToken,
+        tokenBody: parseAccessToken(accessToken)
+      };
+    }
+    async refreshUserInfo() {
+      const accessToken = getAccessToken();
+      if (accessToken == void 0) {
+        return Application.setState(void 0, "userInfo");
+      }
+      const response = await this.makeRequest(userProfileQuery);
+      const userInfo = response.data.Viewer;
+      Application.setState(userInfo, "userInfo");
     }
     async getSettingsForm() {
       return new SettingsForm();
@@ -3811,7 +3770,7 @@ query($id: Int) {
     }
     async getItems(query, queryVariables, metadata, search) {
       const result = [];
-      const json = await makeRequest(
+      const json = await this.makeRequest(
         query,
         queryVariables,
         search
@@ -3844,7 +3803,7 @@ query($id: Int) {
       const variables = {
         id: +mangaId
       };
-      const json = await makeRequest(
+      const json = await this.makeRequest(
         titleViewQuery,
         variables
       );
@@ -3942,7 +3901,7 @@ query($id: Int) {
       const variables = {
         id: +sourceMangaInfo.mangaId
       };
-      const json = await makeRequest(
+      const json = await this.makeRequest(
         mangaProgressQuery,
         variables
       );
@@ -3972,12 +3931,12 @@ query($id: Int) {
         const variables = {
           id: +sourceMangaInfo.mangaId
         };
-        const response = await makeRequest(
+        const response = await this.makeRequest(
           mangaProgressQuery,
           variables
         );
         const anilistManga = response.data.Media;
-        return new SourceForm(anilistManga);
+        return new SourceForm(anilistManga, this.makeRequest);
       }
     }
     async processChapterReadActionQueue(chapterReadActions) {
@@ -3993,7 +3952,7 @@ query($id: Int) {
             const variables = {
               id: +readAction.sourceManga.mangaId
             };
-            const _response = await makeRequest(
+            const _response = await this.makeRequest(
               getMangaProgressQuery,
               variables
             );
@@ -4011,7 +3970,7 @@ query($id: Int) {
             progress: Math.floor(readAction.readChapter.chapNum),
             progressVolumes: readAction.readChapter.volume ? Math.floor(readAction.readChapter.volume) : 1
           };
-          const response = await makeRequest(
+          const response = await this.makeRequest(
             saveMangaProgressMutation,
             params
           );
@@ -4037,6 +3996,41 @@ query($id: Int) {
         }
       }
       return result;
+    }
+    async makeRequest(query, QueryVariables, search) {
+      const accessToken = getAccessToken()?.accessToken;
+      const request = {
+        url: GRAPHQL_ENDPOINT,
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          ...accessToken != null ? {
+            Authorization: `Bearer ${accessToken}`
+          } : {}
+        },
+        body: JSON.stringify({
+          query,
+          variables: QueryVariables
+        })
+      };
+      const [_, buffer] = await Application.scheduleRequest(request);
+      const data = Application.arrayBufferToUTF8String(buffer);
+      const json = JSON.parse(data);
+      if (json == void 0) {
+        throw new Error(
+          `Failed to parse JSON for the ${typeof search === void 0 ? "title" : typeof search === "string" ? 'given search "' + search + '"' : "section " + search}: ${json}`
+        );
+      } else if (typeof json === "object" && json != null && "errors" in json && json.errors != null && Array.isArray(json.errors)) {
+        for (const error of json.errors) {
+          if (typeof error === "object" && error != null && "status" in error && error.status != null && "message" in error && error.message != null) {
+            throw new Error(
+              `AniList returned an error: [${error.status}] ${error.message}`
+            );
+          }
+        }
+      }
+      return json;
     }
   };
   var Anilist = new AniListExtension();

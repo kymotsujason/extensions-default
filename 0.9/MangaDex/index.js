@@ -4311,7 +4311,7 @@ var source = (() => {
               }
               async testProxy() {
                 throw new Error(
-                  `${getProxyServer()} and ${getProxyServer()}`
+                  `${getProxyServer()} and ${getEnableProxyServer()}`
                 );
               }
             }()
