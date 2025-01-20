@@ -3954,7 +3954,7 @@ query($id: Int) {
         chapterId: "",
         sourceManga: sourceMangaInfo,
         langCode: "en",
-        chapNum: mangaDetails?.mediaListEntry.progress
+        chapNum: mangaDetails?.mediaListEntry.progress + 1
       };
       let lastReadDate = new Date(mangaDetails?.mediaListEntry.lastReadAt);
       let score = mangaDetails?.mediaListEntry.score;
