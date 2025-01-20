@@ -3961,9 +3961,7 @@ query($id: Int) {
         mangaProgressQuery,
         variables
       );
-      throw new Error(
-        JSON.stringify(json.data.Media.mediaListEntry.progress)
-      );
+      throw new Error(Application.getState("testTracker"));
       const mangaDetails = json.data.Media;
       if (!mangaDetails?.mediaListEntry) {
         return void 0;
@@ -4027,6 +4025,12 @@ query($id: Int) {
               continue;
             }
           }
+          Application.setState(
+            `${anilistManga?.mediaListEntry?.progress} - ${Math.floor(
+              readAction.readChapter.chapNum
+            )}`,
+            "testTracker"
+          );
           let params = {
             mediaId: readAction.sourceManga.mangaId,
             progress: Math.floor(readAction.readChapter.chapNum),
