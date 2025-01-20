@@ -4276,7 +4276,7 @@ var source = (() => {
                   (0, import_types.Section)("proxySection", [
                     (0, import_types.InputRow)("proxyinput", {
                       title: "Proxy Server",
-                      value: "",
+                      value: getProxyServer() != "" ? getProxyServer() : "",
                       onValueChange: Application.Selector(
                         this,
                         // @ts-expect-error
