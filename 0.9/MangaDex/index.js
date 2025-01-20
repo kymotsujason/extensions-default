@@ -5316,13 +5316,26 @@ var source = (() => {
       this.checkId(chapterId);
       const dataSaver = getDataSaver();
       const forcePort = getForcePort443();
-      const request = {
-        url: `${MANGADEX_API}/at-home/server/${chapterId}${forcePort ? "?forcePort443=true" : ""}`,
-        method: "GET"
-      };
-      const [_, buffer] = await Application.scheduleRequest(request);
-      const data = Application.arrayBufferToUTF8String(buffer);
-      const json = typeof data === "string" ? JSON.parse(data) : data;
+      const proxyURL = getProxyServer();
+      const proxyEnabled = getEnableProxyServer();
+      let json;
+      if (proxyEnabled && proxyURL != "") {
+        const request = {
+          url: `${proxyURL}/manga?chapterId=${chapterId}`,
+          method: "GET"
+        };
+        const [_, buffer] = await Application.scheduleRequest(request);
+        const data = Application.arrayBufferToUTF8String(buffer);
+        json = typeof data === "string" ? JSON.parse(data) : data;
+      } else {
+        const request = {
+          url: `${MANGADEX_API}/at-home/server/${chapterId}${forcePort ? "?forcePort443=true" : ""}`,
+          method: "GET"
+        };
+        const [_, buffer] = await Application.scheduleRequest(request);
+        const data = Application.arrayBufferToUTF8String(buffer);
+        json = typeof data === "string" ? JSON.parse(data) : data;
+      }
       const serverUrl = json.baseUrl;
       const chapterDetails = json.chapter;
       let pages;
