@@ -4188,6 +4188,12 @@ var source = (() => {
   function getForcePort443() {
     return Application.getState("force_port_443") ?? false;
   }
+  function getProxyServer() {
+    return Application.getState("proxy_server") ?? "";
+  }
+  function getEnableProxyServer() {
+    return Application.getState("enable_proxy_server") ?? false;
+  }
   function setLanguages(value) {
     Application.setState(value, "languages");
   }
@@ -4202,6 +4208,12 @@ var source = (() => {
   }
   function setForcePort443(value) {
     Application.setState(value, "force_port_443");
+  }
+  function setProxyServer(value) {
+    Application.setState(value, "proxy_server");
+  }
+  function setEnableProxyServer(value) {
+    Application.setState(value, "enable_proxy_server");
   }
   function getHomepageThumbnail() {
     return Application.getState("homepage_thumbnail") ?? MDImageQuality.getDefault("homepage");
@@ -4255,6 +4267,56 @@ var source = (() => {
             form: new SourceUIPlaygroundForm()
           })
         ]),
+        (0, import_types.Section)("proxy", [
+          (0, import_types.NavigationRow)("proxy", {
+            title: "Proxy Settings",
+            form: new class extends import_types.Form {
+              getSections() {
+                return [
+                  (0, import_types.Section)("proxySection", [
+                    (0, import_types.InputRow)("proxyinput", {
+                      title: "Proxy Server",
+                      value: "",
+                      onValueChange: Application.Selector(
+                        this,
+                        // @ts-expect-error
+                        "changeProxy"
+                      )
+                    }),
+                    (0, import_types.ToggleRow)("enableProxy", {
+                      title: "Enable Proxy Server",
+                      value: getEnableProxyServer(),
+                      onValueChange: Application.Selector(
+                        this,
+                        // @ts-expect-error
+                        "changeEnableProxy"
+                      )
+                    }),
+                    (0, import_types.ButtonRow)("testProxy", {
+                      title: "Test Proxy",
+                      onSelect: Application.Selector(
+                        this,
+                        // @ts-expect-error
+                        "testProxy"
+                      )
+                    })
+                  ])
+                ];
+              }
+              async changeProxy(value) {
+                setProxyServer(value);
+              }
+              async changeEnableProxy(value) {
+                setEnableProxyServer(value);
+              }
+              async testProxy() {
+                throw new Error(
+                  `${getProxyServer()} and ${getProxyServer()}`
+                );
+              }
+            }()
+          })
+        ]),
         (0, import_types.Section)("oAuthSection", [
           (0, import_types.DeferredItem)(() => {
             if (getAccessToken()) {
@@ -4274,7 +4336,9 @@ var source = (() => {
                     return [
                       (0, import_types.Section)(
                         "introspect",
-                        Object.keys(accessToken.tokenBody).map((key) => {
+                        Object.keys(
+                          accessToken.tokenBody
+                        ).map((key) => {
                           return (0, import_types.LabelRow)(key, {
                             title: key,
                             value: `${accessToken.tokenBody[key]}`
@@ -4284,8 +4348,11 @@ var source = (() => {
                       (0, import_types.Section)("logout", [
                         (0, import_types.ButtonRow)("logout", {
                           title: "Logout",
-                          // @ts-expect-error
-                          onSelect: Application.Selector(this, "logout")
+                          onSelect: Application.Selector(
+                            this,
+                            // @ts-expect-error
+                            "logout"
+                          )
                         })
                       ])
                     ];
