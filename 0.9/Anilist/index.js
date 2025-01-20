@@ -4035,7 +4035,7 @@ query($id: Int) {
             params = {
               mediaId: readAction.sourceManga.mangaId,
               progress: Math.floor(readAction.readChapter.chapNum),
-              progressVolumes: readAction.readChapter.volume ? Math.floor(readAction.readChapter.volume) : void 0
+              progressVolumes: readAction.readChapter.volume ? Math.floor(readAction.readChapter.volume) : 1
             };
           }
           const response = await makeRequest(
@@ -4052,7 +4052,7 @@ query($id: Int) {
                 progress: Math.floor(
                   readAction.readChapter.chapNum
                 ),
-                progressVolumes: readAction.readChapter.volume ? Math.floor(readAction.readChapter.volume) : void 0
+                progressVolumes: readAction.readChapter.volume ? Math.floor(readAction.readChapter.volume) : 1
               };
               anilistMangaCache[readAction.sourceManga.mangaId] = anilistManga;
             }
