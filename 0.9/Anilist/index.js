@@ -3961,6 +3961,7 @@ query($id: Int) {
         mangaProgressQuery,
         variables
       );
+      throw new Error(JSON.stringify(json.data.mediaListEntry.progress));
       const mangaDetails = json.data.Media;
       if (!mangaDetails?.mediaListEntry) {
         return void 0;
@@ -4024,20 +4025,11 @@ query($id: Int) {
               continue;
             }
           }
-          let params = {};
-          if (Math.floor(readAction.readChapter.chapNum) == 1 && !readAction.readChapter.volume) {
-            params = {
-              mediaId: readAction.sourceManga.mangaId,
-              progress: 1,
-              progressVolumes: 1
-            };
-          } else {
-            params = {
-              mediaId: readAction.sourceManga.mangaId,
-              progress: Math.floor(readAction.readChapter.chapNum),
-              progressVolumes: readAction.readChapter.volume ? Math.floor(readAction.readChapter.volume) : 1
-            };
-          }
+          let params = {
+            mediaId: readAction.sourceManga.mangaId,
+            progress: Math.floor(readAction.readChapter.chapNum),
+            progressVolumes: readAction.readChapter.volume ? Math.floor(readAction.readChapter.volume) : 1
+          };
           const response = await makeRequest(
             saveMangaProgressMutation,
             params
