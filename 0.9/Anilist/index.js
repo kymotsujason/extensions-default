@@ -3946,7 +3946,6 @@ query($id: Int) {
         mangaProgressQuery,
         variables
       );
-      throw new Error(Application.getState("testTracker"));
       const mangaDetails = json.data.Media;
       if (!mangaDetails?.mediaListEntry) {
         return void 0;
