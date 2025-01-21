@@ -3910,8 +3910,7 @@ query($id: Int) {
         return void 0;
       }
       let lastReadChapter = {
-        // @ts-expect-error
-        chapterId: sourceMangaInfo.id,
+        chapterId: sourceMangaInfo.mangaId,
         sourceManga: sourceMangaInfo,
         langCode: "en",
         chapNum: mangaDetails?.mediaListEntry.progress + 1
