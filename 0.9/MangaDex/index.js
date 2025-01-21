@@ -4990,9 +4990,6 @@ var source = (() => {
       );
     }
     async interceptRequest(request) {
-      if (getEnableProxyServer()) {
-        return request;
-      }
       request.headers = {
         ...request.headers,
         referer: `${MANGADEX_DOMAIN}/`
