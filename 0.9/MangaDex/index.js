@@ -5042,6 +5042,9 @@ var source = (() => {
       return request;
     }
     async interceptResponse(request, response, data) {
+      if (request.url.includes("data")) {
+        throw new Error("image detected");
+      }
       return data;
     }
   };
