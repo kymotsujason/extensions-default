@@ -22592,10 +22592,10 @@ var source = (() => {
       return request;
     }
     async interceptResponse(request, response, data) {
-      if (response.headers.get("Content-Type")?.startsWith("image")) {
+      if (response.headers["Content-Type"]?.startsWith("image")) {
         const image = await Jimp.read(data);
         const cropped = image.autocrop();
-        if (response.headers.get("Content-Type")?.includes("image/jpeg")) {
+        if (response.headers["Content-Type"]?.includes("image/jpeg")) {
           return cropped.getBuffer("image/jpeg");
         } else {
           return cropped.getBuffer("image/png");
