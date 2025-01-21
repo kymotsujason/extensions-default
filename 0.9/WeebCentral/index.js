@@ -18302,7 +18302,7 @@ Type: ${row["type"]}`
       const LIMIT = 32;
       const offset = metadata?.offset ?? 0;
       let searchParams = "";
-      const regex = /[!?$$$$]/g;
+      const regex = /[!?()]/g;
       if (query.title) {
         searchParams = searchParams.concat(
           encodeURI(`&text=${query.title.replace(regex, "") ?? ""}`)
