@@ -4995,7 +4995,7 @@ var source = (() => {
         referer: `${MANGADEX_DOMAIN}/`
       };
       let accessToken = getAccessToken();
-      if (this.imageRegex.test(request.url) || request.url.includes("auth/") || request.url.includes("auth.mangadex") || request.url.includes(getProxyServer()) || !accessToken) {
+      if (getEnableProxyServer() || this.imageRegex.test(request.url) || request.url.includes("auth/") || request.url.includes("auth.mangadex") || !accessToken) {
         return request;
       }
       if (Number(accessToken.tokenBody.exp) <= Date.now() / 1e3 - 60) {
