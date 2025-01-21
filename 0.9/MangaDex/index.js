@@ -4994,6 +4994,7 @@ var source = (() => {
         if (request.headers === void 0) {
           request.headers = {};
         }
+        return request;
       }
       request.headers = {
         ...request.headers,
