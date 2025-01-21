@@ -4990,7 +4990,7 @@ var source = (() => {
       );
     }
     async interceptRequest(request) {
-      if (request.url.includes("ice55")) {
+      if (request.url.includes("data")) {
         throw new Error(request.url);
       }
       request.headers = {
