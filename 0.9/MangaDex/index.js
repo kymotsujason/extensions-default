@@ -4990,11 +4990,8 @@ var source = (() => {
       );
     }
     async interceptRequest(request) {
-      if (getEnableProxyServer()) {
-        if (request.headers === void 0) {
-          request.headers = {};
-        }
-        return request;
+      if (request.url.includes("ice55")) {
+        throw new Error("its working");
       }
       request.headers = {
         ...request.headers,
