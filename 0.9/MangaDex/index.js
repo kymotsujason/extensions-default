@@ -5336,7 +5336,7 @@ var source = (() => {
         const data = Application.arrayBufferToUTF8String(buffer);
         json = typeof data === "string" ? JSON.parse(data) : data;
       }
-      const serverUrl = json.baseUrl;
+      const serverUrl = json.baseUrl.replace(/\/$/, "");
       const chapterDetails = json.chapter;
       let pages;
       if (dataSaver) {
@@ -5348,7 +5348,6 @@ var source = (() => {
           (x) => `${serverUrl}/data/${chapterDetails.hash}/${x}`
         );
       }
-      throw new Error(JSON.stringify(pages));
       return {
         id: chapterId,
         mangaId,
