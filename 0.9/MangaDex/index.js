@@ -4992,7 +4992,7 @@ var source = (() => {
     async interceptRequest(request) {
       const proxyURL = getProxyServer();
       const proxyEnabled = getEnableProxyServer();
-      if (proxyEnabled && proxyURL != "") {
+      if (proxyEnabled && proxyURL != "" && request.url.includes("data")) {
         request.headers = {
           ...request.headers,
           referer: `${proxyURL}/`
