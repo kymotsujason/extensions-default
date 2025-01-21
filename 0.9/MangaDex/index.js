@@ -4990,10 +4990,19 @@ var source = (() => {
       );
     }
     async interceptRequest(request) {
-      request.headers = {
-        ...request.headers,
-        referer: `${MANGADEX_DOMAIN}/`
-      };
+      const proxyURL = getProxyServer();
+      const proxyEnabled = getEnableProxyServer();
+      if (proxyEnabled && proxyURL != "") {
+        request.headers = {
+          ...request.headers,
+          referer: `${proxyURL}/`
+        };
+      } else {
+        request.headers = {
+          ...request.headers,
+          referer: `${MANGADEX_DOMAIN}/`
+        };
+      }
       let accessToken = getAccessToken();
       if (this.imageRegex.test(request.url) || request.url.includes("auth/") || request.url.includes("auth.mangadex") || !accessToken) {
         return request;
