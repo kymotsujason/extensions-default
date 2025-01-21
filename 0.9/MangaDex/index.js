@@ -4990,9 +4990,6 @@ var source = (() => {
       );
     }
     async interceptRequest(request) {
-      if (request.url.includes("data")) {
-        throw new Error(request.url);
-      }
       request.headers = {
         ...request.headers,
         referer: `${MANGADEX_DOMAIN}/`
@@ -5351,6 +5348,7 @@ var source = (() => {
           (x) => `${serverUrl}/data/${chapterDetails.hash}/${x}`
         );
       }
+      throw new Error(JSON.stringify(pages));
       return {
         id: chapterId,
         mangaId,
