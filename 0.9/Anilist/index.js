@@ -2881,12 +2881,14 @@ query($id: Int) {
   init_buffer();
   var import_types = __toESM(require_lib());
   var SettingsForm = class extends import_types.Form {
-    constructor(saveAccessToken, refreshUserInfo, getAccessToken, getUserInfo) {
+    constructor(saveAccessToken, refreshUserInfo, getAccessToken, getUserInfo, parseAccessToken, makeRequest) {
       super();
       this.saveAccessToken = saveAccessToken;
       this.refreshUserInfo = refreshUserInfo;
       this.getAccessToken = getAccessToken;
       this.getUserInfo = getUserInfo;
+      this.parseAccessToken = parseAccessToken;
+      this.makeRequest = makeRequest;
     }
     getSections() {
       return [
@@ -2896,12 +2898,14 @@ query($id: Int) {
               return (0, import_types.NavigationRow)("sessionInfo", {
                 title: "Session Info",
                 form: new class extends import_types.Form {
-                  constructor(saveAccessToken, refreshUserInfo, getAccessToken, getUserInfo) {
+                  constructor(saveAccessToken, refreshUserInfo, getAccessToken, getUserInfo, parseAccessToken, makeRequest) {
                     super();
                     this.saveAccessToken = saveAccessToken;
                     this.refreshUserInfo = refreshUserInfo;
                     this.getAccessToken = getAccessToken;
                     this.getUserInfo = getUserInfo;
+                    this.parseAccessToken = parseAccessToken;
+                    this.makeRequest = makeRequest;
                   }
                   getSections() {
                     const accessToken = this.getAccessToken();
@@ -2968,7 +2972,9 @@ query($id: Int) {
                   this.saveAccessToken,
                   this.refreshUserInfo,
                   this.getAccessToken,
-                  this.getUserInfo
+                  this.getUserInfo,
+                  this.parseAccessToken,
+                  this.makeRequest
                 )
               });
             } else {
@@ -3652,15 +3658,6 @@ query($id: Int) {
 
   // src/Anilist/main.ts
   var GRAPHQL_ENDPOINT = "https://graphql.anilist.co";
-  function parseAccessToken(accessToken) {
-    if (!accessToken) return void 0;
-    const tokenBodyBase64 = accessToken.split(".")[1];
-    if (!tokenBodyBase64) return void 0;
-    const tokenBodyJSON = Buffer2.from(tokenBodyBase64, "base64").toString(
-      "ascii"
-    );
-    return JSON.parse(tokenBodyJSON);
-  }
   var AniListInterceptor = class extends import_types3.PaperbackInterceptor {
     async interceptRequest(request) {
       return request;
@@ -3682,13 +3679,22 @@ query($id: Int) {
       this.mainRateLimiter.registerInterceptor();
       this.mainInterceptor.registerInterceptor();
     }
+    parseAccessToken(accessToken) {
+      if (!accessToken) return void 0;
+      const tokenBodyBase64 = accessToken.split(".")[1];
+      if (!tokenBodyBase64) return void 0;
+      const tokenBodyJSON = Buffer2.from(tokenBodyBase64, "base64").toString(
+        "ascii"
+      );
+      return JSON.parse(tokenBodyJSON);
+    }
     saveAccessToken(accessToken) {
       Application.setSecureState(accessToken, "access_token");
       this.refreshUserInfo();
       if (!accessToken) return void 0;
       return {
         accessToken,
-        tokenBody: parseAccessToken(accessToken)
+        tokenBody: this.parseAccessToken(accessToken)
       };
     }
     getAccessToken() {
@@ -3696,7 +3702,7 @@ query($id: Int) {
       if (!accessToken) return void 0;
       return {
         accessToken,
-        tokenBody: parseAccessToken(accessToken)
+        tokenBody: this.parseAccessToken(accessToken)
       };
     }
     getUserInfo() {
@@ -3719,7 +3725,9 @@ query($id: Int) {
         this.saveAccessToken,
         this.refreshUserInfo,
         this.getAccessToken,
-        this.getUserInfo
+        this.getUserInfo,
+        this.parseAccessToken,
+        this.makeRequest
       );
     }
     async getSearchResults(query, metadata) {
