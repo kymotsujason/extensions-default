@@ -3652,6 +3652,15 @@ query($id: Int) {
 
   // src/Anilist/main.ts
   var GRAPHQL_ENDPOINT = "https://graphql.anilist.co";
+  function parseAccessToken(accessToken) {
+    if (!accessToken) return void 0;
+    const tokenBodyBase64 = accessToken.split(".")[1];
+    if (!tokenBodyBase64) return void 0;
+    const tokenBodyJSON = Buffer2.from(tokenBodyBase64, "base64").toString(
+      "ascii"
+    );
+    return JSON.parse(tokenBodyJSON);
+  }
   var AniListInterceptor = class extends import_types3.PaperbackInterceptor {
     async interceptRequest(request) {
       return request;
@@ -3673,22 +3682,13 @@ query($id: Int) {
       this.mainRateLimiter.registerInterceptor();
       this.mainInterceptor.registerInterceptor();
     }
-    parseAccessToken(accessToken) {
-      if (!accessToken) return void 0;
-      const tokenBodyBase64 = accessToken.split(".")[1];
-      if (!tokenBodyBase64) return void 0;
-      const tokenBodyJSON = Buffer2.from(tokenBodyBase64, "base64").toString(
-        "ascii"
-      );
-      return JSON.parse(tokenBodyJSON);
-    }
     saveAccessToken(accessToken) {
       Application.setSecureState(accessToken, "access_token");
       this.refreshUserInfo();
       if (!accessToken) return void 0;
       return {
         accessToken,
-        tokenBody: this.parseAccessToken(accessToken)
+        tokenBody: parseAccessToken(accessToken)
       };
     }
     getAccessToken() {
@@ -3696,7 +3696,7 @@ query($id: Int) {
       if (!accessToken) return void 0;
       return {
         accessToken,
-        tokenBody: this.parseAccessToken(accessToken)
+        tokenBody: parseAccessToken(accessToken)
       };
     }
     getUserInfo() {
