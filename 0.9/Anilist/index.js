@@ -2666,11 +2666,7 @@ var source = (() => {
   var main_exports = {};
   __export(main_exports, {
     AniListExtension: () => AniListExtension,
-    Anilist: () => Anilist,
-    getAccessToken: () => getAccessToken,
-    getUserInfo: () => getUserInfo,
-    isLoggedIn: () => isLoggedIn,
-    parseAccessToken: () => parseAccessToken
+    Anilist: () => Anilist
   });
   init_buffer();
   var import_types3 = __toESM(require_lib());
@@ -2885,27 +2881,31 @@ query($id: Int) {
   init_buffer();
   var import_types = __toESM(require_lib());
   var SettingsForm = class extends import_types.Form {
-    constructor(saveAccessToken, refreshUserInfo) {
+    constructor(saveAccessToken, refreshUserInfo, getAccessToken, getUserInfo) {
       super();
       this.saveAccessToken = saveAccessToken;
       this.refreshUserInfo = refreshUserInfo;
+      this.getAccessToken = getAccessToken;
+      this.getUserInfo = getUserInfo;
     }
     getSections() {
       return [
         (0, import_types.Section)("oAuthSection", [
           (0, import_types.DeferredItem)(() => {
-            if (getAccessToken()) {
+            if (this.getAccessToken()) {
               return (0, import_types.NavigationRow)("sessionInfo", {
                 title: "Session Info",
                 form: new class extends import_types.Form {
-                  constructor(saveAccessToken, refreshUserInfo) {
+                  constructor(saveAccessToken, refreshUserInfo, getAccessToken, getUserInfo) {
                     super();
                     this.saveAccessToken = saveAccessToken;
                     this.refreshUserInfo = refreshUserInfo;
+                    this.getAccessToken = getAccessToken;
+                    this.getUserInfo = getUserInfo;
                   }
                   getSections() {
-                    const accessToken = getAccessToken();
-                    const userInfo = getUserInfo();
+                    const accessToken = this.getAccessToken();
+                    const userInfo = this.getUserInfo();
                     if (!accessToken)
                       return [
                         (0, import_types.Section)("introspect", [
@@ -2964,7 +2964,12 @@ query($id: Int) {
                     this.saveAccessToken(void 0);
                     this.reloadForm();
                   }
-                }(this.saveAccessToken, this.refreshUserInfo)
+                }(
+                  this.saveAccessToken,
+                  this.refreshUserInfo,
+                  this.getAccessToken,
+                  this.getUserInfo
+                )
               });
             } else {
               return (0, import_types.OAuthButtonRow)("oAuthButton", {
@@ -2993,7 +2998,7 @@ query($id: Int) {
   init_buffer();
   var import_types2 = __toESM(require_lib());
   var SourceForm = class extends import_types2.Form {
-    constructor(anilistManga, makeRequest) {
+    constructor(anilistManga, makeRequest, getUserInfo) {
       super();
       this.changes = {
         status: ["CURRENT"],
@@ -3007,6 +3012,7 @@ query($id: Int) {
       };
       this.anilistManga = anilistManga;
       this.makeRequest = makeRequest;
+      this.getUserInfo = getUserInfo;
     }
     get requiresExplicitSubmission() {
       return true;
@@ -3016,7 +3022,7 @@ query($id: Int) {
         (0, import_types2.Section)("User Information", [
           (0, import_types2.LabelRow)("username", {
             title: "Username",
-            value: getUserInfo()?.name?.toString()
+            value: this.getUserInfo()?.name?.toString()
           })
         ]),
         (0, import_types2.Section)("Manga Information", [
@@ -3646,29 +3652,6 @@ query($id: Int) {
 
   // src/Anilist/main.ts
   var GRAPHQL_ENDPOINT = "https://graphql.anilist.co";
-  function getAccessToken() {
-    const accessToken = Application.getSecureState("access_token");
-    if (!accessToken) return void 0;
-    return {
-      accessToken,
-      tokenBody: parseAccessToken(accessToken)
-    };
-  }
-  function parseAccessToken(accessToken) {
-    if (!accessToken) return void 0;
-    const tokenBodyBase64 = accessToken.split(".")[1];
-    if (!tokenBodyBase64) return void 0;
-    const tokenBodyJSON = Buffer2.from(tokenBodyBase64, "base64").toString(
-      "ascii"
-    );
-    return JSON.parse(tokenBodyJSON);
-  }
-  function getUserInfo() {
-    return Application.getState("userInfo");
-  }
-  function isLoggedIn() {
-    return getUserInfo() != void 0;
-  }
   var AniListInterceptor = class extends import_types3.PaperbackInterceptor {
     async interceptRequest(request) {
       return request;
@@ -3696,11 +3679,34 @@ query($id: Int) {
       if (!accessToken) return void 0;
       return {
         accessToken,
-        tokenBody: parseAccessToken(accessToken)
+        tokenBody: this.parseAccessToken(accessToken)
       };
     }
+    getAccessToken() {
+      const accessToken = Application.getSecureState("access_token");
+      if (!accessToken) return void 0;
+      return {
+        accessToken,
+        tokenBody: this.parseAccessToken(accessToken)
+      };
+    }
+    parseAccessToken(accessToken) {
+      if (!accessToken) return void 0;
+      const tokenBodyBase64 = accessToken.split(".")[1];
+      if (!tokenBodyBase64) return void 0;
+      const tokenBodyJSON = Buffer2.from(tokenBodyBase64, "base64").toString(
+        "ascii"
+      );
+      return JSON.parse(tokenBodyJSON);
+    }
+    getUserInfo() {
+      return Application.getState("userInfo");
+    }
+    isLoggedIn() {
+      return this.getUserInfo() != void 0;
+    }
     async refreshUserInfo() {
-      const accessToken = getAccessToken();
+      const accessToken = this.getAccessToken();
       if (accessToken == void 0) {
         return Application.setState(void 0, "userInfo");
       }
@@ -3709,7 +3715,12 @@ query($id: Int) {
       Application.setState(userInfo, "userInfo");
     }
     async getSettingsForm() {
-      return new SettingsForm(this.saveAccessToken, this.refreshUserInfo);
+      return new SettingsForm(
+        this.saveAccessToken,
+        this.refreshUserInfo,
+        this.getAccessToken,
+        this.getUserInfo
+      );
     }
     async getSearchResults(query, metadata) {
       const variables = {
@@ -3943,7 +3954,7 @@ query($id: Int) {
       };
     }
     async getMangaProgressManagementForm(sourceMangaInfo) {
-      if (!isLoggedIn()) {
+      if (!this.isLoggedIn()) {
         return this.getSettingsForm();
       } else {
         const variables = {
@@ -3954,7 +3965,11 @@ query($id: Int) {
           variables
         );
         const anilistManga = response.data.Media;
-        return new SourceForm(anilistManga, this.makeRequest);
+        return new SourceForm(
+          anilistManga,
+          this.makeRequest,
+          this.getUserInfo
+        );
       }
     }
     async processChapterReadActionQueue(chapterReadActions) {
@@ -4016,7 +4031,7 @@ query($id: Int) {
       return result;
     }
     async makeRequest(query, QueryVariables, search) {
-      const accessToken = getAccessToken()?.accessToken;
+      const accessToken = this.getAccessToken()?.accessToken;
       const request = {
         url: GRAPHQL_ENDPOINT,
         method: "POST",
