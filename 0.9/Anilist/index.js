@@ -3673,6 +3673,15 @@ query($id: Int) {
       this.mainRateLimiter.registerInterceptor();
       this.mainInterceptor.registerInterceptor();
     }
+    parseAccessToken(accessToken) {
+      if (!accessToken) return void 0;
+      const tokenBodyBase64 = accessToken.split(".")[1];
+      if (!tokenBodyBase64) return void 0;
+      const tokenBodyJSON = Buffer2.from(tokenBodyBase64, "base64").toString(
+        "ascii"
+      );
+      return JSON.parse(tokenBodyJSON);
+    }
     saveAccessToken(accessToken) {
       Application.setSecureState(accessToken, "access_token");
       this.refreshUserInfo();
@@ -3689,15 +3698,6 @@ query($id: Int) {
         accessToken,
         tokenBody: this.parseAccessToken(accessToken)
       };
-    }
-    parseAccessToken(accessToken) {
-      if (!accessToken) return void 0;
-      const tokenBodyBase64 = accessToken.split(".")[1];
-      if (!tokenBodyBase64) return void 0;
-      const tokenBodyJSON = Buffer2.from(tokenBodyBase64, "base64").toString(
-        "ascii"
-      );
-      return JSON.parse(tokenBodyJSON);
     }
     getUserInfo() {
       return Application.getState("userInfo");
