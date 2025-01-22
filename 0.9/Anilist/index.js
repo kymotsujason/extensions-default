@@ -3706,6 +3706,7 @@ query($id: Int) {
       return this.getUserInfo() != void 0;
     }
     async refreshUserInfo() {
+      throw new Error(`Not implemented ${this.getAccessToken()}`);
       const accessToken = this.getAccessToken();
       if (accessToken == void 0) {
         return Application.setState(void 0, "userInfo");
