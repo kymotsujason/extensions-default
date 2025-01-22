@@ -4390,16 +4390,15 @@ var source = (() => {
                     password
                   }
                 });
+                const data = Application.arrayBufferToUTF8String(buffer);
+                const json = JSON.parse(data);
                 if (response.status > 200) {
-                  const data = Application.arrayBufferToUTF8String(buffer);
-                  const json = JSON.parse(data);
-                  setProxyAccess(json.data.token);
-                  throw new Error(
-                    `Done Login: ${json.data.token}`
-                  );
+                  throw new Error(JSON.stringify(json));
+                  setProxyAccess(json.data);
+                  throw new Error(`Done Login: ${json.data}`);
                 } else {
                   throw new Error(
-                    `Login failed with error code: ${response.status}`
+                    `Login failed with error code: ${json.data}`
                   );
                 }
               }
