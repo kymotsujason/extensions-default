@@ -4194,6 +4194,15 @@ var source = (() => {
   function getEnableProxyServer() {
     return Application.getState("enable_proxy_server") ?? false;
   }
+  function getProxyUser() {
+    return Application.getState("proxy_user") ?? "";
+  }
+  function getProxyPass() {
+    return Application.getState("proxy_pass") ?? "";
+  }
+  function getProxyAccess() {
+    return Application.getSecureState("access_token") ?? "";
+  }
   function setLanguages(value) {
     Application.setState(value, "languages");
   }
@@ -4214,6 +4223,9 @@ var source = (() => {
   }
   function setEnableProxyServer(value) {
     Application.setState(value, "enable_proxy_server");
+  }
+  function setProxyAccess(value) {
+    Application.setSecureState(value, "proxy_access");
   }
   function getHomepageThumbnail() {
     return Application.getState("homepage_thumbnail") ?? MDImageQuality.getDefault("homepage");
@@ -4299,6 +4311,14 @@ var source = (() => {
                         // @ts-expect-error
                         "testProxy"
                       )
+                    }),
+                    (0, import_types.ButtonRow)("login", {
+                      title: "Login to Proxy",
+                      onSelect: Application.Selector(
+                        this,
+                        // @ts-expect-error
+                        "login"
+                      )
                     })
                   ])
                 ];
@@ -4310,9 +4330,42 @@ var source = (() => {
                 setEnableProxyServer(value);
               }
               async testProxy() {
-                throw new Error(
-                  `${getProxyServer()} and ${getEnableProxyServer()}`
-                );
+                const proxyURL = getProxyServer();
+                const [response, _] = await Application.scheduleRequest({
+                  method: "GET",
+                  url: `${proxyURL}`,
+                  headers: {
+                    "Content-Type": "application/json",
+                    referer: `${proxyURL}/`
+                  }
+                });
+                throw new Error(`${response.status}`);
+              }
+              async login() {
+                const proxyURL = getProxyServer();
+                const username = getProxyUser();
+                const password = getProxyPass();
+                const [response, buffer] = await Application.scheduleRequest({
+                  method: "POST",
+                  url: `${proxyURL}/api/auth/login`,
+                  headers: {
+                    "Content-Type": "application/json",
+                    referer: `${proxyURL}/`
+                  },
+                  body: {
+                    username,
+                    password
+                  }
+                });
+                if (response.status > 200) {
+                  const data = Application.arrayBufferToUTF8String(buffer);
+                  const json = JSON.parse(data);
+                  setProxyAccess(json.data.token);
+                } else {
+                  throw new Error(
+                    `Login failed with error code: ${response.status}`
+                  );
+                }
               }
             }()
           })
@@ -4992,11 +5045,14 @@ var source = (() => {
     async interceptRequest(request) {
       const proxyURL = getProxyServer();
       const proxyEnabled = getEnableProxyServer();
+      const proxyToken = getProxyAccess();
       if (proxyEnabled && proxyURL != "" && request.url.includes("data")) {
         request.headers = {
           ...request.headers,
-          referer: `${proxyURL}/`
+          referer: `${proxyURL}/`,
+          Authorization: "Bearer " + proxyToken
         };
+        return request;
       } else {
         request.headers = {
           ...request.headers,
