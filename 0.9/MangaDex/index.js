@@ -4198,10 +4198,10 @@ var source = (() => {
     return Application.getState("proxy_user") ?? "";
   }
   function getProxyPass() {
-    return Application.getState("proxy_pass") ?? "";
+    return Application.getSecureState("proxy_pass") ?? "";
   }
   function getProxyAccess() {
-    return Application.getSecureState("access_token") ?? "";
+    return Application.getSecureState("proxy_token") ?? "";
   }
   function setLanguages(value) {
     Application.setState(value, "languages");
@@ -4228,10 +4228,10 @@ var source = (() => {
     Application.setState(value, "proxy_user");
   }
   function setProxyPass(value) {
-    Application.setState(value, "proxy_pass");
+    Application.setSecureState(value, "proxy_pass");
   }
   function setProxyAccess(value) {
-    Application.setSecureState(value, "proxy_access");
+    Application.setSecureState(value, "proxy_token");
   }
   function getHomepageThumbnail() {
     return Application.getState("homepage_thumbnail") ?? MDImageQuality.getDefault("homepage");
