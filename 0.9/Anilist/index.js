@@ -2885,6 +2885,11 @@ query($id: Int) {
   init_buffer();
   var import_types = __toESM(require_lib());
   var SettingsForm = class extends import_types.Form {
+    constructor(saveAccessToken, refreshUserInfo) {
+      super();
+      this.saveAccessToken = saveAccessToken;
+      this.refreshUserInfo = refreshUserInfo;
+    }
     getSections() {
       return [
         (0, import_types.Section)("oAuthSection", [
@@ -2893,6 +2898,11 @@ query($id: Int) {
               return (0, import_types.NavigationRow)("sessionInfo", {
                 title: "Session Info",
                 form: new class extends import_types.Form {
+                  constructor(saveAccessToken, refreshUserInfo) {
+                    super();
+                    this.saveAccessToken = saveAccessToken;
+                    this.refreshUserInfo = refreshUserInfo;
+                  }
                   getSections() {
                     const accessToken = getAccessToken();
                     const userInfo = getUserInfo();
@@ -2927,6 +2937,14 @@ query($id: Int) {
                         })
                       ]),
                       (0, import_types.Section)("logout", [
+                        (0, import_types.ButtonRow)("refresh", {
+                          title: "Refresh User Info",
+                          onSelect: Application.Selector(
+                            this,
+                            // @ts-expect-error
+                            "refresh"
+                          )
+                        }),
                         (0, import_types.ButtonRow)("logout", {
                           title: "Logout",
                           onSelect: Application.Selector(
@@ -2938,15 +2956,15 @@ query($id: Int) {
                       ])
                     ];
                   }
-                  async logout() {
-                    Application.setSecureState(
-                      void 0,
-                      "access_token"
-                    );
-                    Application.setState(void 0, "userInfo");
+                  async refresh() {
+                    this.refreshUserInfo();
                     this.reloadForm();
                   }
-                }()
+                  async logout() {
+                    this.saveAccessToken(void 0);
+                    this.reloadForm();
+                  }
+                }(this.saveAccessToken, this.refreshUserInfo)
               });
             } else {
               return (0, import_types.OAuthButtonRow)("oAuthButton", {
@@ -2967,7 +2985,7 @@ query($id: Int) {
       ];
     }
     async oauthDidSucceed(value) {
-      Application.setSecureState(value, "access_token");
+      this.saveAccessToken(value);
     }
   };
 
@@ -3691,8 +3709,7 @@ query($id: Int) {
       Application.setState(userInfo, "userInfo");
     }
     async getSettingsForm() {
-      throw new Error("Not implemented");
-      return new SettingsForm();
+      return new SettingsForm(this.saveAccessToken, this.refreshUserInfo);
     }
     async getSearchResults(query, metadata) {
       const variables = {
