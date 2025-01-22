@@ -4393,12 +4393,13 @@ var source = (() => {
                 const data = Application.arrayBufferToUTF8String(buffer);
                 const json = JSON.parse(data);
                 if (response.status === 200) {
-                  throw new Error(JSON.stringify(json));
-                  setProxyAccess(json.data);
-                  throw new Error(`Done Login: ${json.data}`);
+                  setProxyAccess(json.token);
+                  throw new Error(`Done Login: ${json.token}`);
                 } else {
                   throw new Error(
-                    `Login failed with error code: ${json.data}`
+                    `Login failed with error code: ${JSON.stringify(
+                      json
+                    )}`
                   );
                 }
               }
