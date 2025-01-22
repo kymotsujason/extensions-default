@@ -3691,6 +3691,7 @@ query($id: Int) {
       Application.setState(userInfo, "userInfo");
     }
     async getSettingsForm() {
+      throw new Error("Not implemented");
       return new SettingsForm();
     }
     async getSearchResults(query, metadata) {
