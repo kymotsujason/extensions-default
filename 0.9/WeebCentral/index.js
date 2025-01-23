@@ -18471,6 +18471,7 @@ Type: ${row["type"]}`
         });
         const response2 = await this.requestManager.schedule(request2, 1);
         const json = JSON.parse(response2.data);
+        throw new Error(response2.data);
         chapters.pages = json.processedImages;
       }
       return chapters;
