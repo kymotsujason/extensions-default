@@ -5136,12 +5136,11 @@ var source = (() => {
     async interceptResponse(request, response, data) {
       if (request.url.includes("data") && // @ts-expect-error
       response.headers["Content-Type"].includes("image")) {
-        throw new Error(Application.arrayBufferToUTF8String(data));
         const proxyURL = getProxyServer();
         const bufferString = Application.arrayBufferToUTF8String(data);
         const [_, buffer] = await Application.scheduleRequest({
           url: `${proxyURL}/manga/trim`,
-          method: "get",
+          method: "post",
           headers: {
             ...request.headers
           },
