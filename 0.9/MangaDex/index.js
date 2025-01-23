@@ -5140,7 +5140,7 @@ var source = (() => {
         const bufferString = Application.arrayBufferToUTF8String(data);
         const [_, buffer] = await Application.scheduleRequest({
           url: `${proxyURL}/trim`,
-          method: "POST",
+          method: "get",
           headers: {
             referer: `${proxyURL}/`
           },
