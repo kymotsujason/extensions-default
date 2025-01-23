@@ -5134,9 +5134,7 @@ var source = (() => {
       return request;
     }
     async interceptResponse(request, response, data) {
-      if (response.headers["Content-Type"]?.includes("image")) {
-        throw new Error(JSON.stringify(response));
-      }
+      throw new Error(JSON.stringify(request));
       return data;
     }
   };
