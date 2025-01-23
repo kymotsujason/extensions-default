@@ -5082,7 +5082,7 @@ var source = (() => {
       const proxyURL = getProxyServer();
       const proxyEnabled = getEnableProxyServer();
       const proxyToken = getProxyAccess();
-      if (proxyEnabled && proxyURL != "" && (request.url.includes("data") || request.url.includes("manga"))) {
+      if (proxyEnabled && proxyURL != "" && (request.url.includes("data") || request.url.includes("chapterId"))) {
         request.headers = {
           ...request.headers,
           referer: `${proxyURL}/`,
@@ -5445,15 +5445,9 @@ var source = (() => {
           (x) => `${serverUrl}/data-saver/${chapterDetails.hash}/${x}`
         );
       } else {
-        if (proxyEnabled && proxyURL != "") {
-          pages = chapterDetails.data.map(
-            (x) => `${serverUrl}/proxycache/${chapterDetails.hash}/${x}`
-          );
-        } else {
-          pages = chapterDetails.data.map(
-            (x) => `${serverUrl}/data/${chapterDetails.hash}/${x}`
-          );
-        }
+        pages = chapterDetails.data.map(
+          (x) => `${serverUrl}/data/${chapterDetails.hash}/${x}`
+        );
       }
       return {
         id: chapterId,
