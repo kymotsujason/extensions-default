@@ -5083,6 +5083,7 @@ var source = (() => {
       const proxyEnabled = getEnableProxyServer();
       const proxyToken = getProxyAccess();
       if (proxyEnabled && proxyURL != "" && request.url.includes("data") || request.url.includes("manga")) {
+        throw new Error("No");
         request.headers = {
           ...request.headers,
           referer: `${proxyURL}/`,
