@@ -5244,14 +5244,9 @@ var source = (() => {
 
   // src/MangaDex/trimWhitespace.ts
   var import_stream = __toESM(require_stream());
-  async function trimWhitespace(imageArrayBuffer, imageType) {
+  async function trimWhitespace(imageArrayBuffer) {
     const buffer = Buffer2.from(imageArrayBuffer);
-    img: void 0;
-    if (imageType === "png") {
-      await (void 0)(import_stream.Readable.from(buffer));
-    } else if (imageType === "jpeg") {
-      await (void 0)(import_stream.Readable.from(buffer));
-    }
+    const img = await (void 0)(import_stream.Readable.from(buffer));
     const { width, height } = img;
     let top = height, left = width, right = 0, bottom = 0;
     const ctx = img.getContext("2d");
@@ -5293,7 +5288,7 @@ var source = (() => {
     const arrayBuffer = await encodePNGToArrayBuffer(trimmedImg);
     return arrayBuffer;
   }
-  function encodePNGToArrayBuffer(img2) {
+  function encodePNGToArrayBuffer(img) {
     return new Promise((resolve, reject) => {
       const chunks = [];
       const stream = {
@@ -5323,7 +5318,7 @@ var source = (() => {
           }
         }
       };
-      (void 0)(img2, stream).then(() => {
+      (void 0)(img, stream).then(() => {
       }).catch((err) => {
         reject(err);
       });
@@ -5399,11 +5394,7 @@ var source = (() => {
     }
     async interceptResponse(request, response, data) {
       if (request.url.includes("data")) {
-        if (response.headers["Content-Type"].includes("image")) {
-          return await trimWhitespace(data, "jpeg");
-        } else {
-          return await trimWhitespace(data, "png");
-        }
+        return await trimWhitespace(data);
       }
       return data;
     }
