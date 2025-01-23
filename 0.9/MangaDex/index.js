@@ -5151,8 +5151,9 @@ var source = (() => {
         const trimmedData = Application.arrayBufferToUTF8String(buffer);
         const json = JSON.parse(trimmedData);
         return json.data.trimmed;
+      } else {
+        return data;
       }
-      return data;
     }
   };
   var MangaDexExtension = class {
