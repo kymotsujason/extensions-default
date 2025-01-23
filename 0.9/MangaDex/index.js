@@ -22697,7 +22697,6 @@ var source = (() => {
           //fuzzy: true, // Enable fuzzy matching
         });
         if (response.headers["Content-Type"].includes("png")) {
-          return await image.getBuffer("image/png");
           const buffer = await image.getBuffer("image/png");
           const arrayBuffer = new ArrayBuffer(buffer.length);
           const view = new Uint8Array(arrayBuffer);
@@ -22706,7 +22705,6 @@ var source = (() => {
           }
           return arrayBuffer;
         } else {
-          return await image.getBuffer("image/jpeg");
           const buffer = await image.getBuffer("image/jpeg");
           const arrayBuffer = new ArrayBuffer(buffer.length);
           const view = new Uint8Array(arrayBuffer);
