@@ -25409,23 +25409,32 @@ Type: ${row["type"]}`
                 id: "login_proxy_server",
                 label: "Login to Proxy Server",
                 onTap: async () => {
-                  const proxyURL = getProxyServer(stateManager);
-                  const username = getProxyUser(stateManager);
-                  const password = getProxyPass(stateManager);
-                  const [response, buffer] = await Application.scheduleRequest({
-                    method: "POST",
+                  const proxyURL = await getProxyServer(
+                    stateManager
+                  );
+                  const username = await getProxyUser(
+                    stateManager
+                  );
+                  const password = await getProxyPass(
+                    stateManager
+                  );
+                  const request = App.createRequest({
                     url: `${proxyURL}/api/auth/login`,
+                    method: "POST",
                     headers: {
                       "Content-Type": "application/json",
                       referer: `${proxyURL}/`
                     },
-                    body: {
+                    data: {
                       username,
                       password
                     }
                   });
-                  const data2 = Application.arrayBufferToUTF8String(buffer);
-                  const json = JSON.parse(data2);
+                  const response = await requestManager.schedule(
+                    request,
+                    1
+                  );
+                  const json = JSON.parse(response.data);
                   if (response.status === 200) {
                     await stateManager.store(
                       "proxy_token",
