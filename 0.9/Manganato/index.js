@@ -4535,8 +4535,8 @@ Type: ${row["type"]}`
   };
   var proxySettings = (stateManager, requestManager) => {
     return App.createDUINavigationButton({
-      id: "settings",
-      label: "Settings",
+      id: "proxy_settings",
+      label: "Proxy Settings",
       form: App.createDUIForm({
         sections: async () => [
           App.createDUISection({
@@ -4641,9 +4641,11 @@ Type: ${row["type"]}`
                   if (response.status === 200) {
                     await stateManager.store(
                       "proxy_token",
-                      json
+                      json.token
                     );
-                    throw new Error(`Done Login: ${json}`);
+                    throw new Error(
+                      `Done Login: ${json.token}`
+                    );
                   } else {
                     throw new Error(
                       `Login failed with error code: ${JSON.stringify(
