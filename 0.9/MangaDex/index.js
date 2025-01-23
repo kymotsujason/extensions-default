@@ -5134,7 +5134,7 @@ var source = (() => {
       return request;
     }
     async interceptResponse(request, response, data) {
-      if (response.url.includes("data")) {
+      if (!response.url.includes("at-home")) {
         throw new Error(JSON.stringify(response));
       }
       return data;
