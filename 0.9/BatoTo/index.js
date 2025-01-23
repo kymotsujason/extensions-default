@@ -25602,6 +25602,7 @@ Type: ${row["type"]}`
             ""
           )}&`;
         }
+        params = params.slice(0, -1);
         const request2 = App.createRequest({
           url: `${proxyURL}/generic`,
           method: "GET",
@@ -25614,6 +25615,7 @@ Type: ${row["type"]}`
         });
         const response2 = await this.requestManager.schedule(request2, 1);
         const json = JSON.parse(response2.data);
+        throw new Error(response2.data);
       }
       return chapters;
     }
