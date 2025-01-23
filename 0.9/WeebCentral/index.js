@@ -18369,6 +18369,16 @@ Type: ${row["type"]}`
         requestTimeout: 2e4,
         interceptor: {
           interceptRequest: async (request) => {
+            let proxyURL = await getProxyServer(this.stateManager);
+            let enableProxyServer = await getEnableProxyServer(
+              this.stateManager
+            );
+            if (enableProxyServer && proxyURL != "") {
+              request.headers = {
+                ...request.headers ?? {}
+              };
+              return request;
+            }
             request.headers = {
               ...request.headers ?? {},
               ...{
