@@ -22696,6 +22696,7 @@ var source = (() => {
           // Optional: leave a border of pixels around the image
           //fuzzy: true, // Enable fuzzy matching
         });
+        return data;
         if (response.headers["Content-Type"].includes("png")) {
           const buffer = await image.getBuffer("image/png");
           const arrayBuffer = new ArrayBuffer(buffer.length);
