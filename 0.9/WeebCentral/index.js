@@ -18212,6 +18212,152 @@ Type: ${row["type"]}`
   var parse5 = getParse((content, options, isDocument2, context) => options._useHtmlParser2 ? parseDocument(content, options) : parseWithParse5(content, options, isDocument2, context));
   var load = getLoad(parse5, (dom, options) => options._useHtmlParser2 ? esm_default(dom, options) : renderWithParse5(dom));
 
+  // src/WeebCentral/WeebCentralSettings.ts
+  init_buffer();
+  var getProxyUser = async (stateManager) => {
+    return await stateManager.retrieve("proxy_user") ?? "";
+  };
+  var getProxyPass = async (stateManager) => {
+    return await stateManager.retrieve("proxy_pass") ?? "";
+  };
+  var getProxyAccess = async (stateManager) => {
+    return await stateManager.retrieve("proxy_token") ?? "";
+  };
+  var getProxyServer = async (stateManager) => {
+    return await stateManager.retrieve("proxy_server") ?? "";
+  };
+  var getEnableProxyServer = async (stateManager) => {
+    return await stateManager.retrieve("enable_proxy_server") ?? false;
+  };
+  var proxySettings = (stateManager, requestManager) => {
+    return App.createDUINavigationButton({
+      id: "proxy_settings",
+      label: "Proxy Settings",
+      form: App.createDUIForm({
+        sections: async () => [
+          App.createDUISection({
+            id: "proxy",
+            footer: "Proxy Settings",
+            isHidden: false,
+            rows: async () => [
+              App.createDUIInputField({
+                id: "proxy_server",
+                label: "Proxy Server",
+                value: App.createDUIBinding({
+                  get: () => getProxyServer(stateManager),
+                  set: async (newValue) => await stateManager.store(
+                    "proxy_server",
+                    newValue
+                  )
+                })
+              }),
+              App.createDUIInputField({
+                id: "proxy_user",
+                label: "Proxy Username",
+                value: App.createDUIBinding({
+                  get: () => getProxyUser(stateManager),
+                  set: async (newValue) => await stateManager.store(
+                    "proxy_user",
+                    newValue
+                  )
+                })
+              }),
+              App.createDUIInputField({
+                id: "proxy_pass",
+                label: "Proxy Password",
+                value: App.createDUIBinding({
+                  get: () => getProxyPass(stateManager),
+                  set: async (newValue) => await stateManager.store(
+                    "proxy_pass",
+                    newValue
+                  )
+                })
+              }),
+              App.createDUISwitch({
+                id: "enable_proxy_server",
+                label: "Enable Proxy Server",
+                value: App.createDUIBinding({
+                  get: () => getEnableProxyServer(stateManager),
+                  set: async (newValue) => await stateManager.store(
+                    "enable_proxy_server",
+                    newValue
+                  )
+                })
+              }),
+              App.createDUIButton({
+                id: "test_proxy",
+                label: "Test Proxy Server",
+                onTap: async () => {
+                  const proxyURL = await getProxyServer(
+                    stateManager
+                  );
+                  const request = App.createRequest({
+                    url: `${proxyURL}`,
+                    method: "GET",
+                    headers: {
+                      referer: `${proxyURL}/`
+                    }
+                  });
+                  const response = await requestManager.schedule(
+                    request,
+                    1
+                  );
+                  throw new Error(`${response.status}`);
+                }
+              }),
+              App.createDUIButton({
+                id: "login_proxy_server",
+                label: "Login to Proxy Server",
+                onTap: async () => {
+                  const proxyURL = await getProxyServer(
+                    stateManager
+                  );
+                  const username = await getProxyUser(
+                    stateManager
+                  );
+                  const password = await getProxyPass(
+                    stateManager
+                  );
+                  const request = App.createRequest({
+                    url: `${proxyURL}/api/auth/login`,
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      referer: `${proxyURL}/`
+                    },
+                    param: `?username=${username}&password=${password}`
+                  });
+                  const response = await requestManager.schedule(
+                    request,
+                    1
+                  );
+                  const json = JSON.parse(
+                    response.data
+                  );
+                  if (response.status === 200) {
+                    await stateManager.store(
+                      "proxy_token",
+                      json.token
+                    );
+                    throw new Error(
+                      `Done Login: ${json.token}`
+                    );
+                  } else {
+                    throw new Error(
+                      `Login failed with error code: ${JSON.stringify(
+                        json
+                      )}`
+                    );
+                  }
+                }
+              })
+            ]
+          })
+        ]
+      })
+    });
+  };
+
   // src/WeebCentral/main.ts
   var BASE_DOMAIN = "https://weebcentral.com";
   var WeebCentralExtension = class extends import__2.Source {
@@ -18239,9 +18385,22 @@ Type: ${row["type"]}`
       });
       this.RETRY = 5;
       this.parser = new Parser();
+      this.stateManager = App.createSourceStateManager();
     }
     getMangaShareUrl(mangaId) {
       return `${this.baseUrl}/series/${mangaId}`;
+    }
+    async getSourceMenu() {
+      return Promise.resolve(
+        App.createDUISection({
+          id: "main",
+          header: "Source Settings",
+          isHidden: false,
+          rows: async () => [
+            proxySettings(this.stateManager, this.requestManager)
+          ]
+        })
+      );
     }
     async getMangaDetails(mangaId) {
       const request = App.createRequest({
@@ -18283,7 +18442,38 @@ Type: ${row["type"]}`
       );
       this.checkResponseError(response);
       const $2 = this.cheerio.load(response.data);
-      return this.parser.parseChapterDetails($2, mangaId, chapterId);
+      let chapters = await this.parser.parseChapterDetails(
+        $2,
+        mangaId,
+        chapterId
+      );
+      let accessToken = await getProxyAccess(this.stateManager);
+      let proxyURL = await getProxyServer(this.stateManager);
+      let enableProxyServer = await getEnableProxyServer(this.stateManager);
+      if (enableProxyServer && proxyURL != "") {
+        let params = "?";
+        for (const page in chapters.pages) {
+          params += `imageUrls=${chapters.pages[page].replace(
+            "?undefined",
+            ""
+          )}&`;
+        }
+        params = params.slice(0, -1);
+        const request2 = App.createRequest({
+          url: `${proxyURL}/generic`,
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            referer: `${proxyURL}/`,
+            Authorization: `Bearer ${accessToken}`
+          },
+          param: params
+        });
+        const response2 = await this.requestManager.schedule(request2, 1);
+        const json = JSON.parse(response2.data);
+        chapters.pages = json.processedImages;
+      }
+      return chapters;
     }
     async getSearchTags() {
       const request = App.createRequest({
