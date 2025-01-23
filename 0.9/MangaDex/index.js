@@ -5393,7 +5393,8 @@ var source = (() => {
       return request;
     }
     async interceptResponse(request, response, data) {
-      if (request.url.includes("data")) {
+      if (response.url.includes("data")) {
+        throw new Error("test");
         return await trimWhitespace(data);
       }
       return data;
