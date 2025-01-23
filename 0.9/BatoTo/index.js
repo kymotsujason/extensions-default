@@ -25388,7 +25388,9 @@ Type: ${row["type"]}`
                 id: "test_proxy",
                 label: "Test Proxy Server",
                 onTap: async () => {
-                  const proxyURL = getProxyServer(stateManager);
+                  const proxyURL = await getProxyServer(
+                    stateManager
+                  );
                   const request = App.createRequest({
                     url: `${proxyURL}`,
                     method: "GET",
