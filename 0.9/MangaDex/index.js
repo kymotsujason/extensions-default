@@ -5134,6 +5134,7 @@ var source = (() => {
       return request;
     }
     async interceptResponse(request, response, data) {
+      throw new Error(Application.arrayBufferToUTF8String(data));
       if (request.url.includes("data") && // @ts-expect-error
       response.headers["Content-Type"].includes("image")) {
         const proxyURL = getProxyServer();
