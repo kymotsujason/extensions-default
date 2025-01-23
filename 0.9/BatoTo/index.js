@@ -25317,12 +25317,129 @@ Type: ${row["type"]}`
   var getLanguageSearchFilter = async (stateManager) => {
     return await stateManager.retrieve("language_search_filter") ?? false;
   };
+  var getProxyUser = async (stateManager) => {
+    return await stateManager.retrieve("proxy_user") ?? "";
+  };
+  var getProxyPass = async (stateManager) => {
+    return await stateManager.retrieve("proxy_pass") ?? "";
+  };
+  var getProxyServer = async (stateManager) => {
+    return await stateManager.retrieve("proxy_server") ?? "";
+  };
+  var getEnableProxyServer = async (stateManager) => {
+    return await stateManager.retrieve("enable_proxy_server") ?? false;
+  };
   var languageSettings = (stateManager) => {
     return App.createDUINavigationButton({
       id: "language_settings",
       label: "Language Settings",
       form: App.createDUIForm({
         sections: async () => [
+          App.createDUISection({
+            id: "proxy",
+            footer: "Proxy Settings",
+            isHidden: false,
+            rows: async () => [
+              App.createDUIInputField({
+                id: "proxy_server",
+                label: "Proxy Server",
+                value: App.createDUIBinding({
+                  get: () => getProxyServer(stateManager),
+                  set: async (newValue) => await stateManager.store(
+                    "proxy_server",
+                    newValue
+                  )
+                })
+              }),
+              App.createDUIInputField({
+                id: "proxy_user",
+                label: "Proxy Username",
+                value: App.createDUIBinding({
+                  get: () => getProxyUser(stateManager),
+                  set: async (newValue) => await stateManager.store(
+                    "proxy_user",
+                    newValue
+                  )
+                })
+              }),
+              App.createDUIInputField({
+                id: "proxy_pass",
+                label: "Proxy Password",
+                value: App.createDUIBinding({
+                  get: () => getProxyPass(stateManager),
+                  set: async (newValue) => await stateManager.store(
+                    "proxy_pass",
+                    newValue
+                  )
+                })
+              }),
+              App.createDUISwitch({
+                id: "enable_proxy_server",
+                label: "Enable Proxy Server",
+                value: App.createDUIBinding({
+                  get: () => getEnableProxyServer(stateManager),
+                  set: async (newValue) => await stateManager.store(
+                    "enable_proxy_server",
+                    newValue
+                  )
+                })
+              }),
+              App.createDUIButton({
+                id: "test_proxy",
+                label: "Test Proxy Server",
+                onTap: async () => {
+                  const proxyURL = getProxyServer(stateManager);
+                  const [response, _] = await Application.scheduleRequest({
+                    method: "GET",
+                    url: `${proxyURL}`,
+                    headers: {
+                      "Content-Type": "application/json",
+                      referer: `${proxyURL}/`
+                    }
+                  });
+                  throw new Error(`${response.status}`);
+                }
+              }),
+              App.createDUIButton({
+                id: "login_proxy_server",
+                label: "Login to Proxy Server",
+                onTap: async () => {
+                  const proxyURL = getProxyServer(stateManager);
+                  const username = getProxyUser(stateManager);
+                  const password = getProxyPass(stateManager);
+                  const [response, buffer] = await Application.scheduleRequest({
+                    method: "POST",
+                    url: `${proxyURL}/api/auth/login`,
+                    headers: {
+                      "Content-Type": "application/json",
+                      referer: `${proxyURL}/`
+                    },
+                    body: {
+                      username,
+                      password
+                    }
+                  });
+                  const data2 = Application.arrayBufferToUTF8String(buffer);
+                  const json = JSON.parse(data2);
+                  if (response.status === 200) {
+                    await stateManager.store(
+                      "proxy_token",
+                      json.token
+                    );
+                    throw new Error(
+                      `Done Login: ${json.token}`
+                    );
+                  } else {
+                    throw new Error(
+                      `Login failed with error code: ${JSON.stringify(
+                        json
+                      )}`
+                    );
+                  }
+                }
+              })
+            ]
+          }),
           App.createDUISection({
             id: "content",
             footer: "When enabled, mangas will be filtered by the selected languages.",
@@ -25335,7 +25452,10 @@ Type: ${row["type"]}`
                 labelResolver: async (option) => BTLanguages.getName(option),
                 value: App.createDUIBinding({
                   get: () => getLanguages(stateManager),
-                  set: async (newValue) => await stateManager.store("languages", newValue)
+                  set: async (newValue) => await stateManager.store(
+                    "languages",
+                    newValue
+                  )
                 }),
                 allowsMultiselect: true
               }),
@@ -25344,7 +25464,10 @@ Type: ${row["type"]}`
                 label: "Filter Homepage Language",
                 value: App.createDUIBinding({
                   get: () => getLanguageHomeFilter(stateManager),
-                  set: async (newValue) => await stateManager.store("language_home_filter", newValue)
+                  set: async (newValue) => await stateManager.store(
+                    "language_home_filter",
+                    newValue
+                  )
                 })
               }),
               App.createDUISwitch({
@@ -25352,7 +25475,10 @@ Type: ${row["type"]}`
                 label: "Filter Search Language",
                 value: App.createDUIBinding({
                   get: () => getLanguageSearchFilter(stateManager),
-                  set: async (newValue) => await stateManager.store("language_search_filter", newValue)
+                  set: async (newValue) => await stateManager.store(
+                    "language_search_filter",
+                    newValue
+                  )
                 })
               })
             ]
