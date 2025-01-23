@@ -25323,6 +25323,9 @@ Type: ${row["type"]}`
   var getProxyPass = async (stateManager) => {
     return await stateManager.retrieve("proxy_pass") ?? "";
   };
+  var getProxyAccess = async (stateManager) => {
+    return await stateManager.retrieve("proxy_token") ?? "";
+  };
   var getProxyServer = async (stateManager) => {
     return await stateManager.retrieve("proxy_server") ?? "";
   };
@@ -25431,15 +25434,15 @@ Type: ${row["type"]}`
                     request,
                     1
                   );
-                  const json = JSON.parse(response.data);
+                  const json = JSON.parse(
+                    response.data
+                  );
                   if (response.status === 200) {
                     await stateManager.store(
                       "proxy_token",
-                      json.token
+                      json
                     );
-                    throw new Error(
-                      `Done Login: ${json.token}`
-                    );
+                    throw new Error(`Done Login: ${json}`);
                   } else {
                     throw new Error(
                       `Login failed with error code: ${JSON.stringify(
@@ -25587,7 +25590,29 @@ Type: ${row["type"]}`
       const response = await this.requestManager.schedule(request, 1);
       this.CloudFlareError(response.status);
       const $3 = this.cheerio.load(response.data);
-      return parseChapterDetails($3, mangaId2, chapterId2);
+      let chapters = parseChapterDetails($3, mangaId2, chapterId2);
+      let accessToken = await getProxyAccess(this.stateManager);
+      let proxyURL = await getProxyServer(this.stateManager);
+      let enableProxyServer = await getEnableProxyServer(this.stateManager);
+      if (enableProxyServer && proxyURL != "") {
+        let params = "?";
+        for (const page in chapters.pages) {
+          params += `page=${page.replace("?undefined", "")}&`;
+        }
+        const request2 = App.createRequest({
+          url: `${proxyURL}/generic`,
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            referer: `${proxyURL}/`,
+            Authorization: `Bearer ${accessToken}`
+          },
+          param: params
+        });
+        const response2 = await this.requestManager.schedule(request2, 1);
+        const json = JSON.parse(response2.data);
+      }
+      return chapters;
     }
     async getHomePageSections(sectionCallback) {
       const request = App.createRequest({
