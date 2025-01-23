@@ -5139,7 +5139,7 @@ var source = (() => {
         const proxyURL = getProxyServer();
         const bufferString = Application.arrayBufferToUTF8String(data);
         const [_, buffer] = await Application.scheduleRequest({
-          url: `${proxyURL}/manga/trim`,
+          url: `${proxyURL}/trim`,
           method: "post",
           headers: {
             referer: `${proxyURL}/`
