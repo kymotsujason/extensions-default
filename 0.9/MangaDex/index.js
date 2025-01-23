@@ -5142,7 +5142,7 @@ var source = (() => {
           url: `${proxyURL}/manga/trim`,
           method: "post",
           headers: {
-            ...request.headers
+            referer: `${proxyURL}/`
           },
           body: {
             buffer: bufferString
