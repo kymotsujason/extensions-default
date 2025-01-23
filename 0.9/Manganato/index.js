@@ -4518,6 +4518,147 @@ Type: ${row["type"]}`
       })
     });
   };
+  var getProxyUser = async (stateManager) => {
+    return await stateManager.retrieve("proxy_user") ?? "";
+  };
+  var getProxyPass = async (stateManager) => {
+    return await stateManager.retrieve("proxy_pass") ?? "";
+  };
+  var getProxyAccess = async (stateManager) => {
+    return await stateManager.retrieve("proxy_token") ?? "";
+  };
+  var getProxyServer = async (stateManager) => {
+    return await stateManager.retrieve("proxy_server") ?? "";
+  };
+  var getEnableProxyServer = async (stateManager) => {
+    return await stateManager.retrieve("enable_proxy_server") ?? false;
+  };
+  var proxySettings = (stateManager, requestManager) => {
+    return App.createDUINavigationButton({
+      id: "settings",
+      label: "Settings",
+      form: App.createDUIForm({
+        sections: async () => [
+          App.createDUISection({
+            id: "proxy",
+            footer: "Proxy Settings",
+            isHidden: false,
+            rows: async () => [
+              App.createDUIInputField({
+                id: "proxy_server",
+                label: "Proxy Server",
+                value: App.createDUIBinding({
+                  get: () => getProxyServer(stateManager),
+                  set: async (newValue) => await stateManager.store(
+                    "proxy_server",
+                    newValue
+                  )
+                })
+              }),
+              App.createDUIInputField({
+                id: "proxy_user",
+                label: "Proxy Username",
+                value: App.createDUIBinding({
+                  get: () => getProxyUser(stateManager),
+                  set: async (newValue) => await stateManager.store(
+                    "proxy_user",
+                    newValue
+                  )
+                })
+              }),
+              App.createDUIInputField({
+                id: "proxy_pass",
+                label: "Proxy Password",
+                value: App.createDUIBinding({
+                  get: () => getProxyPass(stateManager),
+                  set: async (newValue) => await stateManager.store(
+                    "proxy_pass",
+                    newValue
+                  )
+                })
+              }),
+              App.createDUISwitch({
+                id: "enable_proxy_server",
+                label: "Enable Proxy Server",
+                value: App.createDUIBinding({
+                  get: () => getEnableProxyServer(stateManager),
+                  set: async (newValue) => await stateManager.store(
+                    "enable_proxy_server",
+                    newValue
+                  )
+                })
+              }),
+              App.createDUIButton({
+                id: "test_proxy",
+                label: "Test Proxy Server",
+                onTap: async () => {
+                  const proxyURL = await getProxyServer(
+                    stateManager
+                  );
+                  const request = App.createRequest({
+                    url: `${proxyURL}`,
+                    method: "GET",
+                    headers: {
+                      referer: `${proxyURL}/`
+                    }
+                  });
+                  const response = await requestManager.schedule(
+                    request,
+                    1
+                  );
+                  throw new Error(`${response.status}`);
+                }
+              }),
+              App.createDUIButton({
+                id: "login_proxy_server",
+                label: "Login to Proxy Server",
+                onTap: async () => {
+                  const proxyURL = await getProxyServer(
+                    stateManager
+                  );
+                  const username = await getProxyUser(
+                    stateManager
+                  );
+                  const password = await getProxyPass(
+                    stateManager
+                  );
+                  const request = App.createRequest({
+                    url: `${proxyURL}/api/auth/login`,
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                      referer: `${proxyURL}/`
+                    },
+                    param: `?username=${username}&password=${password}`
+                  });
+                  const response = await requestManager.schedule(
+                    request,
+                    1
+                  );
+                  const json = JSON.parse(
+                    response.data
+                  );
+                  if (response.status === 200) {
+                    await stateManager.store(
+                      "proxy_token",
+                      json
+                    );
+                    throw new Error(`Done Login: ${json}`);
+                  } else {
+                    throw new Error(
+                      `Login failed with error code: ${JSON.stringify(
+                        json
+                      )}`
+                    );
+                  }
+                }
+              })
+            ]
+          })
+        ]
+      })
+    });
+  };
 
   // node_modules/cheerio/dist/browser/index.js
   var browser_exports = {};
@@ -17903,7 +18044,10 @@ Type: ${row["type"]}`
         id: "main",
         header: "Source Settings",
         isHidden: false,
-        rows: async () => [chapterSettings(this.stateManager)]
+        rows: async () => [
+          chapterSettings(this.stateManager),
+          proxySettings(this.stateManager, this.requestManager)
+        ]
       });
     }
     getMangaShareUrl(mangaId) {
@@ -17998,7 +18142,39 @@ Type: ${row["type"]}`
       });
       const response = await this.requestManager.schedule(request, 1);
       const $2 = this.cheerio.load(response.data);
-      return this.parser.parseChapterDetails($2, mangaId, chapterId, this);
+      let chapters = await this.parser.parseChapterDetails(
+        $2,
+        mangaId,
+        chapterId,
+        this
+      );
+      let accessToken = await getProxyAccess(this.stateManager);
+      let proxyURL = await getProxyServer(this.stateManager);
+      let enableProxyServer = await getEnableProxyServer(this.stateManager);
+      if (enableProxyServer && proxyURL != "") {
+        let params = "?";
+        for (const page in chapters.pages) {
+          params += `imageUrls=${chapters.pages[page].replace(
+            "?undefined",
+            ""
+          )}&`;
+        }
+        params = params.slice(0, -1);
+        const request2 = App.createRequest({
+          url: `${proxyURL}/generic`,
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            referer: `${proxyURL}/`,
+            Authorization: `Bearer ${accessToken}`
+          },
+          param: params
+        });
+        const response2 = await this.requestManager.schedule(request2, 1);
+        const json = JSON.parse(response2.data);
+        chapters.pages = json.processedImages;
+      }
+      return chapters;
     }
     async getViewMoreItems(homePageSectionId, metadata) {
       const page = metadata?.page ?? 1;

@@ -25332,7 +25332,7 @@ Type: ${row["type"]}`
   var getEnableProxyServer = async (stateManager) => {
     return await stateManager.retrieve("enable_proxy_server") ?? false;
   };
-  var languageSettings = (stateManager, requestManager) => {
+  var proxySettings = (stateManager, requestManager) => {
     return App.createDUINavigationButton({
       id: "settings",
       label: "Settings",
@@ -25453,7 +25453,17 @@ Type: ${row["type"]}`
                 }
               })
             ]
-          }),
+          })
+        ]
+      })
+    });
+  };
+  var languageSettings = (stateManager) => {
+    return App.createDUINavigationButton({
+      id: "language_settings",
+      label: "Language Settings",
+      form: App.createDUIForm({
+        sections: async () => [
           App.createDUISection({
             id: "content",
             footer: "When enabled, mangas will be filtered by the selected languages.",
@@ -25553,7 +25563,8 @@ Type: ${row["type"]}`
           header: "Source Settings",
           isHidden: false,
           rows: async () => [
-            languageSettings(this.stateManager, this.requestManager),
+            proxySettings(this.stateManager, this.requestManager),
+            languageSettings(this.stateManager),
             resetSettings(this.stateManager)
           ]
         })
@@ -25590,7 +25601,7 @@ Type: ${row["type"]}`
       const response = await this.requestManager.schedule(request, 1);
       this.CloudFlareError(response.status);
       const $3 = this.cheerio.load(response.data);
-      let chapters = parseChapterDetails($3, mangaId2, chapterId2);
+      let chapters = await parseChapterDetails($3, mangaId2, chapterId2);
       let accessToken = await getProxyAccess(this.stateManager);
       let proxyURL = await getProxyServer(this.stateManager);
       let enableProxyServer = await getEnableProxyServer(this.stateManager);
