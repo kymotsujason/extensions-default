@@ -25329,10 +25329,10 @@ Type: ${row["type"]}`
   var getEnableProxyServer = async (stateManager) => {
     return await stateManager.retrieve("enable_proxy_server") ?? false;
   };
-  var languageSettings = (stateManager) => {
+  var languageSettings = (stateManager, requestManager) => {
     return App.createDUINavigationButton({
-      id: "language_settings",
-      label: "Language Settings",
+      id: "settings",
+      label: "Settings",
       form: App.createDUIForm({
         sections: async () => [
           App.createDUISection({
@@ -25389,14 +25389,17 @@ Type: ${row["type"]}`
                 label: "Test Proxy Server",
                 onTap: async () => {
                   const proxyURL = getProxyServer(stateManager);
-                  const [response, _] = await Application.scheduleRequest({
-                    method: "GET",
+                  const request = App.createRequest({
                     url: `${proxyURL}`,
+                    method: "GET",
                     headers: {
-                      "Content-Type": "application/json",
                       referer: `${proxyURL}/`
                     }
                   });
+                  const response = await requestManager.schedule(
+                    request,
+                    1
+                  );
                   throw new Error(`${response.status}`);
                 }
               }),
@@ -25539,7 +25542,7 @@ Type: ${row["type"]}`
           header: "Source Settings",
           isHidden: false,
           rows: async () => [
-            languageSettings(this.stateManager),
+            languageSettings(this.stateManager, this.requestManager),
             resetSettings(this.stateManager)
           ]
         })
