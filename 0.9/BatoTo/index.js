@@ -25170,6 +25170,7 @@ Type: ${row["type"]}`
     const pages = imgList.map(
       (value, index2) => `${value}?${tknList[index2]}`
     );
+    console.log(pages);
     const chapterDetails = App.createChapterDetails({
       id: chapterId,
       mangaId,
