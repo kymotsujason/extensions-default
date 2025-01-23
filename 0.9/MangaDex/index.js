@@ -5445,9 +5445,15 @@ var source = (() => {
           (x) => `${serverUrl}/data-saver/${chapterDetails.hash}/${x}`
         );
       } else {
-        pages = chapterDetails.data.map(
-          (x) => `${serverUrl}/data/${chapterDetails.hash}/${x}`
-        );
+        if (proxyEnabled && proxyURL != "") {
+          pages = chapterDetails.data.map(
+            (x) => `${serverUrl}/proxycache/${chapterDetails.hash}/${x}`
+          );
+        } else {
+          pages = chapterDetails.data.map(
+            (x) => `${serverUrl}/data/${chapterDetails.hash}/${x}`
+          );
+        }
       }
       return {
         id: chapterId,
