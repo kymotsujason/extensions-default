@@ -25170,7 +25170,6 @@ Type: ${row["type"]}`
     const pages = imgList.map(
       (value, index2) => `${value}?${tknList[index2]}`
     );
-    throw new Error(JSON.stringify(pages));
     const chapterDetails = App.createChapterDetails({
       id: chapterId,
       mangaId,

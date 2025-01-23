@@ -5134,6 +5134,23 @@ var source = (() => {
       return request;
     }
     async interceptResponse(request, response, data) {
+      if (request.url.includes("data") && // @ts-expect-error
+      response.headers["Content-Type"].includes("image")) {
+        const proxyURL = getProxyServer();
+        const [_, buffer] = await Application.scheduleRequest({
+          url: `${proxyURL}/manga/trim`,
+          method: "get",
+          headers: {
+            ...request.headers
+          },
+          body: {
+            buffer: Application.arrayBufferToUTF8String(data)
+          }
+        });
+        const trimmedData = Application.arrayBufferToUTF8String(buffer);
+        const json = JSON.parse(trimmedData);
+        return json.data.trimmed;
+      }
       return data;
     }
   };
