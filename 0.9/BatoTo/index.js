@@ -25425,10 +25425,7 @@ Type: ${row["type"]}`
                       "Content-Type": "application/json",
                       referer: `${proxyURL}/`
                     },
-                    data: {
-                      username,
-                      password
-                    }
+                    param: `&username=${username}&password=${password}`
                   });
                   const response = await requestManager.schedule(
                     request,
