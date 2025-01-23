@@ -22684,10 +22684,8 @@ var source = (() => {
       return request;
     }
     async interceptResponse(request, response, data) {
-      if (
-        // @ts-expect-error
-        response.headers["content-type"].includes("image") && response.url.includes("data")
-      ) {
+      if (request.url.includes("data") && // @ts-expect-error
+      response.headers["Content-Type"].includes("image")) {
         const image = await Jimp.read(data);
         image.autocrop({
           tolerance: 0.05,
