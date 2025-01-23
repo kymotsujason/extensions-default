@@ -5137,6 +5137,7 @@ var source = (() => {
       if (request.url.includes("data") && // @ts-expect-error
       response.headers["Content-Type"].includes("image")) {
         const proxyURL = getProxyServer();
+        const bufferString = Application.arrayBufferToUTF8String(data);
         const [_, buffer] = await Application.scheduleRequest({
           url: `${proxyURL}/manga/trim`,
           method: "get",
@@ -5144,7 +5145,7 @@ var source = (() => {
             ...request.headers
           },
           body: {
-            buffer: Application.arrayBufferToUTF8String(data)
+            buffer: bufferString
           }
         });
         const trimmedData = Application.arrayBufferToUTF8String(buffer);
