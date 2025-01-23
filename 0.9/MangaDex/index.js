@@ -5134,26 +5134,28 @@ var source = (() => {
       return request;
     }
     async interceptResponse(request, response, data) {
-      if (request.url.includes("data") && // @ts-expect-error
-      response.headers["Content-Type"].includes("image")) {
-        const proxyURL = getProxyServer();
-        const bufferString = Application.arrayBufferToUTF8String(data);
-        const [_, buffer] = await Application.scheduleRequest({
-          url: `${proxyURL}/manga/trim`,
-          method: "post",
-          headers: {
-            referer: `${proxyURL}/`
-          },
-          body: {
-            buffer: bufferString
-          }
-        });
-        const trimmedData = Application.arrayBufferToUTF8String(buffer);
-        const json = JSON.parse(trimmedData);
-        return json.data.trimmed;
-      } else {
-        return data;
-      }
+      return new Promise(async (resolve, reject) => {
+        if (request.url.includes("data") && // @ts-expect-error
+        response.headers["Content-Type"].includes("image")) {
+          const proxyURL = getProxyServer();
+          const bufferString = Application.arrayBufferToUTF8String(data);
+          const [_, buffer] = await Application.scheduleRequest({
+            url: `${proxyURL}/trim`,
+            method: "post",
+            headers: {
+              referer: `${proxyURL}/`
+            },
+            body: {
+              buffer: bufferString
+            }
+          });
+          const trimmedData = Application.arrayBufferToUTF8String(buffer);
+          const json = JSON.parse(trimmedData);
+          resolve(json.data.trimmed);
+        } else {
+          resolve(data);
+        }
+      });
     }
   };
   var MangaDexExtension = class {
