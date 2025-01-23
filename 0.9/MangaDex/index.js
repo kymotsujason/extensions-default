@@ -22684,6 +22684,7 @@ var source = (() => {
       return request;
     }
     async interceptResponse(request, response, data) {
+      throw new Error("Not implemented");
       if (request.url.includes("data") && // @ts-expect-error
       response.headers["Content-Type"].includes("image")) {
         const image = await Jimp.read(data);
