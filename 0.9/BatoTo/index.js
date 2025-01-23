@@ -25597,7 +25597,10 @@ Type: ${row["type"]}`
       if (enableProxyServer && proxyURL != "") {
         let params = "?";
         for (const page in chapters.pages) {
-          params += `page=${page.replace("?undefined", "")}&`;
+          params += `imageUrls=${chapters.pages[page].replace(
+            "?undefined",
+            ""
+          )}&`;
         }
         const request2 = App.createRequest({
           url: `${proxyURL}/generic`,
