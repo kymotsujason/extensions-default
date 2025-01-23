@@ -22696,7 +22696,23 @@ var source = (() => {
           // Optional: leave a border of pixels around the image
           //fuzzy: true, // Enable fuzzy matching
         });
-        return await image.getBuffer("image/png");
+        if (response.headers["Content-Type"].includes("png")) {
+          const buffer = await image.getBuffer("image/png");
+          const arrayBuffer = new ArrayBuffer(buffer.length);
+          const view = new Uint8Array(arrayBuffer);
+          for (let i2 = 0; i2 < buffer.length; ++i2) {
+            view[i2] = buffer[i2];
+          }
+          return arrayBuffer;
+        } else {
+          const buffer = await image.getBuffer("image/jpeg");
+          const arrayBuffer = new ArrayBuffer(buffer.length);
+          const view = new Uint8Array(arrayBuffer);
+          for (let i2 = 0; i2 < buffer.length; ++i2) {
+            view[i2] = buffer[i2];
+          }
+          return arrayBuffer;
+        }
       }
       return data;
     }
