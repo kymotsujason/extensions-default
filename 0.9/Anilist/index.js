@@ -3004,7 +3004,7 @@ query($id: Int) {
   init_buffer();
   var import_types2 = __toESM(require_lib());
   var SourceForm = class extends import_types2.Form {
-    constructor(anilistManga, makeRequest, getUserInfo) {
+    constructor(anilistManga, makeRequest, getUserInfo, getAccessToken, parseAccessToken) {
       super();
       this.changes = {
         status: ["CURRENT"],
@@ -3019,6 +3019,8 @@ query($id: Int) {
       this.anilistManga = anilistManga;
       this.makeRequest = makeRequest;
       this.getUserInfo = getUserInfo;
+      this.getAccessToken = getAccessToken;
+      this.parseAccessToken = parseAccessToken;
     }
     get requiresExplicitSubmission() {
       return true;
@@ -3224,6 +3226,9 @@ query($id: Int) {
     }
     async updateRating(value) {
       this.changes.rating = value;
+    }
+    async updateNotes(value) {
+      this.changes.notes = value;
     }
     async formDidSubmit() {
       const id = this.anilistManga.mediaListEntry?.id ? Number(this.anilistManga.mediaListEntry?.id) : void 0;
@@ -3976,7 +3981,9 @@ query($id: Int) {
         return new SourceForm(
           anilistManga,
           this.makeRequest,
-          this.getUserInfo
+          this.getUserInfo,
+          this.getAccessToken,
+          this.parseAccessToken
         );
       }
     }
