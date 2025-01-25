@@ -24780,15 +24780,33 @@ Type: ${row["type"]}`
     }
     // Utility
     constructSearchRequest(page, query) {
-      return App.createRequest({
-        url: new URLBuilder(this.baseUrl).addPathComponent("search").addPathComponent(`${encodeURIComponent(query?.title ?? "")}`).addPathComponent(
-          `${this.searchPagePathName}${page.toString()}`
-        ).buildUrl({
-          addTrailingSlash: true,
-          includeUndefinedParameters: false
-        }),
-        method: "GET"
-      });
+      if (query.title) {
+        return App.createRequest({
+          url: new URLBuilder(this.baseUrl).addPathComponent(this.searchPagePathName).addPathComponent(page.toString()).addQueryParameter(
+            "s",
+            encodeURIComponent(query?.title ?? "")
+          ).addQueryParameter("post_type", "wp-manga").addQueryParameter(
+            "genre",
+            query?.includedTags?.map((x) => x.id)
+          ).buildUrl({
+            addTrailingSlash: true,
+            includeUndefinedParameters: false
+          }),
+          method: "GET"
+        });
+      } else {
+        return App.createRequest({
+          url: new URLBuilder(this.baseUrl).addPathComponent("search").addPathComponent(
+            `${encodeURIComponent(query?.title ?? "")}`
+          ).addPathComponent(
+            `${this.searchPagePathName}${page.toString()}`
+          ).buildUrl({
+            addTrailingSlash: true,
+            includeUndefinedParameters: false
+          }),
+          method: "GET"
+        });
+      }
     }
     constructAjaxHomepageRequest(page, postsPerPage, meta_key, meta_value) {
       return App.createRequest({
