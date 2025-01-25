@@ -24659,6 +24659,7 @@ Type: ${row["type"]}`
           );
         }
       }
+      throw new Error(`${results.length}`);
       return App.createPagedResults({
         results: manga,
         metadata: void 0
