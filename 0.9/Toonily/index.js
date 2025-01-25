@@ -24797,7 +24797,9 @@ Type: ${row["type"]}`
       } else {
         return App.createRequest({
           url: new URLBuilder(this.baseUrl).addPathComponent("search").addPathComponent(
-            `${encodeURIComponent(query?.title ?? "")}`
+            `${encodeURIComponent(
+              query?.title?.replace(/ /g, "-") ?? ""
+            )}`
           ).addPathComponent(
             `${this.searchPagePathName}${page.toString()}`
           ).buildUrl({
