@@ -24659,10 +24659,10 @@ Type: ${row["type"]}`
           );
         }
       }
-      throw new Error(`${results.length}`);
+      metadata = results.length >= 18 ? { page: page + 1 } : void 0;
       return App.createPagedResults({
         results: manga,
-        metadata: void 0
+        metadata
       });
     }
     async getHomePageSections(sectionCallback) {
