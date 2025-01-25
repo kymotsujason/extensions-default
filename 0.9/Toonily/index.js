@@ -24780,7 +24780,7 @@ Type: ${row["type"]}`
     }
     // Utility
     constructSearchRequest(page, query) {
-      if (query.title) {
+      if (query.title == "") {
         return App.createRequest({
           url: new URLBuilder(this.baseUrl).addPathComponent(this.searchPagePathName).addPathComponent(page.toString()).addQueryParameter(
             "s",
