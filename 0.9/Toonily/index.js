@@ -24781,9 +24781,8 @@ Type: ${row["type"]}`
     // Utility
     constructSearchRequest(page, query) {
       return App.createRequest({
-        url: new URLBuilder(this.baseUrl).addPathComponent(this.searchPagePathName).addPathComponent(page.toString()).addQueryParameter("s", encodeURIComponent(query?.title ?? "")).addQueryParameter("post_type", "wp-manga").addQueryParameter(
-          "genre",
-          query?.includedTags?.map((x) => x.id)
+        url: new URLBuilder(this.baseUrl).addPathComponent("search").addPathComponent(`${encodeURIComponent(query?.title ?? "")}`).addPathComponent(
+          `${this.searchPagePathName}${page.toString()}`
         ).buildUrl({
           addTrailingSlash: true,
           includeUndefinedParameters: false
