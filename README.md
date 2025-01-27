@@ -13,7 +13,7 @@ Sources added from others:
 
 Trackers added from others:
 
-- [Anilist](https://github.com/Paperback-iOS/extensions)  (Improved search sorting)
+- [Anilist](https://github.com/Paperback-iOS/extensions)  (Improved search sorting) (Automatic entry on new reads)
 
 TODO:
 

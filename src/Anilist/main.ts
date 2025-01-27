@@ -525,6 +525,32 @@ export class AniListExtension implements AniListImplementation {
 						result.successfulItems.push(readAction.id);
 						continue;
 					}
+				} else {
+					const id = undefined;
+					// @ts-expect-error
+					const mediaId = Number(anilistManga.id);
+					const volume = readAction.readChapter.volume
+						? Math.floor(readAction.readChapter.volume)
+						: 1;
+					const progress = Math.floor(readAction.readChapter.chapNum);
+
+					let mutation = {
+						id: id,
+						mediaId: mediaId,
+						status: "CURRENT",
+						notes: "",
+						progress: volume,
+						progressVolumes: progress,
+						repeat: 1,
+						private: false,
+						hiddenFromStatusLists: false,
+						score: 0,
+					};
+					await this.makeRequest<SaveMangaProgressVariables>(
+						saveMangaProgressMutation,
+						mutation
+					);
+					continue;
 				}
 				let params = {
 					mediaId: readAction.sourceManga.mangaId,
