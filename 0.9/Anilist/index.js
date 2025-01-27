@@ -4012,6 +4012,28 @@ query($id: Int) {
               result.successfulItems.push(readAction.id);
               continue;
             }
+          } else {
+            const id = void 0;
+            const mediaId = Number(anilistManga.id);
+            const volume = readAction.readChapter.volume ? Math.floor(readAction.readChapter.volume) : 1;
+            const progress = Math.floor(readAction.readChapter.chapNum);
+            let mutation = {
+              id,
+              mediaId,
+              status: "CURRENT",
+              notes: "",
+              progress: volume,
+              progressVolumes: progress,
+              repeat: 1,
+              private: false,
+              hiddenFromStatusLists: false,
+              score: 0
+            };
+            await this.makeRequest(
+              saveMangaProgressMutation,
+              mutation
+            );
+            continue;
           }
           let params = {
             mediaId: readAction.sourceManga.mangaId,
