@@ -21,3 +21,13 @@ TODO:
 - Anilist: Rewrite to use the states for updates, it's just hacked together atm
 - Rewrite stuff for 0.9? Compatibility works though
 - More testing
+
+# Preview
+
+|                           Uncropped                            |                           Cropped                            |
+| :------------------------------------------------------------: | :----------------------------------------------------------: |
+| <img src="preview_uncropped.PNG" alt="uncropped" width="400"/> | <img src="preview_cropped.PNG" alt="uncropped" width="400"/> |
+
+|                           Unsorted                            |                           Sorted                            |
+| :-----------------------------------------------------------: | :---------------------------------------------------------: |
+| <img src="preview_unsorted.PNG" alt="uncropped" width="400"/> | <img src="preview_sorted.PNG" alt="uncropped" width="400"/> |
