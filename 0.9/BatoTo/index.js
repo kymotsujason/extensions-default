@@ -25002,6 +25002,7 @@ var source = (() => {
       }
     }
     async getSearchResults(query, metadata) {
+      throw new Error(query.title);
       const page = metadata?.page ?? 1;
       let request;
       if (query.title) {
