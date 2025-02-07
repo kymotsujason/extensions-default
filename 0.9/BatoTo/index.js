@@ -24597,6 +24597,9 @@ var source = (() => {
   function getEnableProxyServer() {
     return Application.getState("enable_proxy_server") ?? false;
   }
+  function getCloudFlareCookie() {
+    return Application.getState("cloudflare_cookie") ?? "";
+  }
   function setLanguages(value) {
     Application.setState(value, "languages");
   }
@@ -24812,6 +24815,10 @@ var source = (() => {
   var BATO_DOMAIN = "https://batocomic.org";
   var BatotoInterceptor = class extends import_types4.PaperbackInterceptor {
     async interceptRequest(request) {
+      const cookies = getCloudFlareCookie() ?? [];
+      if (cookies.length > 0) {
+        request.cookies = JSON.parse(cookies);
+      }
       request.headers = {
         ...request.headers ?? {},
         ...{
@@ -25141,12 +25148,17 @@ var source = (() => {
       return parseTags();
     }
     saveCloudflareBypassCookies(cookies) {
-      let str = "";
-      for (const cookie of cookies) {
-        str += `${JSON.stringify(cookie)}; `;
-      }
-      throw new Error(str);
       return Promise.resolve(setCloudFlareCookie(JSON.stringify(cookies)));
+    }
+    getCloudflareBypassRequestAsync() {
+      return Promise.resolve({
+        url: `${BATO_DOMAIN}/`,
+        method: "GET",
+        headers: {
+          referer: `${BATO_DOMAIN}/`
+        },
+        cookies: []
+      });
     }
   };
   var BatoTo = new BatoToExtension();
