@@ -24972,12 +24972,7 @@ var source = (() => {
             items: popularSection_Array,
             metadata
           };
-        //case "popular_updates":
-        //	return this.getLatestUpdatesDiscoverSectionItems(
-        //		section,
-        //		metadata
-        //	);
-        default:
+        case "latest_releases":
           const latestSection_Array = [];
           for (const manga of $3(".series-list .col.item").toArray()) {
             const image = $3("img", manga).attr("src") ?? "";
@@ -24999,10 +24994,11 @@ var source = (() => {
             items: latestSection_Array,
             metadata
           };
+        default:
+          return { items: [], metadata };
       }
     }
     async getSearchResults(query, metadata) {
-      throw new Error(query.title);
       const page = metadata?.page ?? 1;
       let request;
       if (query.title) {
