@@ -24188,7 +24188,7 @@ var source = (() => {
   };
 
   // src/BatoTo/BatoToParser.ts
-  var parseMangaDetails = ($3, mangaId2) => {
+  var parseMangaDetails = ($3, mangaId2, url) => {
     const titles = [];
     titles.push(
       Application.decodeHTMLEntities(
@@ -24251,7 +24251,8 @@ var source = (() => {
         artist,
         tagGroups: tagSections,
         synopsis: description,
-        contentRating: import_types2.ContentRating.EVERYONE
+        contentRating: import_types2.ContentRating.EVERYONE,
+        shareUrl: url
       }
     };
   };
@@ -24746,12 +24747,13 @@ var source = (() => {
       return new BatotoSettingsForm();
     }
     async getMangaDetails(mangaId2) {
+      const url = `${BATO_DOMAIN}/series/${mangaId2}`;
       const request = {
-        url: `${BATO_DOMAIN}/series/${mangaId2}`,
+        url,
         method: "GET"
       };
       const $3 = await this.fetchCheerio(request);
-      return parseMangaDetails($3, mangaId2);
+      return parseMangaDetails($3, mangaId2, url);
     }
     async getChapters(sourceManga) {
       const request = {

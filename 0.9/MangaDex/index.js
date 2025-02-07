@@ -5054,8 +5054,9 @@ var source = (() => {
         synopsis: desc ?? "No Description",
         status,
         tagGroups: [{ id: "tags", title: "Tags", tags }],
-        contentRating: import_types2.ContentRating.EVERYONE
+        contentRating: import_types2.ContentRating.EVERYONE,
         // TODO: apply proper rating
+        shareUrl: `https://mangadex.org/title/${mangaId}`
       }
     };
   };
