@@ -24962,7 +24962,6 @@ var source = (() => {
     //	parseHomeSections($, sectionCallback);
     //}
     async getDiscoverSectionItems(section, metadata) {
-      throw new Error("Not implemented for Batoto");
       const request = {
         url: `${BATO_DOMAIN}`,
         method: "GET"
@@ -25072,6 +25071,7 @@ var source = (() => {
     //	});
     //}
     async getSearchResults(query, metadata) {
+      throw new Error("Batoto doesn't support regular search yet.");
       const page = metadata?.page ?? 1;
       let request;
       if (query.title) {
