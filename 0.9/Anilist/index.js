@@ -3683,6 +3683,26 @@ query($id: Int) {
     async initialise() {
       this.mainRateLimiter.registerInterceptor();
       this.mainInterceptor.registerInterceptor();
+      Application.registerSearchFilter({
+        id: "includeOperator",
+        type: "dropdown",
+        options: [
+          { id: "AND", value: "AND" },
+          { id: "OR", value: "OR" }
+        ],
+        value: "AND",
+        title: "Include Operator"
+      });
+      Application.registerSearchFilter({
+        id: "excludeOperator",
+        type: "dropdown",
+        options: [
+          { id: "AND", value: "AND" },
+          { id: "OR", value: "OR" }
+        ],
+        value: "OR",
+        title: "Exclude Operator"
+      });
     }
     parseAccessToken(accessToken) {
       if (!accessToken) return void 0;
