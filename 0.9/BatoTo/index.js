@@ -24833,7 +24833,6 @@ var source = (() => {
       return parseThumbnailUrl($3);
     }
     async interceptResponse(request, response, data2) {
-      throw new Error(JSON.stringify(response));
       return data2;
     }
   };
@@ -25146,16 +25145,13 @@ Please go to the homepage of <${_BatoToExtension.name}> and press the cloud icon
         );
       }
     }
-    //async getCloudflareBypassRequestAsync(): Promise<Request> {
-    //	return App.createRequest({
-    //		url: BATO_DOMAIN,
-    //		method: "GET",
-    //		headers: {
-    //			referer: `${BATO_DOMAIN}/`,
-    //			"user-agent": await this.requestManager.getDefaultUserAgent(),
-    //		},
-    //	});
-    //}
+    async getCloudflareBypassRequestAsync() {
+      const request = {
+        url: `${BATO_DOMAIN}`,
+        method: "GET"
+      };
+      return request;
+    }
   };
   var BatoTo = new BatoToExtension();
   return __toCommonJS(main_exports);
