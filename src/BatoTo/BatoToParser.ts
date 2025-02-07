@@ -1,29 +1,34 @@
 import {
 	Chapter,
 	ChapterDetails,
-	HomeSection,
-	HomeSectionType,
-	PartialSourceManga,
-	SearchRequest,
+	ContentRating,
 	SourceManga,
 	Tag,
 	TagSection,
-} from "@paperback/types/lib/compat/0.8";
+	SearchQuery,
+	SearchResultItem,
+	DiscoverSectionItem,
+} from "@paperback/types";
 import CryptoJS from "crypto-js";
-import { decode as decodeHTMLEntity } from "html-entities";
 import { BTGenres, BTLanguages } from "./BatoToHelper";
 import { relevanceScore } from "./RelevanceScore";
 
 export const parseMangaDetails = ($: any, mangaId: string): SourceManga => {
 	const titles: string[] = [];
 
-	titles.push(decodeHTMLEntity($("a", $(".item-title")).text().trim() ?? ""));
+	titles.push(
+		Application.decodeHTMLEntities(
+			$("a", $(".item-title")).text().trim() ?? ""
+		)
+	);
 	const altTitles = $(".alias-set").text().trim().split("/");
 	for (const title of altTitles) {
-		titles.push(decodeHTMLEntity(title));
+		titles.push(Application.decodeHTMLEntities(title));
 	}
 
-	const description = decodeHTMLEntity($(".limit-html").text().trim() ?? "");
+	const description = Application.decodeHTMLEntities(
+		$(".limit-html").text().trim() ?? ""
+	);
 
 	const authorElement = $('div.attr-item b:contains("Authors")').next("span");
 	const author = authorElement.length
@@ -56,14 +61,14 @@ export const parseMangaDetails = ($: any, mangaId: string): SourceManga => {
 		const id = encodeURI(BTGenres.getParam(label) ?? label);
 
 		if (!id || !label) continue;
-		arrayTags.push({ id: id, label: label });
+		arrayTags.push({ id: id, title: label });
 	}
 	const tagSections: TagSection[] = [
-		App.createTagSection({
+		{
 			id: "0",
-			label: "genres",
-			tags: arrayTags.map((x) => App.createTag(x)),
-		}),
+			title: "genres",
+			tags: arrayTags.map((x) => x),
+		},
 	];
 
 	const rawStatus = $('div.attr-item b:contains("Upload status")')
@@ -86,21 +91,27 @@ export const parseMangaDetails = ($: any, mangaId: string): SourceManga => {
 			break;
 	}
 
-	return App.createSourceManga({
-		id: mangaId,
-		mangaInfo: App.createMangaInfo({
-			titles: titles,
-			image: `mangaId=${mangaId}`,
+	return {
+		mangaId: mangaId,
+		mangaInfo: {
+			primaryTitle: titles[0] as string,
+			secondaryTitles: titles,
+			thumbnailUrl: `mangaId=${mangaId}`,
 			status: status,
 			author: author,
 			artist: artist,
-			tags: tagSections,
-			desc: description,
-		}),
-	});
+			tagGroups: tagSections,
+			synopsis: description,
+			contentRating: ContentRating.EVERYONE,
+		},
+	};
 };
 
-export const parseChapterList = ($: any, mangaId: string): Chapter[] => {
+export const parseChapterList = (
+	$: any,
+	sourceManga: SourceManga
+): Chapter[] => {
+	const mangaId = sourceManga.mangaId;
 	const chapters: Chapter[] = [];
 	let sortingIndex = 0;
 
@@ -204,14 +215,15 @@ export const parseChapterList = ($: any, mangaId: string): Chapter[] => {
 		if (isNaN(volumeNum)) volumeNum = 0;
 
 		chapters.push({
-			id: chapterId,
-			name: title,
+			chapterId: chapterId,
+			title: title,
 			langCode: language,
 			chapNum: chapNum,
-			time: date,
+			publishDate: date,
 			sortingIndex,
 			volume: volumeNum,
-			group: group,
+			version: group,
+			sourceManga: sourceManga,
 		});
 		sortingIndex--;
 	}
@@ -221,8 +233,8 @@ export const parseChapterList = ($: any, mangaId: string): Chapter[] => {
 	}
 
 	return chapters.map((chapter) => {
-		chapter.sortingIndex += chapters.length;
-		return App.createChapter(chapter);
+		chapter.sortingIndex! += chapters.length;
+		return chapter;
 	});
 };
 
@@ -255,93 +267,16 @@ export const parseChapterDetails = (
 		(value: string, index: number) => `${value}?${tknList[index]}`
 	);
 
-	const chapterDetails = App.createChapterDetails({
+	const chapterDetails = {
 		id: chapterId,
 		mangaId: mangaId,
 		pages: pages,
-	});
+	};
 	return chapterDetails;
 };
 
-export const parseHomeSections = (
-	$: any,
-	sectionCallback: (section: HomeSection) => void
-): void => {
-	const popularSection = App.createHomeSection({
-		id: "popular_updates",
-		title: "Popular Updates",
-		containsMoreItems: true,
-		type: HomeSectionType.singleRowLarge,
-	});
-
-	const latestSection = App.createHomeSection({
-		id: "latest_releases",
-		title: "Latest Releases",
-		containsMoreItems: true,
-		type: HomeSectionType.singleRowNormal,
-	});
-
-	// Popular Updates
-	const popularSection_Array: PartialSourceManga[] = [];
-	for (const manga of $(".home-popular .col.item").toArray()) {
-		const image: string = $("img", manga).first().attr("src") ?? "";
-		const title: string = $(".item-title", manga).text().trim() ?? "";
-		const id =
-			$("a", manga)
-				.attr("href")
-				?.replace("/series/", "")
-				?.trim()
-				.split("/")[0] ?? "";
-		const btcode = $("em", manga).attr("data-lang");
-		const lang: string = btcode ? BTLanguages.getLangCode(btcode) : "🇬🇧";
-		const subtitle: string =
-			lang + " " + $(".item-volch", manga).text().trim();
-
-		if (!id || !title) continue;
-		popularSection_Array.push(
-			App.createPartialSourceManga({
-				image: image,
-				title: decodeHTMLEntity(title),
-				mangaId: id,
-				subtitle: decodeHTMLEntity(subtitle),
-			})
-		);
-	}
-	popularSection.items = popularSection_Array;
-	sectionCallback(popularSection);
-
-	// Latest Releases
-	const latestSection_Array: PartialSourceManga[] = [];
-	for (const manga of $(".series-list .col.item").toArray()) {
-		const image: string = $("img", manga).attr("src") ?? "";
-		const title: string = $(".item-title", manga).text().trim() ?? "";
-		const id =
-			$("a", manga)
-				.attr("href")
-				?.replace("/series/", "")
-				?.trim()
-				.split("/")[0] ?? "";
-		const btcode = $("em", manga).attr("data-lang");
-		const lang: string = btcode ? BTLanguages.getLangCode(btcode) : "🇬🇧";
-		const subtitle: string =
-			lang + " " + $(".item-volch a", manga).text().trim();
-
-		if (!id || !title) continue;
-		latestSection_Array.push(
-			App.createPartialSourceManga({
-				image: image,
-				title: decodeHTMLEntity(title),
-				mangaId: id,
-				subtitle: decodeHTMLEntity(subtitle),
-			})
-		);
-	}
-	latestSection.items = latestSection_Array;
-	sectionCallback(latestSection);
-};
-
-export const parseViewMore = ($: any): PartialSourceManga[] => {
-	const manga: PartialSourceManga[] = [];
+export const parseViewMore = ($: any): DiscoverSectionItem[] => {
+	const manga: DiscoverSectionItem[] = [];
 	const collectedIds: string[] = [];
 
 	for (const obj of $(".item", "#series-list").toArray()) {
@@ -358,14 +293,13 @@ export const parseViewMore = ($: any): PartialSourceManga[] => {
 		const image = $("img", obj).attr("src") ?? "";
 
 		if (!id || !title || collectedIds.includes(id)) continue;
-		manga.push(
-			App.createPartialSourceManga({
-				image: image,
-				title: decodeHTMLEntity(title),
-				mangaId: id,
-				subtitle: decodeHTMLEntity(subtitle),
-			})
-		);
+		manga.push({
+			type: "simpleCarouselItem",
+			imageUrl: image,
+			title: Application.decodeHTMLEntities(title),
+			mangaId: id,
+			subtitle: Application.decodeHTMLEntities(subtitle),
+		});
 		collectedIds.push(id);
 	}
 
@@ -378,14 +312,14 @@ export const parseTags = (): TagSection[] => {
 		const id = encodeURI(BTGenres.getParam(label) ?? label);
 
 		if (!id || !label) continue;
-		arrayTags.push({ id: id, label: label });
+		arrayTags.push({ id: id, title: label });
 	}
 	const tagSections: TagSection[] = [
-		App.createTagSection({
+		{
 			id: "0",
-			label: "genres",
-			tags: arrayTags.map((x) => App.createTag(x)),
-		}),
+			title: "genres",
+			tags: arrayTags.map((x) => x),
+		},
 	];
 	return tagSections;
 };
@@ -394,9 +328,9 @@ export const parseSearch = (
 	$: any,
 	langFilter: boolean,
 	langs: string[],
-	query?: SearchRequest
-): PartialSourceManga[] => {
-	const mangas: { manga: PartialSourceManga; relevance: number }[] = [];
+	query?: SearchQuery
+): SearchResultItem[] => {
+	const mangas: { manga: SearchResultItem; relevance: number }[] = [];
 	for (const obj of $(".item", "#series-list").toArray()) {
 		const id =
 			$(".item-cover", obj)
@@ -413,12 +347,12 @@ export const parseSearch = (
 		if (!id || !title) continue;
 		if (langFilter && !langs.includes(btcode)) continue;
 
-		const partialManga = App.createPartialSourceManga({
-			image: image,
-			title: decodeHTMLEntity(title),
+		const partialManga = {
+			imageUrl: image,
+			title: Application.decodeHTMLEntities(title),
 			mangaId: id,
 			subtitle: subtitle,
-		});
+		};
 
 		let relevance = 0;
 		if (query?.title) {

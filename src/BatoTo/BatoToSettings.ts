@@ -1,272 +1,281 @@
 import {
-	DUIButton,
-	DUINavigationButton,
-	RequestManager,
-	SecureStateManager,
-	SourceStateManager,
-} from "@paperback/types/lib/compat/0.8";
+	ButtonRow,
+	Form,
+	InputRow,
+	LabelRow,
+	NavigationRow,
+	Section,
+	SelectRow,
+	ToggleRow,
+} from "@paperback/types";
 import { BTLanguages } from "./BatoToHelper";
 
-const getLanguages = async (
-	stateManager: SourceStateManager
-): Promise<string[]> => {
+export function getLanguages(): string[] {
 	return (
-		(await stateManager.retrieve("languages")) ?? BTLanguages.getDefault()
+		(Application.getState("languages") as string[] | undefined) ??
+		BTLanguages.getDefault()
 	);
-};
+}
 
-const getLanguageHomeFilter = async (
-	stateManager: SourceStateManager
-): Promise<boolean> => {
-	return (await stateManager.retrieve("language_home_filter")) ?? false;
-};
+export function getLanguageHomeFilter(): boolean {
+	return (
+		(Application.getState("language_home_filter") as boolean | undefined) ??
+		false
+	);
+}
 
-const getLanguageSearchFilter = async (
-	stateManager: SourceStateManager
-): Promise<boolean> => {
-	return (await stateManager.retrieve("language_search_filter")) ?? false;
-};
+export function getLanguageSearchFilter(): boolean {
+	return (
+		(Application.getState("language_search_filter") as
+			| boolean
+			| undefined) ?? false
+	);
+}
 
-const getProxyUser = async (
-	stateManager: SourceStateManager
-): Promise<string> => {
-	return (await stateManager.retrieve("proxy_user")) ?? "";
-};
+function getProxyUser(): string {
+	return (Application.getState("proxy_user") as string) ?? "";
+}
 
-const getProxyPass = async (
-	stateManager: SecureStateManager
-): Promise<string> => {
-	return (await stateManager.retrieve("proxy_pass")) ?? "";
-};
+function getProxyPass(): string {
+	return (Application.getSecureState("proxy_pass") as string) ?? "";
+}
 
-export const getProxyAccess = async (
-	stateManager: SecureStateManager
-): Promise<string> => {
-	return (await stateManager.retrieve("proxy_token")) ?? "";
-};
+export function getProxyAccess(): string {
+	return (Application.getSecureState("proxy_token") as string) ?? "";
+}
 
-export const getProxyServer = async (
-	stateManager: SourceStateManager
-): Promise<string> => {
-	return (await stateManager.retrieve("proxy_server")) ?? "";
-};
+export function getProxyServer(): string {
+	return (Application.getState("proxy_server") as string) ?? "";
+}
 
-export const getEnableProxyServer = async (
-	stateManager: SourceStateManager
-): Promise<boolean> => {
-	return (await stateManager.retrieve("enable_proxy_server")) ?? false;
-};
+export function getEnableProxyServer(): boolean {
+	return (Application.getState("enable_proxy_server") as boolean) ?? false;
+}
 
-export const proxySettings = (
-	stateManager: SourceStateManager,
-	requestManager: RequestManager
-): DUINavigationButton => {
-	return App.createDUINavigationButton({
-		id: "proxy_settings",
-		label: "Proxy Settings",
-		form: App.createDUIForm({
-			sections: async () => [
-				App.createDUISection({
-					id: "proxy",
-					footer: "Proxy Settings",
-					isHidden: false,
-					rows: async () => [
-						App.createDUIInputField({
-							id: "proxy_server",
-							label: "Proxy Server",
-							value: App.createDUIBinding({
-								get: () => getProxyServer(stateManager),
-								set: async (newValue) =>
-									await stateManager.store(
-										"proxy_server",
-										newValue
-									),
-							}),
-						}),
-						App.createDUIInputField({
-							id: "proxy_user",
-							label: "Proxy Username",
-							value: App.createDUIBinding({
-								get: () => getProxyUser(stateManager),
-								set: async (newValue) =>
-									await stateManager.store(
-										"proxy_user",
-										newValue
-									),
-							}),
-						}),
-						App.createDUIInputField({
-							id: "proxy_pass",
-							label: "Proxy Password",
-							value: App.createDUIBinding({
-								get: () => getProxyPass(stateManager),
-								set: async (newValue) =>
-									await stateManager.store(
-										"proxy_pass",
-										newValue
-									),
-							}),
-						}),
-						App.createDUISwitch({
-							id: "enable_proxy_server",
-							label: "Enable Proxy Server",
-							value: App.createDUIBinding({
-								get: () => getEnableProxyServer(stateManager),
-								set: async (newValue) =>
-									await stateManager.store(
-										"enable_proxy_server",
-										newValue
-									),
-							}),
-						}),
-						App.createDUIButton({
-							id: "test_proxy",
-							label: "Test Proxy Server",
-							onTap: async () => {
-								const proxyURL = await getProxyServer(
-									stateManager
-								);
-								const request = App.createRequest({
-									url: `${proxyURL}`,
+function setLanguages(value: string[]): void {
+	Application.setState(value, "languages");
+}
+
+function setLanguageHomeFilter(value: boolean): void {
+	Application.setState(value, "language_home_filter");
+}
+
+function setLanguageSearchFilter(value: boolean): void {
+	Application.setState(value, "language_search_filter");
+}
+
+function setProxyUser(value: string): void {
+	Application.setState(value, "proxy_user");
+}
+
+function setProxyPass(value: string): void {
+	Application.setSecureState(value, "proxy_pass");
+}
+
+function setProxyAccess(value: string): void {
+	Application.setSecureState(value, "proxy_token");
+}
+
+function setProxyServer(value: string): void {
+	Application.setState(value, "proxy_server");
+}
+
+function setEnableProxyServer(value: boolean): void {
+	Application.setState(value, "enable_proxy_server");
+}
+
+export class BatotoSettingsForm extends Form {
+	override getSections(): Application.FormSectionElement[] {
+		const languages = getLanguages();
+
+		return [
+			Section("proxy", [
+				NavigationRow("proxy", {
+					title: "Proxy Settings",
+					form: new (class extends Form {
+						override getSections(): Application.FormSectionElement[] {
+							return [
+								Section("proxySection", [
+									LabelRow("proxyInfo", {
+										title: "Prehash the password with an online bcrypter",
+									}),
+									InputRow("proxyinput", {
+										title: "Proxy Server",
+										value:
+											getProxyServer() != ""
+												? getProxyServer()
+												: "",
+										onValueChange: Application.Selector(
+											this,
+											// @ts-expect-error
+											"changeProxy"
+										),
+									}),
+									InputRow("userinput", {
+										title: "Proxy Username",
+										value:
+											getProxyUser() != ""
+												? getProxyUser()
+												: "",
+										onValueChange: Application.Selector(
+											this,
+											// @ts-expect-error
+											"changeProxyUser"
+										),
+									}),
+									InputRow("passinput", {
+										title: "Proxy Password",
+										value:
+											getProxyPass() != ""
+												? getProxyPass()
+												: "",
+										onValueChange: Application.Selector(
+											this,
+											// @ts-expect-error
+											"changeProxyPass"
+										),
+									}),
+									ToggleRow("enableProxy", {
+										title: "Enable Proxy Server",
+										value: getEnableProxyServer(),
+										onValueChange: Application.Selector(
+											this,
+											// @ts-expect-error
+											"changeEnableProxy"
+										),
+									}),
+									ButtonRow("testProxy", {
+										title: "Test Proxy",
+										onSelect: Application.Selector(
+											this,
+											// @ts-expect-error
+											"testProxy"
+										),
+									}),
+									ButtonRow("login", {
+										title: "Login to Proxy",
+										onSelect: Application.Selector(
+											this,
+											// @ts-expect-error
+											"login"
+										),
+									}),
+								]),
+							];
+						}
+
+						async changeProxy(value: string): Promise<void> {
+							setProxyServer(value);
+						}
+
+						async changeProxyUser(value: string): Promise<void> {
+							setProxyUser(value);
+						}
+
+						async changeProxyPass(value: string): Promise<void> {
+							setProxyPass(value);
+						}
+
+						async changeEnableProxy(value: boolean): Promise<void> {
+							setEnableProxyServer(value);
+						}
+
+						async testProxy(): Promise<void> {
+							const proxyURL = getProxyServer();
+							const [response, _] =
+								await Application.scheduleRequest({
 									method: "GET",
-									headers: {
-										referer: `${proxyURL}/`,
-									},
-								});
-
-								const response = await requestManager.schedule(
-									request,
-									1
-								);
-								throw new Error(`${response.status}`);
-							},
-						}),
-						App.createDUIButton({
-							id: "login_proxy_server",
-							label: "Login to Proxy Server",
-							onTap: async () => {
-								const proxyURL = await getProxyServer(
-									stateManager
-								);
-								const username = await getProxyUser(
-									stateManager
-								);
-								const password = await getProxyPass(
-									stateManager
-								);
-								const request = App.createRequest({
-									url: `${proxyURL}/api/auth/login`,
-									method: "POST",
+									url: `${proxyURL}`,
 									headers: {
 										"Content-Type": "application/json",
 										referer: `${proxyURL}/`,
 									},
-									param: `?username=${username}&password=${password}`,
 								});
 
-								const response = await requestManager.schedule(
-									request,
-									1
+							throw new Error(`${response.status}`);
+						}
+
+						async login(): Promise<void> {
+							const proxyURL = getProxyServer();
+							const username = getProxyUser();
+							const password = getProxyPass();
+							const [response, buffer] =
+								await Application.scheduleRequest({
+									method: "POST",
+									url: `${proxyURL}/api/auth/login`,
+									headers: {
+										"Content-Type": "application/json",
+										referer: `${proxyURL}/`,
+									},
+									body: {
+										username: username,
+										password: password,
+									},
+								});
+
+							const data =
+								Application.arrayBufferToUTF8String(buffer);
+							const json = JSON.parse(data);
+							if (response.status === 200) {
+								setProxyAccess(json.token);
+								throw new Error(`Done Login: ${json.token}`);
+							} else {
+								throw new Error(
+									`Login failed with error code: ${JSON.stringify(
+										json
+									)}`
 								);
-
-								const json = JSON.parse(
-									response.data as string
-								);
-								if (response.status === 200) {
-									await stateManager.store(
-										"proxy_token",
-										json.token
-									);
-									throw new Error(
-										`Done Login: ${json.token}`
-									);
-								} else {
-									throw new Error(
-										`Login failed with error code: ${JSON.stringify(
-											json
-										)}`
-									);
-								}
-							},
-						}),
-					],
+							}
+						}
+					})(),
 				}),
-			],
-		}),
-	});
-};
+			]),
 
-export const languageSettings = (
-	stateManager: SourceStateManager
-): DUINavigationButton => {
-	return App.createDUINavigationButton({
-		id: "language_settings",
-		label: "Language Settings",
-		form: App.createDUIForm({
-			sections: async () => [
-				App.createDUISection({
-					id: "content",
-					footer: "When enabled, mangas will be filtered by the selected languages.",
-					isHidden: false,
-					rows: async () => [
-						App.createDUISelect({
-							id: "languages",
-							label: "Languages",
-							options: BTLanguages.getBTCodeList(),
-							labelResolver: async (option) =>
-								BTLanguages.getName(option),
-							value: App.createDUIBinding({
-								get: () => getLanguages(stateManager),
-								set: async (newValue) =>
-									await stateManager.store(
-										"languages",
-										newValue
-									),
-							}),
-							allowsMultiselect: true,
-						}),
-						App.createDUISwitch({
-							id: "language_home_filter",
-							label: "Filter Homepage Language",
-							value: App.createDUIBinding({
-								get: () => getLanguageHomeFilter(stateManager),
-								set: async (newValue) =>
-									await stateManager.store(
-										"language_home_filter",
-										newValue
-									),
-							}),
-						}),
-						App.createDUISwitch({
-							id: "language_search_filter",
-							label: "Filter Search Language",
-							value: App.createDUIBinding({
-								get: () =>
-									getLanguageSearchFilter(stateManager),
-								set: async (newValue) =>
-									await stateManager.store(
-										"language_search_filter",
-										newValue
-									),
-							}),
-						}),
-					],
+			Section("contentSettings", [
+				SelectRow("languages", {
+					title: "Languages",
+					value: languages,
+					minItemCount: 1,
+					maxItemCount: 100,
+					options: BTLanguages.getBTCodeList().map((x) => {
+						return { id: x, title: BTLanguages.getName(x) };
+					}),
+					onValueChange: Application.Selector(
+						this as BatotoSettingsForm,
+						"languageDidChange"
+					),
 				}),
-			],
-		}),
-	});
-};
 
-export const resetSettings = (stateManager: SourceStateManager): DUIButton => {
-	return App.createDUIButton({
-		id: "reset",
-		label: "Reset to Default",
-		onTap: async () => {
-			await Promise.all([
-				stateManager.store("languages", BTLanguages.getDefault()),
-				stateManager.store("language_home_filter", false),
-				stateManager.store("language_search_filter", false),
-			]);
-		},
-	});
-};
+				ToggleRow("language_home_filter", {
+					title: "Filter Homepage Language",
+					value: getLanguageHomeFilter(),
+					onValueChange: Application.Selector(
+						this as BatotoSettingsForm,
+						"filterHomeLanguageDidChange"
+					),
+				}),
+
+				ToggleRow("language_search_filter", {
+					title: "Filter Search Language",
+					value: getLanguageSearchFilter(),
+					onValueChange: Application.Selector(
+						this as BatotoSettingsForm,
+						"filterSearchLanguageDidChange"
+					),
+				}),
+			]),
+		];
+	}
+
+	async languageDidChange(value: string[]) {
+		setLanguages(value);
+	}
+
+	async filterHomeLanguageDidChange(value: boolean) {
+		setLanguageHomeFilter(value);
+	}
+
+	async filterSearchLanguageDidChange(value: boolean) {
+		setLanguageSearchFilter(value);
+	}
+}
