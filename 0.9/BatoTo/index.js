@@ -24814,6 +24814,7 @@ var source = (() => {
       const [_, buffer] = await Application.scheduleRequest(request);
       const data2 = Application.arrayBufferToUTF8String(buffer);
       const json = typeof data2 === "string" ? JSON.parse(data2) : data2;
+      throw new Error(json.data);
       const $3 = load(json.data);
       return parseThumbnailUrl($3);
     }
@@ -24969,7 +24970,6 @@ var source = (() => {
       const [_, buffer] = await Application.scheduleRequest(request);
       const data2 = Application.arrayBufferToUTF8String(buffer);
       const json = typeof data2 === "string" ? JSON.parse(data2) : data2;
-      throw new Error(json.data);
       const $3 = load(json.data);
       switch (section.id) {
         case "popular_updates":
