@@ -24515,6 +24515,28 @@ var source = (() => {
     };
     return chapterDetails;
   };
+  var parseViewMore = ($3) => {
+    const manga = [];
+    const collectedIds = [];
+    for (const obj of $3(".item", "#series-list").toArray()) {
+      const id = $3("a", obj).attr("href")?.replace("/series/", "").trim().split("/")[0] ?? "";
+      const title = $3(".item-title", obj).text();
+      const btcode = $3("em", obj).attr("data-lang");
+      const lang = btcode ? BTLanguages.getLangCode(btcode) : "\u{1F1EC}\u{1F1E7}";
+      const subtitle = lang + " " + $3(".visited", obj).text().trim();
+      const image = $3("img", obj).attr("src") ?? "";
+      if (!id || !title || collectedIds.includes(id)) continue;
+      manga.push({
+        type: "simpleCarouselItem",
+        imageUrl: image,
+        title: (0, import_html_entities.decode)(title),
+        mangaId: id,
+        subtitle: (0, import_html_entities.decode)(subtitle)
+      });
+      collectedIds.push(id);
+    }
+    return manga;
+  };
   var parseTags = () => {
     const arrayTags = [];
     for (const label of BTGenres.getGenresList()) {
@@ -24941,60 +24963,34 @@ var source = (() => {
       ];
     }
     async getDiscoverSectionItems(section, metadata) {
+      const page = metadata?.page ?? 1;
+      let param = "";
+      switch (section.id) {
+        case "popular_updates":
+          param = `?sort=views_d.za&page=${page}`;
+          break;
+        case "latest_releases":
+          param = `?sort=update.za&page=${page}`;
+          break;
+        default:
+          throw new Error(
+            "Requested to getViewMoreItems for a section ID which doesn't exist"
+          );
+      }
+      const langHomeFilter = getLanguageHomeFilter() ?? false;
+      const langs = getLanguages() ?? BTLanguages.getDefault();
+      param += langHomeFilter ? `&langs=${langs.join(",")}` : "";
       const request = {
         url: `${BATO_DOMAIN}`,
         method: "GET"
       };
       const $3 = await this.fetchCheerio(request);
-      switch (section.id) {
-        case "popular_updates":
-          const popularSection_Array = [];
-          for (const manga of $3(".home-popular .col.item").toArray()) {
-            const image = $3("img", manga).first().attr("src") ?? "";
-            const title = $3(".item-title", manga).text().trim() ?? "";
-            const id = $3("a", manga).attr("href")?.replace("/series/", "")?.trim().split("/")[0] ?? "";
-            const btcode = $3("em", manga).attr("data-lang");
-            const lang = btcode ? BTLanguages.getLangCode(btcode) : "\u{1F1EC}\u{1F1E7}";
-            const subtitle = lang + " " + $3(".item-volch", manga).text().trim();
-            if (!id || !title) continue;
-            popularSection_Array.push({
-              type: "prominentCarouselItem",
-              imageUrl: image,
-              title: Application.decodeHTMLEntities(title),
-              mangaId: id,
-              subtitle: Application.decodeHTMLEntities(subtitle)
-            });
-          }
-          return {
-            items: popularSection_Array,
-            metadata
-          };
-        case "latest_releases":
-          const latestSection_Array = [];
-          for (const manga of $3(".series-list .col.item").toArray()) {
-            const image = $3("img", manga).attr("src") ?? "";
-            const title = $3(".item-title", manga).text().trim() ?? "";
-            const id = $3("a", manga).attr("href")?.replace("/series/", "")?.trim().split("/")[0] ?? "";
-            const btcode = $3("em", manga).attr("data-lang");
-            const lang = btcode ? BTLanguages.getLangCode(btcode) : "\u{1F1EC}\u{1F1E7}";
-            const subtitle = lang + " " + $3(".item-volch a", manga).text().trim();
-            if (!id || !title) continue;
-            throw new Error("Not implemented");
-            latestSection_Array.push({
-              type: "simpleCarouselItem",
-              imageUrl: image,
-              title: Application.decodeHTMLEntities(title),
-              mangaId: id,
-              subtitle: Application.decodeHTMLEntities(subtitle)
-            });
-          }
-          return {
-            items: latestSection_Array,
-            metadata
-          };
-        default:
-          return { items: [], metadata };
-      }
+      const manga = parseViewMore($3);
+      metadata = !isLastPage($3) ? { page: page + 1 } : void 0;
+      return {
+        items: manga,
+        metadata
+      };
     }
     async getSearchResults(query, metadata) {
       const page = metadata?.page ?? 1;
