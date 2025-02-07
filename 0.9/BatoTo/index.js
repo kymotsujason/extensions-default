@@ -25108,9 +25108,9 @@ var source = (() => {
       }
       const langSearchFilter = getLanguageSearchFilter() ?? false;
       const langs = getLanguages() ?? BTLanguages.getDefault();
-      throw new Error("Batoto doesn't support regular search yet.");
       const [_, buffer] = await Application.scheduleRequest(request);
       const data2 = Application.arrayBufferToUTF8String(buffer);
+      throw new Error("Batoto doesn't support regular search yet.");
       const json = typeof data2 === "string" ? JSON.parse(data2) : data2;
       const $3 = load(json.data);
       const manga = parseSearch($3, langSearchFilter, langs, query);
