@@ -25110,7 +25110,7 @@ var source = (() => {
       const langs = getLanguages() ?? BTLanguages.getDefault();
       const [_, buffer] = await Application.scheduleRequest(request);
       const data2 = Application.arrayBufferToUTF8String(buffer);
-      throw new Error(data2);
+      throw new Error(typeof data2 === "string" ? JSON.parse(data2) : data2);
       const json = typeof data2 === "string" ? JSON.parse(data2) : data2;
       const $3 = load(json.data);
       const manga = parseSearch($3, langSearchFilter, langs, query);
