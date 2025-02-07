@@ -24803,12 +24803,12 @@ var source = (() => {
         {
           id: "latest_releases",
           title: "Latest Releases",
-          type: import_types4.DiscoverSectionType.chapterUpdates
+          type: import_types4.DiscoverSectionType.simpleCarousel
         },
         {
           id: "popular_updates",
           title: "Popular Updates",
-          type: import_types4.DiscoverSectionType.prominentCarousel
+          type: import_types4.DiscoverSectionType.simpleCarousel
         }
       ];
     }
