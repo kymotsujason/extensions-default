@@ -25151,6 +25151,7 @@ var source = (() => {
       return Promise.resolve(setCloudFlareCookie(JSON.stringify(cookies)));
     }
     getCloudflareBypassRequestAsync() {
+      throw new Error("Cloudflare bypass cookies are not set.");
       return Promise.resolve({
         url: `${BATO_DOMAIN}/`,
         method: "GET",
