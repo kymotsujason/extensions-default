@@ -123,6 +123,7 @@ export const parseMangaDetails = (
 			status,
 			tagGroups: [{ id: "tags", title: "Tags", tags: tags }],
 			contentRating: ContentRating.EVERYONE, // TODO: apply proper rating
+			shareUrl: `https://mangadex.org/title/${mangaId}`,
 		},
 	};
 };

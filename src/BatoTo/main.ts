@@ -153,12 +153,13 @@ export class BatoToExtension implements BatotoImplementation {
 	}
 
 	async getMangaDetails(mangaId: string): Promise<SourceManga> {
+		const url = `${BATO_DOMAIN}/series/${mangaId}`;
 		const request = {
-			url: `${BATO_DOMAIN}/series/${mangaId}`,
+			url: url,
 			method: "GET",
 		};
 		const $ = await this.fetchCheerio(request);
-		return parseMangaDetails($, mangaId);
+		return parseMangaDetails($, mangaId, url);
 	}
 
 	async getChapters(sourceManga: SourceManga): Promise<Chapter[]> {

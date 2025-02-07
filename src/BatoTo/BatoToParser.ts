@@ -13,7 +13,11 @@ import CryptoJS from "crypto-js";
 import { BTGenres, BTLanguages } from "./BatoToHelper";
 import { relevanceScore } from "./RelevanceScore";
 
-export const parseMangaDetails = ($: any, mangaId: string): SourceManga => {
+export const parseMangaDetails = (
+	$: any,
+	mangaId: string,
+	url: string
+): SourceManga => {
 	const titles: string[] = [];
 
 	titles.push(
@@ -103,6 +107,7 @@ export const parseMangaDetails = ($: any, mangaId: string): SourceManga => {
 			tagGroups: tagSections,
 			synopsis: description,
 			contentRating: ContentRating.EVERYONE,
+			shareUrl: url,
 		},
 	};
 };
