@@ -24846,7 +24846,7 @@ var source = (() => {
       return data2;
     }
   };
-  var BatoToExtension = class {
+  var BatoToExtension = class _BatoToExtension {
     constructor() {
       this.globalRateLimiter = new import_types4.BasicRateLimiter("rateLimiter", {
         numberOfRequests: 4,
@@ -25133,7 +25133,8 @@ var source = (() => {
       }
       const langSearchFilter = getLanguageSearchFilter() ?? false;
       const langs = getLanguages() ?? BTLanguages.getDefault();
-      const [_, buffer] = await Application.scheduleRequest(request);
+      const [res, buffer] = await Application.scheduleRequest(request);
+      this.CloudFlareError(res.status);
       const data2 = Application.arrayBufferToUTF8String(buffer);
       const json = typeof data2 === "string" ? JSON.parse(data2) : data2;
       const $3 = load(json.data);
@@ -25147,11 +25148,18 @@ var source = (() => {
     async getSearchTags() {
       return parseTags();
     }
+    CloudFlareError(status) {
+      if (status == 503 || status == 403) {
+        throw new Error(
+          `CLOUDFLARE BYPASS ERROR:
+Please go to the homepage of <${_BatoToExtension.name}> and press the cloud icon.`
+        );
+      }
+    }
     saveCloudflareBypassCookies(cookies) {
       return Promise.resolve(setCloudFlareCookie(JSON.stringify(cookies)));
     }
     getCloudflareBypassRequestAsync() {
-      throw new Error("Cloudflare bypass cookies are not set.");
       return Promise.resolve({
         url: `${BATO_DOMAIN}/`,
         method: "GET",
