@@ -24815,8 +24815,8 @@ var source = (() => {
   var BATO_DOMAIN = "https://batocomic.org";
   var BatotoInterceptor = class extends import_types4.PaperbackInterceptor {
     async interceptRequest(request) {
-      const cookies = JSON.parse(getCloudFlareCookie()) ?? [];
       throw new Error(getCloudFlareCookie());
+      const cookies = JSON.parse(getCloudFlareCookie()) ?? [];
       if (cookies.length > 0) {
         request.cookies = cookies;
       }
