@@ -25039,9 +25039,6 @@ var source = (() => {
       }
       const langSearchFilter = getLanguageSearchFilter() ?? false;
       const langs = getLanguages() ?? BTLanguages.getDefault();
-      const [_, buffer] = await Application.scheduleRequest(request);
-      const data2 = Application.arrayBufferToUTF8String(buffer);
-      const json = typeof data2 === "string" ? JSON.parse(data2) : data2;
       const $3 = await this.fetchCheerio(request);
       const manga = parseSearch($3, langSearchFilter, langs, query);
       metadata = !isLastPage($3) ? { page: page + 1 } : void 0;
@@ -25056,6 +25053,7 @@ var source = (() => {
     async fetchCheerio(request) {
       const [response, data2] = await Application.scheduleRequest(request);
       this.checkCloudflareStatus(response.status);
+      throw new Error(`${JSON.stringify(response)}`);
       return load(Application.arrayBufferToUTF8String(data2));
     }
     checkCloudflareStatus(status) {
