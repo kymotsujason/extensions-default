@@ -86,6 +86,28 @@ export class AniListExtension implements AniListImplementation {
 	async initialise(): Promise<void> {
 		this.mainRateLimiter.registerInterceptor();
 		this.mainInterceptor.registerInterceptor();
+
+		Application.registerSearchFilter({
+			id: "includeOperator",
+			type: "dropdown",
+			options: [
+				{ id: "AND", value: "AND" },
+				{ id: "OR", value: "OR" },
+			],
+			value: "AND",
+			title: "Include Operator",
+		});
+
+		Application.registerSearchFilter({
+			id: "excludeOperator",
+			type: "dropdown",
+			options: [
+				{ id: "AND", value: "AND" },
+				{ id: "OR", value: "OR" },
+			],
+			value: "OR",
+			title: "Exclude Operator",
+		});
 	}
 
 	parseAccessToken(accessToken: string | undefined): any | undefined {
