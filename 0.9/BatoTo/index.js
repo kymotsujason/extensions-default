@@ -24814,7 +24814,7 @@ var source = (() => {
       const [_, buffer] = await Application.scheduleRequest(request);
       const data2 = Application.arrayBufferToUTF8String(buffer);
       const json = typeof data2 === "string" ? JSON.parse(data2) : data2;
-      const $3 = load(JSON.stringify(json.data));
+      const $3 = load(json.data);
       return parseThumbnailUrl($3);
     }
     async interceptResponse(request, response, data2) {
@@ -24878,7 +24878,7 @@ var source = (() => {
       const [_, buffer] = await Application.scheduleRequest(request);
       const data2 = Application.arrayBufferToUTF8String(buffer);
       const json = typeof data2 === "string" ? JSON.parse(data2) : data2;
-      const $3 = load(JSON.stringify(json.data));
+      const $3 = load(json.data);
       return parseMangaDetails($3, mangaId2);
     }
     async getChapters(sourceManga) {
@@ -24889,7 +24889,7 @@ var source = (() => {
       const [_, buffer] = await Application.scheduleRequest(request);
       const data2 = Application.arrayBufferToUTF8String(buffer);
       const json = typeof data2 === "string" ? JSON.parse(data2) : data2;
-      const $3 = load(JSON.stringify(json.data));
+      const $3 = load(json.data);
       return parseChapterList($3, sourceManga);
     }
     async getChapterDetails(chapter) {
@@ -24902,7 +24902,7 @@ var source = (() => {
       const [_, buffer] = await Application.scheduleRequest(request);
       const data2 = Application.arrayBufferToUTF8String(buffer);
       const json = typeof data2 === "string" ? JSON.parse(data2) : data2;
-      const $3 = load(JSON.stringify(json.data));
+      const $3 = load(json.data);
       let chapters = parseChapterDetails($3, mangaId2, chapterId2);
       let accessToken = getProxyAccess();
       let proxyURL = getProxyServer();
@@ -24958,7 +24958,7 @@ var source = (() => {
     //	const json = typeof data === "string" ? JSON.parse(data) : data;
     //
     //	//this.CloudFlareError(response.status);
-    //	const $ = cheerio.load(JSON.stringify(json.data));
+    //	const $ = cheerio.load(json.data as string);
     //	parseHomeSections($, sectionCallback);
     //}
     async getDiscoverSectionItems(section, metadata) {
@@ -24969,7 +24969,8 @@ var source = (() => {
       const [_, buffer] = await Application.scheduleRequest(request);
       const data2 = Application.arrayBufferToUTF8String(buffer);
       const json = typeof data2 === "string" ? JSON.parse(data2) : data2;
-      const $3 = load(JSON.stringify(json.data));
+      throw new Error(json.data);
+      const $3 = load(json.data);
       switch (section.id) {
         case "popular_updates":
           const popularSection_Array = [];
@@ -25061,7 +25062,7 @@ var source = (() => {
     //	const json = typeof data === "string" ? JSON.parse(data) : data;
     //
     //	//this.CloudFlareError(response.status);
-    //	const $ = cheerio.load(JSON.stringify(json.data));
+    //	const $ = cheerio.load(json.data as string);
     //	const manga = parseViewMore($);
     //
     //	metadata = !isLastPage($) ? { page: page + 1 } : undefined;
@@ -25111,7 +25112,7 @@ var source = (() => {
       const [_, buffer] = await Application.scheduleRequest(request);
       const data2 = Application.arrayBufferToUTF8String(buffer);
       const json = typeof data2 === "string" ? JSON.parse(data2) : data2;
-      const $3 = load(JSON.stringify(json.data));
+      const $3 = load(json.data);
       const manga = parseSearch($3, langSearchFilter, langs, query);
       metadata = !isLastPage($3) ? { page: page + 1 } : void 0;
       return {
