@@ -1863,7 +1863,7 @@ var source = (() => {
       exports.SelectRow = SelectRow2;
       exports.ButtonRow = ButtonRow2;
       exports.NavigationRow = NavigationRow2;
-      exports.OAuthButtonRow = OAuthButtonRow;
+      exports.OAuthButtonRow = OAuthButtonRow2;
       exports.DeferredItem = DeferredItem;
       function LabelRow2(id, props) {
         return { ...props, id, type: "labelRow", isHidden: props.isHidden ?? false };
@@ -1888,7 +1888,7 @@ var source = (() => {
           isHidden: props.isHidden ?? false
         };
       }
-      function OAuthButtonRow(id, props) {
+      function OAuthButtonRow2(id, props) {
         return {
           ...props,
           id,
@@ -24775,9 +24775,24 @@ var source = (() => {
               this,
               "filterSearchLanguageDidChange"
             )
+          }),
+          (0, import_types3.OAuthButtonRow)("cloudflare", {
+            title: "Bypass Cloudflare",
+            authorizeEndpoint: "https://batocomic.org/",
+            clientId: "paperback",
+            redirectUri: "paperback://batoto-cloudflare",
+            responseType: {
+              type: "token"
+            },
+            onSuccess: Application.Selector(
+              this,
+              "cloudflare"
+            )
           })
         ])
       ];
+    }
+    async cloudflare(accessToken) {
     }
     async languageDidChange(value) {
       setLanguages(value);
@@ -24797,8 +24812,7 @@ var source = (() => {
       request.headers = {
         ...request.headers ?? {},
         ...{
-          referer: `${BATO_DOMAIN}/`,
-          "user-agent": "Mozilla/5.0 (iPhone; CPU iPhone OS 18_3 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/18.3 Mobile/15E148 Safari/604.1"
+          referer: `${BATO_DOMAIN}/`
         }
       };
       if (request.url.includes("mangaId=")) {
