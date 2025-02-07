@@ -24816,6 +24816,7 @@ var source = (() => {
   var BatotoInterceptor = class extends import_types4.PaperbackInterceptor {
     async interceptRequest(request) {
       const cookies = JSON.parse(getCloudFlareCookie()) ?? [];
+      throw new Error(getCloudFlareCookie());
       if (cookies.length > 0) {
         request.cookies = cookies;
       }
@@ -24846,7 +24847,7 @@ var source = (() => {
       return data2;
     }
   };
-  var BatoToExtension = class _BatoToExtension {
+  var BatoToExtension = class {
     constructor() {
       this.globalRateLimiter = new import_types4.BasicRateLimiter("rateLimiter", {
         numberOfRequests: 4,
@@ -25147,23 +25148,8 @@ var source = (() => {
     async getSearchTags() {
       return parseTags();
     }
-    CloudFlareError(status) {
-      if (status == 503 || status == 403) {
-        throw new Error(
-          `CLOUDFLARE BYPASS ERROR:
-Please go to the homepage of <${_BatoToExtension.name}> and press the cloud icon.`
-        );
-      }
-    }
     saveCloudflareBypassCookies(cookies) {
       return Promise.resolve(setCloudFlareCookie(JSON.stringify(cookies)));
-    }
-    async getCloudflareBypassRequestAsync() {
-      const request = {
-        url: `${BATO_DOMAIN}`,
-        method: "GET"
-      };
-      return request;
     }
   };
   var BatoTo = new BatoToExtension();
