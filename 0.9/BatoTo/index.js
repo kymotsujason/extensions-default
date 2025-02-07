@@ -25053,7 +25053,6 @@ var source = (() => {
     async fetchCheerio(request) {
       const [response, data2] = await Application.scheduleRequest(request);
       this.checkCloudflareStatus(response.status);
-      throw new Error(`${JSON.stringify(response)}`);
       return load(Application.arrayBufferToUTF8String(data2));
     }
     checkCloudflareStatus(status) {
