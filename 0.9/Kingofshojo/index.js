@@ -24374,13 +24374,6 @@ Type: ${row["type"]}`
                 // Used for images hosted on Wordpress blogs
               }
             };
-            request.cookies = [
-              App.createCookie({
-                name: "wpmanga-adault",
-                value: "1",
-                domain: this.baseUrl
-              })
-            ];
             return request;
           },
           interceptResponse: async (response) => {
@@ -24624,6 +24617,7 @@ Type: ${row["type"]}`
     async getSearchResults(query, metadata) {
       const page = metadata?.page ?? 1;
       const request = this.constructSearchRequest(page, query);
+      throw new Error(JSON.stringify(request));
       const response = await this.requestManager.schedule(request, 1);
       this.checkResponseError(response);
       const $2 = this.cheerio.load(response.data);
