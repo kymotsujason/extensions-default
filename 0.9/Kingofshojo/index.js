@@ -24055,7 +24055,11 @@ Type: ${row["type"]}`
       const image = encodeURI(
         await this.getImageSrc($2("div.thumb > img").first(), source)
       );
-      const rating = parseFloat($2("div.rating.bixbox > div > div.num").first().text()) * 10;
+      const rating = parseFloat(
+        (0, import_html_entities.decode)(
+          $2("div.rating.bixbox > div > div.num").first().text()
+        )
+      ) * 10;
       const parsedStatus = $2("tr:nth-child(2) > td:nth-child(2)").first().text().trim();
       let status;
       switch (parsedStatus.toUpperCase()) {
