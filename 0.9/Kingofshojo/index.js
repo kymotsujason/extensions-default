@@ -24088,7 +24088,8 @@ Type: ${row["type"]}`
     parseChapterList($2, mangaId, source) {
       const chapters = [];
       let sortingIndex = 0;
-      for (const obj of $2("li.wp-manga-chapter  ").toArray()) {
+      let chapterIndex = 1;
+      for (const obj of $2("#chapterlist > ul > li").toArray()) {
         const id = this.idCleaner($2("a", obj).first().attr("href") ?? "");
         const chapName = $2("a", obj).first().text().trim() ?? "";
         const chapNumRegex = id.match(
@@ -24098,7 +24099,7 @@ Type: ${row["type"]}`
         chapNum = parseFloat(chapNum) ?? 0;
         let mangaTime;
         const timeSelector = $2(
-          "span.chapter-release-date > a, span.chapter-release-date > span.c-new-tag > a",
+          `#chapterlist > ul > li:nth-child(${chapterIndex}) > div > div > a > span.chapterdate`,
           obj
         ).attr("title");
         if (typeof timeSelector !== "undefined") {
