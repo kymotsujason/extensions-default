@@ -24460,7 +24460,7 @@ Type: ${row["type"]}`
        * each page while on a chapter page. This is the selector
        * which is looped over. This may be overridden if required.
        */
-      this.chapterDetailsSelector = "div.page-break > img";
+      this.chapterDetailsSelector = "#readerarea > p > img";
       /**
        * Some websites have the Cloudflare defense check enabled on specific parts of the website, these need to be loaded when using the Cloudflare bypass within the app
        */
@@ -24621,7 +24621,6 @@ Type: ${row["type"]}`
       this.checkResponseError(response);
       const $2 = this.cheerio.load(response.data);
       const results = await this.parser.parseSearchResults($2, this);
-      throw new Error(`${results.length} results found. Parsing...`);
       const manga = [];
       for (const result of results) {
         if (this.usePostIds) {
