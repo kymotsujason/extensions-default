@@ -24491,7 +24491,6 @@ Type: ${row["type"]}`
       return this.usePostIds ? `${this.baseUrl}/?p=${mangaId}/` : `${this.baseUrl}/${this.directoryPath}/${mangaId}/`;
     }
     async getMangaDetails(mangaId) {
-      throw new Error(mangaId);
       const request = App.createRequest({
         url: this.usePostIds ? `${this.baseUrl}/?p=${mangaId}/` : `${this.baseUrl}/${this.directoryPath}/${mangaId}/`,
         method: "GET"
@@ -24499,6 +24498,7 @@ Type: ${row["type"]}`
       const response = await this.requestManager.schedule(request, 1);
       this.checkResponseError(response);
       const $2 = this.cheerio.load(response.data);
+      throw new Error("Failed to parse manga details");
       return this.parser.parseMangaDetails($2, mangaId, this);
     }
     async getChapters(mangaId) {
