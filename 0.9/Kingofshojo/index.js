@@ -24040,6 +24040,9 @@ Type: ${row["type"]}`
       const title = (0, import_html_entities.decode)(
         $2("div.seriestuhead > h1").children().remove().end().text().trim()
       );
+      const alternateTitles = (0, import_html_entities.decode)(
+        $2("tr:nth-child(1) > td:nth-child(2)").children().remove().end().text().trim()
+      ).split(",");
       const author = (0, import_html_entities.decode)(
         $2("tr:nth-child(5) > td:nth-child(2)").first().text().replace("\\n", "").trim()
       ).replace("Updating", "");
@@ -24052,9 +24055,7 @@ Type: ${row["type"]}`
       const image = encodeURI(
         await this.getImageSrc($2("div.thumb > img").first(), source)
       );
-      const rating = parseFloat(
-        $2("div.rating.bixbox > div > div.num").first().text()
-      );
+      const rating = parseFloat($2("div.rating.bixbox > div > div.num").first().text()) * 10;
       const parsedStatus = $2("tr:nth-child(2) > td:nth-child(2)").first().text().trim();
       let status;
       switch (parsedStatus.toUpperCase()) {
@@ -24078,7 +24079,7 @@ Type: ${row["type"]}`
       return App.createSourceManga({
         id: mangaId,
         mangaInfo: App.createMangaInfo({
-          titles: [title],
+          titles: [title, ...alternateTitles],
           image,
           author,
           artist,
