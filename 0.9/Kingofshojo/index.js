@@ -24233,6 +24233,9 @@ Type: ${row["type"]}`
           await this.getImageSrc($2("img", obj), source)
         );
         const subtitle = $2("span.font-meta.chapter", obj).text().trim();
+        throw new Error(
+          `Unable to parse title or subtitle for manga ${title}`
+        );
         results.push({
           slug,
           path,
@@ -24623,7 +24626,6 @@ Type: ${row["type"]}`
       const results = await this.parser.parseSearchResults($2, this);
       const manga = [];
       for (const result of results) {
-        throw new Error(JSON.stringify(result));
         if (this.usePostIds) {
           const postId = await this.slugToPostId(
             result.slug,
