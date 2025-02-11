@@ -24774,9 +24774,6 @@ Type: ${row["type"]}`
           url: new URLBuilder(this.baseUrl).addPathComponent(this.searchPagePathName).addPathComponent(page.toString()).addQueryParameter(
             "s",
             encodeURIComponent(query?.title ?? "")
-          ).addQueryParameter("post_type", "wp-manga").addQueryParameter(
-            "genre",
-            query?.includedTags?.map((x) => x.id)
           ).buildUrl({
             addTrailingSlash: true,
             includeUndefinedParameters: false
@@ -24785,12 +24782,11 @@ Type: ${row["type"]}`
         });
       } else {
         return App.createRequest({
-          url: new URLBuilder(this.baseUrl).addPathComponent("search").addPathComponent(
-            `${encodeURIComponent(
-              query?.title?.replace(/ /g, "-").replace(/'/g, "\u2019") ?? ""
-            )}`
-          ).addPathComponent(
-            `${this.searchPagePathName}${page.toString()}`
+          url: new URLBuilder(this.baseUrl).addPathComponent(this.searchPagePathName).addPathComponent(page.toString()).addQueryParameter(
+            "s",
+            encodeURIComponent(
+              query?.title?.replace(/ /g, "-") ?? ""
+            )
           ).buildUrl({
             addTrailingSlash: true,
             includeUndefinedParameters: false
