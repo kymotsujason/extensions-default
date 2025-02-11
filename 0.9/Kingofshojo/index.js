@@ -24038,26 +24038,21 @@ Type: ${row["type"]}`
     }
     async parseMangaDetails($2, mangaId, source) {
       const title = (0, import_html_entities.decode)(
-        $2("div.post-title h1, div#manga-title h1").children().remove().end().text().trim()
+        $2("div.seriestuhead > h1").children().remove().end().text().trim()
       );
       const author = (0, import_html_entities.decode)(
-        $2("div.author-content").first().text().replace("\\n", "").trim()
+        $2("tr:nth-child(5) > td:nth-child(2)").first().text().replace("\\n", "").trim()
       ).replace("Updating", "");
       const artist = (0, import_html_entities.decode)(
-        $2("div.artist-content").first().text().replace("\\n", "").trim()
+        $2("tr:nth-child(6) > td:nth-child(2)").first().text().replace("\\n", "").trim()
       ).replace("Updating", "");
       const description = (0, import_html_entities.decode)(
-        $2(
-          "div.description-summary, div.summary-container, div.manga-excerpt"
-        ).first().text()
+        $2("div.entry-content.entry-content-single").first().text()
       ).replace("Show more", "").trim();
       const image = encodeURI(
-        await this.getImageSrc($2("div.summary_image img").first(), source)
+        await this.getImageSrc($2("div.thumb > img").first(), source)
       );
-      const parsedStatus = $2(
-        "div.summary-content",
-        $2("div.post-content_item").last()
-      ).text().trim();
+      const parsedStatus = $2("tr:nth-child(2) > td:nth-child(2)").first().text().trim();
       let status;
       switch (parsedStatus.toUpperCase()) {
         case "COMPLETED":
@@ -24068,7 +24063,7 @@ Type: ${row["type"]}`
           break;
       }
       const genres = [];
-      for (const obj of $2("div.genres-content a").toArray()) {
+      for (const obj of $2("div.seriestucontr > div > a").toArray()) {
         const label = $2(obj).text();
         const id = $2(obj).attr("href")?.split("/")[4] ?? label;
         if (!label || !id) continue;
@@ -24498,7 +24493,6 @@ Type: ${row["type"]}`
       const response = await this.requestManager.schedule(request, 1);
       this.checkResponseError(response);
       const $2 = this.cheerio.load(response.data);
-      throw new Error("Failed to parse manga details");
       return this.parser.parseMangaDetails($2, mangaId, this);
     }
     async getChapters(mangaId) {
@@ -24785,7 +24779,7 @@ Type: ${row["type"]}`
           url: new URLBuilder(this.baseUrl).addPathComponent(this.searchPagePathName).addPathComponent(page.toString()).addQueryParameter(
             "s",
             encodeURIComponent(
-              query?.title?.replace(/ /g, "-") ?? ""
+              query?.title?.replace(/'/g, "\u2019") ?? ""
             )
           ).buildUrl({
             addTrailingSlash: true,
