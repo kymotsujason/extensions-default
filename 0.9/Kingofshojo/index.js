@@ -24052,6 +24052,9 @@ Type: ${row["type"]}`
       const image = encodeURI(
         await this.getImageSrc($2("div.thumb > img").first(), source)
       );
+      const rating = parseFloat(
+        $2("div.rating.bixbox > div > div.num").first().text()
+      );
       const parsedStatus = $2("tr:nth-child(2) > td:nth-child(2)").first().text().trim();
       let status;
       switch (parsedStatus.toUpperCase()) {
@@ -24081,6 +24084,7 @@ Type: ${row["type"]}`
           artist,
           tags: tagSections,
           desc: description,
+          rating,
           status
         })
       });
@@ -24127,6 +24131,7 @@ Type: ${row["type"]}`
           group: ""
         });
         sortingIndex--;
+        chapterIndex++;
       }
       if (chapters.length == 0) {
         throw new Error(
