@@ -24491,6 +24491,7 @@ Type: ${row["type"]}`
       return this.usePostIds ? `${this.baseUrl}/?p=${mangaId}/` : `${this.baseUrl}/${this.directoryPath}/${mangaId}/`;
     }
     async getMangaDetails(mangaId) {
+      throw new Error(mangaId);
       const request = App.createRequest({
         url: this.usePostIds ? `${this.baseUrl}/?p=${mangaId}/` : `${this.baseUrl}/${this.directoryPath}/${mangaId}/`,
         method: "GET"
@@ -24786,7 +24787,7 @@ Type: ${row["type"]}`
         return App.createRequest({
           url: new URLBuilder(this.baseUrl).addPathComponent("search").addPathComponent(
             `${encodeURIComponent(
-              query?.title?.replace(/ /g, "-") ?? ""
+              query?.title?.replace(/ /g, "-").replace(/'/g, "\u2019") ?? ""
             )}`
           ).addPathComponent(
             `${this.searchPagePathName}${page.toString()}`
