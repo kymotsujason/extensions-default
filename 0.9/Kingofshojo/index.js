@@ -24425,7 +24425,7 @@ Type: ${row["type"]}`
        * each manga object while on a search result page. This is the selector
        * which is looped over. This may be overridden if required.
        */
-      this.searchMangaSelector = "div.page-item-detail.manga";
+      this.searchMangaSelector = "div.bsx";
       /**
        * Set to true if your source has advanced search functionality built in.
        * If this is not true, no genre tags will be shown on the homepage!
