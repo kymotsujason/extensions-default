@@ -24450,7 +24450,7 @@ Type: ${row["type"]}`
        * 2: (POST) Manga page (https://domain.com/manga/manga-slug)
        * 3: (GET) Manga page (https://domain.com/manga/manga-slug)
        */
-      this.chapterEndpoint = 1;
+      this.chapterEndpoint = 2;
       /**
        * Different Madara sources might have a slightly different selector which is required to parse out
        * each page while on a chapter page. This is the selector
