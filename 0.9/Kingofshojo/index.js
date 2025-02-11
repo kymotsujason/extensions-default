@@ -24617,13 +24617,13 @@ Type: ${row["type"]}`
     async getSearchResults(query, metadata) {
       const page = metadata?.page ?? 1;
       const request = this.constructSearchRequest(page, query);
-      throw new Error(JSON.stringify(request));
       const response = await this.requestManager.schedule(request, 1);
       this.checkResponseError(response);
       const $2 = this.cheerio.load(response.data);
       const results = await this.parser.parseSearchResults($2, this);
       const manga = [];
       for (const result of results) {
+        throw new Error(JSON.stringify(result));
         if (this.usePostIds) {
           const postId = await this.slugToPostId(
             result.slug,
@@ -24648,7 +24648,7 @@ Type: ${row["type"]}`
           );
         }
       }
-      metadata = results.length >= 18 ? { page: page + 1 } : void 0;
+      metadata = results.length >= 10 ? { page: page + 1 } : void 0;
       return App.createPagedResults({
         results: manga,
         metadata
