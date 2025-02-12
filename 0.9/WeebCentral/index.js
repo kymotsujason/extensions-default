@@ -16534,16 +16534,12 @@ var source = (() => {
     const title = Application.decodeHTMLEntities(
       $2("h1").first().text().trim() ?? ""
     );
-    let altTitle = [""];
-    for (const altTitleElement of $2(
-      "section:nth-child(3) > ul > li:nth-child(2)"
-    ).toArray()) {
-      const parsedStatus2 = $2(
-        'strong:contains("Associated Name(s)")',
-        altTitleElement
-      ).text().trim();
-      altTitle.push(Application.decodeHTMLEntities(parsedStatus2));
-    }
+    let altTitle = [];
+    const altTitleElement = $2(
+      "section:nth-child(3) > ul > li:nth-child(2)",
+      `strong:contains("Associated Name(s)")`
+    ).text();
+    altTitle.push(altTitleElement);
     const image = $2("picture > img").attr("src") ?? "";
     const description = Application.decodeHTMLEntities(
       $2(".whitespace-pre-wrap").text().trim()
@@ -17091,10 +17087,11 @@ var source = (() => {
     async getSearchResults(query, metadata) {
       const LIMIT = 32;
       const offset = metadata?.offset ?? 0;
+      const regex = /[!?()]/g;
       let searchParams = "";
       if (query.title) {
         searchParams = searchParams.concat(
-          encodeURI(`&text=${query.title ?? ""}`)
+          encodeURI(`&text=${query.title.replace(regex, "") ?? ""}`)
         );
       } else {
         let included = "";
