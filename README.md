@@ -8,7 +8,7 @@ Sources added from others:
 - [Manganato](https://github.com/TheNetsky/extensions-generic-0.8/tree/mangabox) (compatibility) (Improved search sorting) (Proxy server for cropping)
 - [BatoTo](https://github.com/TheNetsky/community-extensions/tree/0.8) (0.9) (Improved search sorting) (Proxy server for cropping)
 - [WeebCentral](https://github.com/GabrielCWT/gabe-extensions) (compatibility) (Improved search matching) (Proxy server for cropping)
-- [Toonily](https://github.com/TheNetsky/extensions-generic-0.8/tree/madara) (compatibility)
+- [Toonily](https://github.com/TheNetsky/extensions-generic-0.8/tree/madara) (0.9)
 - [Komga](https://github.com/Paperback-iOS/extensions-default/tree/0.9) (compatibility)
 - [Kunmanga](https://github.com/TheNetsky/extensions-generic-0.8/tree/madara) (0.9)
 

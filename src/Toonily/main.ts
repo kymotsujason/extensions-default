@@ -1,346 +1,163 @@
 import {
 	Chapter,
 	ChapterDetails,
-	HomeSection,
 	PagedResults,
-	SearchRequest,
+	SearchQuery,
 	SourceManga,
 	TagSection,
 	Request,
 	Response,
-	SourceStateManager,
-	DUINavigationButton,
-	PartialSourceManga,
 	SearchResultsProviding,
 	MangaProviding,
 	ChapterProviding,
-	DUISection,
-	Tag,
-	HomePageSectionsProviding,
-	HomeSectionType,
-	CompatWrapper,
-	Source,
-} from "@paperback/types/lib/compat/0.8";
+	CloudflareBypassRequestProviding,
+	Extension,
+	PaperbackInterceptor,
+	BasicRateLimiter,
+	CookieStorageInterceptor,
+	CloudflareError,
+	Cookie,
+	DiscoverSection,
+	DiscoverSectionItem,
+	DiscoverSectionType,
+	SearchResultItem,
+} from "@paperback/types";
 
-import * as cheerios from "cheerio";
+import * as cheerio from "cheerio";
+import { CheerioAPI } from "cheerio";
 
 import { Parser } from "./MadaraParser";
-import { URLBuilder } from "./MadaraHelper";
 
-export class Madara
-	extends Source
-	implements
-		SearchResultsProviding,
-		MangaProviding,
-		ChapterProviding,
-		HomePageSectionsProviding
-{
-	/**
-	 *  Request manager override
-	 */
-	requestsPerSecond = 5;
-	requestTimeout = 20000;
+const TOONILY_DOMAIN = "https://toonily.com";
 
-	requestManager = App.createRequestManager({
-		requestsPerSecond: this.requestsPerSecond,
-		requestTimeout: this.requestTimeout,
-		interceptor: {
-			interceptRequest: async (request: Request): Promise<Request> => {
-				request.headers = {
-					...(request.headers ?? {}),
-					...{
-						"user-agent":
-							await this.requestManager.getDefaultUserAgent(),
-						referer: `${this.baseUrl}/`,
-						origin: `${this.baseUrl}/`,
-						...(request.url.includes("wordpress.com") && {
-							Accept: "image/avif,image/webp,*/*",
-						}), // Used for images hosted on Wordpress blogs
-					},
-				};
-				request.cookies = [
-					App.createCookie({
-						name: "wpmanga-adault",
-						value: "1",
-						domain: this.baseUrl,
-					}),
-					App.createCookie({
-						name: "toonily-mature",
-						value: "1",
-						domain: this.baseUrl,
-					}),
-				];
+type ToonilyImplementation = Extension &
+	SearchResultsProviding &
+	MangaProviding &
+	ChapterProviding &
+	CloudflareBypassRequestProviding;
 
-				return request;
+class ToonilyInterceptor extends PaperbackInterceptor {
+	override async interceptRequest(request: Request): Promise<Request> {
+		request.headers = {
+			...(request.headers ?? {}),
+			...{
+				"user-agent": await Application.getDefaultUserAgent(),
+				referer: `${TOONILY_DOMAIN}/`,
+				origin: `${TOONILY_DOMAIN}/`,
+				...(request.url.includes("wordpress.com") && {
+					Accept: "image/avif,image/webp,*/*",
+				}), // Used for images hosted on Wordpress blogs
 			},
+		};
+		request.cookies = {
+			"toonily-mature": "1",
+		};
 
-			interceptResponse: async (
-				response: Response
-			): Promise<Response> => {
-				return response;
-			},
-		},
-	});
-
-	stateManager = App.createSourceStateManager();
-
-	override async getSourceMenu(): Promise<DUISection> {
-		return App.createDUISection({
-			id: "sourceMenu",
-			header: "Source Menu",
-			isHidden: false,
-			rows: async () => [this.sourceSettings(this.stateManager)],
-		});
+		return request;
 	}
 
-	sourceSettings = (
-		stateManager: SourceStateManager
-	): DUINavigationButton => {
-		return App.createDUINavigationButton({
-			id: "madara_settings",
-			label: "Source Settings",
-			form: App.createDUIForm({
-				sections: async () => [
-					App.createDUISection({
-						id: "hq_thumb",
-						isHidden: false,
-						footer: "Enabling HQ thumbnails will use more bandwidth and will load thumbnails slightly slower.",
-						rows: async () => [
-							App.createDUISwitch({
-								id: "HQthumb",
-								label: "HQ Thumbnails",
-								value: App.createDUIBinding({
-									get: async () =>
-										(await stateManager.retrieve(
-											"HQthumb"
-										)) ?? false,
-									set: async (newValue) =>
-										await stateManager.store(
-											"HQthumb",
-											newValue
-										),
-								}),
-							}),
-						],
-					}),
-				],
-			}),
-		});
-	};
+	override async interceptResponse(
+		request: Request,
+		response: Response,
+		data: ArrayBuffer
+	): Promise<ArrayBuffer> {
+		return data;
+	}
+}
 
-	/**
-	 * The Madara URL of the website. Eg. https://webtoon.xyz
-	 */
-	baseUrl: string = "https://toonily.com";
-
-	/**
-	 * The language code the source's content is served in in string form.
-	 */
+export class ToonilyExtension implements ToonilyImplementation {
+	baseUrl = TOONILY_DOMAIN;
 	language = "🇬🇧";
-
-	/**
-	 * Different Madara sources might have a slightly different selector which is required to parse out
-	 * each manga object while on a search result page. This is the selector
-	 * which is looped over. This may be overridden if required.
-	 */
 	searchMangaSelector = "div.page-item-detail.manga";
-
-	/**
-	 * Set to true if your source has advanced search functionality built in.
-	 * If this is not true, no genre tags will be shown on the homepage!
-	 * See https://www.webtoon.xyz/?s=&post_type=wp-manga if they have a "advanced" option, if NOT, set this to false.
-	 */
-	hasAdvancedSearchPage = true;
-
-	/**
-	 * The path used for search pagination. Used in search function.
-	 * Eg. for https://mangabob.com/page/2/?s&post_type=wp-manga it would be 'page'
-	 */
 	searchPagePathName = "page";
-
-	/**
-	 * Set to true if the source makes use of the manga chapter protector plugin.
-	 * (https://mangabooth.com/product/wp-manga-chapter-protector/)
-	 */
-	hasProtectedChapters = false;
-
-	/**
-	 * Some sources may in the future change how to get the chapter protector data,
-	 * making it configurable, will make it way more flexible and open to customized installations of the protector plugin.
-	 */
-	protectedChapterDataSelector = "#chapter-protector-data";
-
-	/**
-	 * Some sites use the alternate URL for getting chapters through ajax
-	 * 0: (POST) Form data https://domain.com/wp-admin/admin-ajax.php
-	 * 1: (POST) Alternative Ajax page (https://domain.com/manga/manga-slug/ajax/chapters)
-	 * 2: (POST) Manga page (https://domain.com/manga/manga-slug)
-	 * 3: (GET) Manga page (https://domain.com/manga/manga-slug)
-	 */
-	chapterEndpoint = 1;
-
-	/**
-	 * Different Madara sources might have a slightly different selector which is required to parse out
-	 * each page while on a chapter page. This is the selector
-	 * which is looped over. This may be overridden if required.
-	 */
-	chapterDetailsSelector = "div.page-break > img";
-
-	/**
-	 * Some websites have the Cloudflare defense check enabled on specific parts of the website, these need to be loaded when using the Cloudflare bypass within the app
-	 */
-	bypassPage = "";
-
-	/**
-	 * If it's not possible to use postIds for certain reasons, you can disable this here.
-	 */
-	usePostIds = true;
-
-	/**
-	 * When not using postIds, you need to set the directory path
-	 */
-	directoryPath = "manga";
-
-	/**
-	 * Some sources may redirect to the manga page instead of the chapter page if adding the parameter '?style=list'
-	 */
-	useListParameter = true;
-
+	chapterDetailsSelector = "div.reading-content > div > img";
+	directoryPath = "webtoon";
 	parser = new Parser();
 
-	override getMangaShareUrl(mangaId: string): string {
-		return this.usePostIds
-			? `${this.baseUrl}/?p=${mangaId}/`
-			: `${this.baseUrl}/${this.directoryPath}/${mangaId}/`;
+	globalRateLimiter = new BasicRateLimiter("rateLimiter", {
+		numberOfRequests: 4,
+		bufferInterval: 1,
+		ignoreImages: true,
+	});
+	mainRequestInterceptor = new ToonilyInterceptor("main");
+	cookieStorageInterceptor = new CookieStorageInterceptor({
+		storage: "stateManager",
+	});
+
+	async initialise(): Promise<void> {
+		this.globalRateLimiter.registerInterceptor();
+		this.mainRequestInterceptor.registerInterceptor();
+		this.cookieStorageInterceptor.registerInterceptor();
+
+		if (Application.isResourceLimited) return;
+
+		Application.registerSearchFilter({
+			id: "includeOperator",
+			type: "dropdown",
+			options: [
+				{ id: "AND", value: "AND" },
+				{ id: "OR", value: "OR" },
+			],
+			value: "AND",
+			title: "Include Operator",
+		});
+
+		for (const tags of await this.getSearchTags()) {
+			Application.registerSearchFilter({
+				type: "multiselect",
+				options: tags.tags.map((x) => ({ id: x.id, value: x.title })),
+				id: "tags-" + tags.id,
+				allowExclusion: true,
+				title: tags.title,
+				value: {},
+				allowEmptySelection: true,
+				maximum: undefined,
+			});
+		}
 	}
 
 	async getMangaDetails(mangaId: string): Promise<SourceManga> {
-		const request = App.createRequest({
-			url: this.usePostIds
-				? `${this.baseUrl}/?p=${mangaId}/`
-				: `${this.baseUrl}/${this.directoryPath}/${mangaId}/`,
+		const request = {
+			url: `${TOONILY_DOMAIN}/?p=${mangaId}/`,
 			method: "GET",
-		});
-
-		const response = await this.requestManager.schedule(request, 1);
-		this.checkResponseError(response);
-		const $ = this.cheerio.load(response.data as string);
+		};
+		const $ = await this.fetchCheerio(request);
 
 		return this.parser.parseMangaDetails($, mangaId, this);
 	}
 
-	async getChapters(mangaId: string): Promise<Chapter[]> {
-		let requestConfig;
+	async getChapters(sourceManga: SourceManga): Promise<Chapter[]> {
+		let mangaId = sourceManga.mangaId;
 		let path = this.directoryPath;
 		let slug = mangaId;
 
-		if (this.usePostIds) {
-			const postData = await this.convertPostIdToSlug(Number(mangaId));
-			path = postData.path;
-			slug = postData.slug;
-		}
+		const postData = await this.convertPostIdToSlug(Number(mangaId));
+		path = postData.path;
+		slug = postData.slug;
 
-		switch (this.chapterEndpoint) {
-			case 0:
-				requestConfig = {
-					url: `${this.baseUrl}/wp-admin/admin-ajax.php`,
-					method: "POST",
-					headers: {
-						"content-type": "application/x-www-form-urlencoded",
-					},
-					data: {
-						action: "manga_get_chapters",
-						manga: this.usePostIds
-							? mangaId
-							: await this.convertSlugToPostId(
-									mangaId,
-									this.directoryPath
-							  ),
-					},
-				};
-				break;
+		const request = {
+			url: `${TOONILY_DOMAIN}/${path}/${slug}/ajax/chapters`,
+			method: "POST",
+			headers: {
+				"content-type": "application/x-www-form-urlencoded",
+			},
+		};
+		const $ = await this.fetchCheerio(request);
 
-			case 1:
-				requestConfig = {
-					url: `${this.baseUrl}/${path}/${slug}/ajax/chapters`,
-					method: "POST",
-					headers: {
-						"content-type": "application/x-www-form-urlencoded",
-					},
-				};
-				break;
-
-			case 2:
-				requestConfig = {
-					url: `${this.baseUrl}/${path}/${slug}`,
-					method: "POST",
-					headers: {
-						"content-type": "application/x-www-form-urlencoded",
-					},
-				};
-				break;
-
-			case 3:
-				requestConfig = {
-					url: `${this.baseUrl}/${path}/${slug}`,
-					method: "GET",
-					headers: {
-						"content-type": "application/x-www-form-urlencoded",
-					},
-				};
-				break;
-
-			default:
-				throw new Error("Invalid chapter endpoint!");
-		}
-
-		const request = App.createRequest(requestConfig);
-
-		const response = await this.requestManager.schedule(request, 1);
-		this.checkResponseError(response);
-		const $ = this.cheerio.load(response.data as string);
-
-		return this.parser.parseChapterList($, mangaId, this);
+		return this.parser.parseChapterList($, sourceManga, this);
 	}
 
-	async getChapterDetails(
-		mangaId: string,
-		chapterId: string
-	): Promise<ChapterDetails> {
+	async getChapterDetails(chapter: Chapter): Promise<ChapterDetails> {
+		const chapterId = chapter.chapterId;
+		const mangaId = chapter.sourceManga.mangaId;
 		let url: string;
-		if (this.usePostIds) {
-			const slugData: any = await this.convertPostIdToSlug(
-				Number(mangaId)
-			);
-			url = `${this.baseUrl}/${slugData.path}/${
-				slugData.slug
-			}/${chapterId}/${this.useListParameter ? "?style=list" : ""}`;
-		} else {
-			url = `${this.baseUrl}/${
-				this.directoryPath
-			}/${mangaId}/${chapterId}/${
-				this.useListParameter ? "?style=list" : ""
-			}`;
-		}
-
-		const request = App.createRequest({
+		const slugData: any = await this.convertPostIdToSlug(Number(mangaId));
+		url = `${TOONILY_DOMAIN}/${slugData.path}/${slugData.slug}/${chapterId}/?style=list`;
+		const request = {
 			url: url,
 			method: "GET",
-		});
-
-		const response = await this.requestManager.schedule(request, 1);
-		this.checkResponseError(response);
-		const $ = this.cheerio.load(response.data as string);
-
-		if (this.hasProtectedChapters) {
-			return this.parser.parseProtectedChapterDetails(
-				$,
-				mangaId,
-				chapterId,
-				this.protectedChapterDataSelector,
-				this
-			);
-		}
+		};
+		const $ = await this.fetchCheerio(request);
 
 		return this.parser.parseChapterDetails(
 			$,
@@ -351,318 +168,168 @@ export class Madara
 		);
 	}
 
-	override async getSearchTags(): Promise<TagSection[]> {
+	async getSearchTags(): Promise<TagSection[]> {
 		let request;
-		if (this.hasAdvancedSearchPage) {
-			// Adding the fake query "the" since some source revert to homepage when none is given!
-			request = App.createRequest({
-				url: `${this.baseUrl}/?s=the&post_type=wp-manga`,
-				method: "GET",
-			});
-		} else {
-			request = App.createRequest({
-				url: `${this.baseUrl}/`,
-				method: "GET",
-			});
-		}
-
-		const response = await this.requestManager.schedule(request, 1);
-		this.checkResponseError(response);
-		const $ = this.cheerio.load(response.data as string);
-
-		return this.parser.parseTags($, this.hasAdvancedSearchPage);
+		// Adding the fake query "the" since some source revert to homepage when none is given!
+		request = {
+			url: `${TOONILY_DOMAIN}/?s=the&post_type=wp-manga`,
+			method: "GET",
+		};
+		const $ = await this.fetchCheerio(request);
+		return this.parser.parseTags($, true);
 	}
 
 	async getSearchResults(
-		query: SearchRequest,
+		query: SearchQuery,
 		metadata: any
-	): Promise<PagedResults> {
+	): Promise<PagedResults<SearchResultItem>> {
 		// If we're supplied a page that we should be on, set our internal reference to that page. Otherwise, we start from page 0.
 		const page = metadata?.page ?? 1;
 
 		const request = this.constructSearchRequest(page, query);
-		const response = await this.requestManager.schedule(request, 1);
-		this.checkResponseError(response);
-		const $ = this.cheerio.load(response.data as string);
+		const $ = await this.fetchCheerio(request);
 		const results = await this.parser.parseSearchResults($, this);
 
-		const manga: PartialSourceManga[] = [];
+		const manga: SearchResultItem[] = [];
 		for (const result of results) {
-			if (this.usePostIds) {
-				const postId = await this.slugToPostId(
-					result.slug,
-					result.path
-				);
+			const postId = await this.slugToPostId(result.slug, result.path);
 
-				manga.push(
-					App.createPartialSourceManga({
-						mangaId: String(postId),
-						image: result.image,
-						title: result.title,
-						subtitle: result.subtitle,
-					})
-				);
-			} else {
-				manga.push(
-					App.createPartialSourceManga({
-						mangaId: result.slug,
-						image: result.image,
-						title: result.title,
-						subtitle: result.subtitle,
-					})
-				);
-			}
+			manga.push({
+				mangaId: String(postId),
+				imageUrl: result.image,
+				title: result.title,
+				subtitle: result.subtitle,
+			});
 		}
-		metadata = results.length >= 18 ? { page: page + 1 } : undefined;
+		metadata = results.length >= 12 ? { page: page + 1 } : undefined;
 
-		return App.createPagedResults({
-			results: manga,
+		return {
+			items: manga,
 			metadata: metadata,
-		});
+		};
 	}
 
-	override async getHomePageSections(
-		sectionCallback: (section: HomeSection) => void
-	): Promise<void> {
-		const sections = [
+	async getDiscoverSections(): Promise<DiscoverSection[]> {
+		return [
 			{
-				request: this.constructAjaxHomepageRequest(
-					0,
-					10,
-					"_latest_update"
-				),
-				section: App.createHomeSection({
-					id: "0",
-					title: "Recently Updated",
-					type: HomeSectionType.singleRowNormal,
-					containsMoreItems: true,
-				}),
+				id: "new_manga",
+				title: "New Manga",
+				type: DiscoverSectionType.simpleCarousel,
 			},
 			{
-				request: this.constructAjaxHomepageRequest(
-					0,
-					10,
-					"_wp_manga_week_views_value"
-				),
-				section: App.createHomeSection({
-					id: "1",
-					title: "Currently Trending",
-					type: HomeSectionType.singleRowNormal,
-					containsMoreItems: true,
-				}),
-			},
-			{
-				request: this.constructAjaxHomepageRequest(
-					0,
-					10,
-					"_wp_manga_views"
-				),
-				section: App.createHomeSection({
-					id: "2",
-					title: "Most Popular",
-					type: HomeSectionType.singleRowNormal,
-					containsMoreItems: true,
-				}),
-			},
-			{
-				request: this.constructAjaxHomepageRequest(
-					0,
-					10,
-					"_wp_manga_status",
-					"end"
-				),
-				section: App.createHomeSection({
-					id: "3",
-					title: "Completed",
-					type: HomeSectionType.singleRowNormal,
-					containsMoreItems: true,
-				}),
+				id: "latest_releases",
+				title: "Latest Releases",
+				type: DiscoverSectionType.simpleCarousel,
 			},
 		];
-
-		const promises: Promise<void>[] = [];
-		for (const section of sections) {
-			// Let the app load empty sections
-			sectionCallback(section.section);
-
-			// Get the section data
-			promises.push(
-				this.requestManager
-					.schedule(section.request, 1)
-					.then(async (response) => {
-						this.checkResponseError(response);
-						const $ = this.cheerio.load(response.data as string);
-						section.section.items =
-							await this.parser.parseHomeSection($, this);
-						sectionCallback(section.section);
-					})
-			);
-		}
-
-		// Make sure the function completes
-		await Promise.all(promises);
 	}
 
-	override async getViewMoreItems(
-		homepageSectionId: string,
+	async getDiscoverSectionItems(
+		section: DiscoverSection,
 		metadata: any
-	): Promise<PagedResults> {
-		const page = metadata?.page ?? 0;
-		let sortBy: any[] = [];
-
-		switch (homepageSectionId) {
-			case "0": {
-				sortBy = ["_latest_update"];
+	): Promise<PagedResults<DiscoverSectionItem>> {
+		const page: number = metadata?.page ?? 1;
+		let param = "";
+		switch (section.id) {
+			case "new_manga":
+				param = `?m_orderby=new-manga`;
 				break;
-			}
-			case "1": {
-				sortBy = ["_wp_manga_week_views_value"];
+			case "latest_releases":
+				param = `?m_orderby=latest`;
 				break;
-			}
-			case "2": {
-				sortBy = ["_wp_manga_views"];
-				break;
-			}
-			case "3": {
-				sortBy = ["_wp_manga_status", "end"];
-				break;
-			}
+			default:
+				throw new Error(
+					"Requested to getViewMoreItems for a section ID which doesn't exist"
+				);
 		}
-
-		const request = this.constructAjaxHomepageRequest(
-			page,
-			50,
-			sortBy[0],
-			sortBy[1]
-		);
-		const response = await this.requestManager.schedule(request, 1);
-		this.checkResponseError(response);
-		const $ = this.cheerio.load(response.data as string);
-		const items: PartialSourceManga[] = await this.parser.parseHomeSection(
-			$,
-			this
-		);
-
-		let mData: any = { page: page + 1 };
-		if (items.length < 50) {
-			mData = undefined;
-		}
-
-		return App.createPagedResults({
-			results: items,
-			metadata: mData,
-		});
+		const request = {
+			url: `${TOONILY_DOMAIN}/webtoons/page/${page}/${param}`,
+			method: "GET",
+		};
+		const $ = await this.fetchCheerio(request);
+		const manga = await this.parser.parseHomeSection($, this);
+		metadata = manga.length >= 18 ? { page: page + 1 } : undefined;
+		return {
+			items: manga,
+			metadata,
+		};
 	}
 
 	// Utility
-	constructSearchRequest(page: number, query: SearchRequest): any {
+	constructSearchRequest(page: number, query: SearchQuery): any {
 		if (query.title == "") {
-			return App.createRequest({
-				url: new URLBuilder(this.baseUrl)
-					.addPathComponent(this.searchPagePathName)
-					.addPathComponent(page.toString())
-					.addQueryParameter(
-						"s",
-						encodeURIComponent(query?.title ?? "")
-					)
-					.addQueryParameter("post_type", "wp-manga")
-					.addQueryParameter(
-						"genre",
-						query?.includedTags?.map((x: Tag) => x.id)
-					)
-					.buildUrl({
-						addTrailingSlash: true,
-						includeUndefinedParameters: false,
-					}),
+			let url = `${TOONILY_DOMAIN}/${
+				this.searchPagePathName
+			}/${page.toString()}/?s=${encodeURIComponent(query?.title ?? "")}`;
+			let included = "&";
+			for (const filter of query.filters) {
+				if (filter.id.startsWith("tags")) {
+					const tags = (filter.value ?? {}) as Record<
+						string,
+						"included"
+					>;
+					for (const tag of Object.entries(tags)) {
+						switch (tag[1]) {
+							case "included":
+								included += `genre[]=${included}${tag[0]}&`;
+								break;
+						}
+					}
+				}
+			}
+			included = included.slice(0, -1);
+			return {
+				url: `${url}${included}`,
 				method: "GET",
-			});
+			};
 		} else {
-			return App.createRequest({
-				url: new URLBuilder(this.baseUrl)
-					.addPathComponent("search")
-					.addPathComponent(
-						`${encodeURIComponent(
-							query?.title?.replace(/ /g, "-") ?? ""
-						)}`
-					)
-					.addPathComponent(
-						`${this.searchPagePathName}${page.toString()}`
-					)
-					.buildUrl({
-						addTrailingSlash: true,
-						includeUndefinedParameters: false,
-					}),
+			return {
+				url: `${TOONILY_DOMAIN}/${
+					this.searchPagePathName
+				}/${page.toString()}/?s=${encodeURIComponent(
+					query?.title?.replace(/'/g, "’") ?? ""
+				)}`,
 				method: "GET",
-			});
+			};
 		}
-	}
-
-	constructAjaxHomepageRequest(
-		page: number,
-		postsPerPage: number,
-		meta_key: string,
-		meta_value?: string
-	): any {
-		return App.createRequest({
-			url: `${this.baseUrl}/wp-admin/admin-ajax.php`,
-			method: "POST",
-			headers: {
-				"content-type": "application/x-www-form-urlencoded",
-			},
-			data: {
-				action: "madara_load_more",
-				template: "madara-core/content/content-archive",
-				page: page,
-				"vars[paged]": "1",
-				"vars[posts_per_page]": postsPerPage,
-				"vars[orderby]": "meta_value_num",
-				"vars[sidebar]": "right",
-				"vars[post_type]": "wp-manga",
-				"vars[order]": "desc",
-				"vars[meta_key]": meta_key,
-				"vars[meta_value]": meta_value,
-			},
-		});
 	}
 
 	async slugToPostId(slug: string, path: string): Promise<string> {
-		if ((await this.stateManager.retrieve(slug)) == null) {
+		if (Application.getState(slug) == null) {
 			const postId = await this.convertSlugToPostId(slug, path);
 
-			const existingMappedSlug = await this.stateManager.retrieve(postId);
+			const existingMappedSlug = Application.getState(postId);
 			if (existingMappedSlug != null) {
-				await this.stateManager.store(slug, undefined);
+				Application.setState(undefined, slug);
 			}
 
-			await this.stateManager.store(postId, slug);
-			await this.stateManager.store(slug, postId);
+			Application.setState(slug, postId);
+			Application.setState(postId, slug);
 		}
 
-		const postId = await this.stateManager.retrieve(slug);
+		const postId = Application.getState(slug);
 		if (!postId) throw new Error(`Unable to fetch postId for slug:${slug}`);
 
-		return postId;
+		return postId as string;
 	}
 
 	async convertPostIdToSlug(postId: number) {
-		const request = App.createRequest({
-			url: `${this.baseUrl}/?p=${postId}`,
+		const request = {
+			url: `${TOONILY_DOMAIN}/?p=${postId}`,
 			method: "GET",
-		});
-
-		const response = await this.requestManager.schedule(request, 1);
-		const $ = this.cheerio.load(response.data as string);
+		};
+		const $ = await this.fetchCheerio(request);
 
 		let parseSlug: any;
 		// Step 1: Try to get slug from og-url
 		parseSlug = String($('meta[property="og:url"]').attr("content"));
 
 		// Step 2: Try to get slug from canonical
-		if (!parseSlug.includes(this.baseUrl)) {
+		if (!parseSlug.includes(TOONILY_DOMAIN)) {
 			parseSlug = String($('link[rel="canonical"]').attr("href"));
 		}
 
-		if (!parseSlug || !parseSlug.includes(this.baseUrl)) {
+		if (!parseSlug || !parseSlug.includes(TOONILY_DOMAIN)) {
 			throw new Error("Unable to parse slug!");
 		}
 
@@ -676,11 +343,13 @@ export class Madara
 
 	async convertSlugToPostId(slug: string, path: string): Promise<string> {
 		// Credit to the MadaraDex team :-D
-		const headRequest = App.createRequest({
-			url: `${this.baseUrl}/${path}/${slug}`,
+		const headRequest = {
+			url: `${TOONILY_DOMAIN}/${path}/${slug}`,
 			method: "HEAD",
-		});
-		const headResponse = await this.requestManager.schedule(headRequest, 1);
+		};
+		const [headResponse, _] = await Application.scheduleRequest(
+			headRequest
+		);
 
 		let postId: any;
 
@@ -692,13 +361,11 @@ export class Madara
 			postId = "";
 		}
 
-		const request = App.createRequest({
-			url: `${this.baseUrl}/${path}/${slug}`,
+		const request = {
+			url: `${TOONILY_DOMAIN}/${path}/${slug}`,
 			method: "GET",
-		});
-
-		const response = await this.requestManager.schedule(request, 1);
-		const $ = this.cheerio.load(response.data as string);
+		};
+		const $ = await this.fetchCheerio(request);
 
 		// Step 1: Try to get postId from shortlink
 		postId = Number(
@@ -728,35 +395,29 @@ export class Madara
 		return postId.toString();
 	}
 
-	override async getCloudflareBypassRequestAsync() {
-		return App.createRequest({
-			url: this.bypassPage || this.baseUrl,
-			method: "GET",
-			headers: {
-				referer: `${this.baseUrl}/`,
-				origin: `${this.baseUrl}/`,
-				"user-agent": await this.requestManager.getDefaultUserAgent(),
-			},
-		});
+	async fetchCheerio(request: Request): Promise<CheerioAPI> {
+		const [response, data] = await Application.scheduleRequest(request);
+		this.checkCloudflareStatus(response.status);
+		return cheerio.load(Application.arrayBufferToUTF8String(data));
 	}
 
-	checkResponseError(response: Response): void {
-		const status = response.status;
-		switch (status) {
-			case 403:
-			case 503:
-				throw new Error(
-					`CLOUDFLARE BYPASS ERROR:\nPlease go to the homepage of <${this.baseUrl}> and press the cloud icon.`
-				);
-			case 404:
-				throw new Error(
-					`The requested page ${response.request.url} was not found!`
-				);
+	checkCloudflareStatus(status: number): void {
+		if (status == 503 || status == 403) {
+			throw new CloudflareError({ url: TOONILY_DOMAIN, method: "GET" });
+		}
+	}
+
+	async saveCloudflareBypassCookies(cookies: Cookie[]): Promise<void> {
+		for (const cookie of cookies) {
+			if (
+				cookie.name.startsWith("cf") ||
+				cookie.name.startsWith("_cf") ||
+				cookie.name.startsWith("__cf")
+			) {
+				this.cookieStorageInterceptor.setCookie(cookie);
+			}
 		}
 	}
 }
 
-export const Toonily = CompatWrapper(
-	{ registerHomeSectionsInInitialise: true },
-	new Madara(cheerios)
-);
+export const Toonily = new ToonilyExtension();
