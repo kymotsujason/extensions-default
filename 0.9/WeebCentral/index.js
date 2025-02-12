@@ -16535,11 +16535,20 @@ var source = (() => {
       $2("h1").first().text().trim() ?? ""
     );
     let altTitle = [];
-    const altTitleElement = $2(
-      "section:nth-child(3) > ul > li:nth-child(2)",
-      `strong:contains("Associated Name(s)")`
-    ).text();
-    altTitle.push(altTitleElement);
+    for (const altTitleObj of $2(
+      "section:nth-child(3) > ul > li:nth-child(2)"
+    ).toArray()) {
+      const altTitleText = $2(
+        'strong:contains("Associated Name(s)")',
+        altTitleObj
+      ).text().trim();
+      if (altTitleText == "Associated Name(s)") {
+        for (const altTitleElement of $2("ul > li", altTitleObj).toArray()) {
+          const parsedStatus2 = $2(altTitleElement).text().trim();
+          altTitle.push(Application.decodeHTMLEntities(parsedStatus2));
+        }
+      }
+    }
     const image = $2("picture > img").attr("src") ?? "";
     const description = Application.decodeHTMLEntities(
       $2(".whitespace-pre-wrap").text().trim()
