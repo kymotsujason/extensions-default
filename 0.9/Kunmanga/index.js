@@ -16621,7 +16621,8 @@ var source = (() => {
           synopsis: description,
           status,
           rating,
-          contentRating: import_types2.ContentRating.EVERYONE
+          contentRating: import_types2.ContentRating.EVERYONE,
+          shareUrl: `${source.baseUrl}/?p=${mangaId}`
         }
       };
     }
@@ -16660,7 +16661,10 @@ var source = (() => {
           chapterId: id,
           langCode: source.language,
           chapNum,
-          title: chapName ? Application.decodeHTMLEntities(chapName) : "",
+          title: chapName ? Application.decodeHTMLEntities(chapName).replace(
+            /^Chapter\s*(\d+(?:\.\d+)?)(?:\s*[-:]\s*)?/i,
+            ""
+          ).trim() : "",
           publishDate: mangaTime,
           sortingIndex,
           volume: 0,
@@ -16791,12 +16795,7 @@ var source = (() => {
       } else {
         image = "";
       }
-      if (source?.stateManager) {
-        const HQthumb = true;
-        if (HQthumb) {
-          image = image?.replace("-110x150", "").replace("-175x238", "").replace("-193x278", "").replace("-350x476", "");
-        }
-      }
+      image = image?.replace("-110x150", "").replace("-175x238", "").replace("-193x278", "").replace("-350x476", "");
       if (image?.startsWith("/")) {
         image = source.baseUrl + image;
       }
@@ -16839,6 +16838,7 @@ var source = (() => {
   };
   var KunmangaExtension = class {
     constructor() {
+      this.baseUrl = KUNMANGA_DOMAIN;
       this.language = "\u{1F1EC}\u{1F1E7}";
       this.searchMangaSelector = "div.c-tabs-item > div";
       this.searchPagePathName = "page";
@@ -16913,7 +16913,7 @@ var source = (() => {
       const mangaId = chapter.sourceManga.mangaId;
       let url;
       const slugData = await this.convertPostIdToSlug(Number(mangaId));
-      url = `${KUNMANGA_DOMAIN}/${slugData.path}/${slugData.slug}/${chapterId}/${"?style=list"}`;
+      url = `${KUNMANGA_DOMAIN}/${slugData.path}/${slugData.slug}/${chapterId}/?style=list`;
       const request = {
         url,
         method: "GET"

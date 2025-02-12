@@ -24322,7 +24322,7 @@ var source = (() => {
       if (isNaN(volumeNum)) volumeNum = 0;
       chapters.push({
         chapterId: chapterId2,
-        title,
+        title: title.replace(/^Chapter\s*(\d+(?:\.\d+)?)(?:\s*[-:]\s*)?/i, "").trim(),
         langCode: language,
         chapNum,
         publishDate: date,

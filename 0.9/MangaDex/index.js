@@ -5066,7 +5066,7 @@ var source = (() => {
     if (!info) {
       return "Not found";
     }
-    return `${info.volume ? `Vol. ${info.volume}` : ""} ${info.chapter ? `Ch. ${info.chapter}` : ""} ${info.title ? info.title : ""}`.trim();
+    return `asd asd`.trim();
   };
 
   // src/MangaDex/main.ts
@@ -5377,9 +5377,7 @@ var source = (() => {
         for (const chapter of json.data) {
           const chapterId = chapter.id;
           const chapterDetails = chapter.attributes;
-          const name = Application.decodeHTMLEntities(
-            chapterDetails.title
-          );
+          const name = Application.decodeHTMLEntities(chapterDetails.title) ?? "";
           const chapNum = Number(chapterDetails?.chapter);
           const volume = Number(chapterDetails?.volume);
           const langCode = MDLanguages.getFlagCode(
