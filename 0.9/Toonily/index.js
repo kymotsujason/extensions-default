@@ -16660,7 +16660,10 @@ var source = (() => {
           chapterId: id,
           langCode: source.language,
           chapNum,
-          title: chapName ? Application.decodeHTMLEntities(chapName) : "",
+          title: chapName ? Application.decodeHTMLEntities(chapName).replace(
+            /^Chapter\s+(\d+)/i,
+            ""
+          ) : "",
           publishDate: mangaTime,
           sortingIndex,
           volume: 0,
@@ -16915,6 +16918,11 @@ var source = (() => {
         }
       };
       const $2 = await this.fetchCheerio(request);
+      throw new Error(
+        JSON.stringify(
+          await this.parser.parseChapterList($2, sourceManga, this)
+        )
+      );
       return this.parser.parseChapterList($2, sourceManga, this);
     }
     async getChapterDetails(chapter) {
