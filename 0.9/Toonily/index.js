@@ -16854,7 +16854,7 @@ var source = (() => {
       this.searchMangaSelector = "div.page-content-listing.item-big_thumbnail > div > div > div > div";
       this.searchPagePathName = "page";
       this.chapterDetailsSelector = "div.reading-content > div";
-      this.directoryPath = "manga";
+      this.directoryPath = "webtoon";
       this.parser = new Parser3();
       this.globalRateLimiter = new import_types3.BasicRateLimiter("rateLimiter", {
         numberOfRequests: 4,
@@ -17015,8 +17015,8 @@ var source = (() => {
       if (query.title == "") {
         let url = `${TOONILY_DOMAIN}/webtoon/${this.searchPagePathName}/${page.toString()}/?s=${encodeURIComponent(
           query?.title ?? ""
-        )}&post_type=wp-manga&`;
-        let included = "";
+        )}&post_type=wp-manga`;
+        let included = "&";
         for (const filter4 of query.filters) {
           if (filter4.id.startsWith("tags")) {
             const tags = filter4.value ?? {};
