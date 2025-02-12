@@ -24802,7 +24802,6 @@ var source = (() => {
           method: "GET"
         };
       }
-      throw new Error(JSON.stringify(request));
       const langSearchFilter = getLanguageSearchFilter() ?? false;
       const langs = getLanguages() ?? MFLanguages.getDefault();
       const $3 = await this.fetchCheerio(request);
