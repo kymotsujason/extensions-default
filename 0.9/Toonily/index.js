@@ -16623,7 +16623,8 @@ var source = (() => {
           synopsis: description,
           contentRating: import_types2.ContentRating.ADULT,
           status,
-          rating
+          rating,
+          shareUrl: `${source.TOONILY_DOMAIN}/?p=${mangaId}`
         }
       };
     }
@@ -16958,7 +16959,7 @@ var source = (() => {
           subtitle: result.subtitle
         });
       }
-      metadata = results.length >= 18 ? { page: page + 1 } : void 0;
+      metadata = results.length >= 12 ? { page: page + 1 } : void 0;
       return {
         items: manga,
         metadata
