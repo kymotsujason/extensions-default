@@ -3,7 +3,7 @@ import { ContentRating, SourceIntents } from "@paperback/types";
 export default {
 	icon: "icon.png",
 	name: "Manganato",
-	version: "0.9.1",
+	version: "5.0.0",
 	description: "The manganato.com extension.",
 	contentRating: ContentRating.MATURE,
 	developers: [

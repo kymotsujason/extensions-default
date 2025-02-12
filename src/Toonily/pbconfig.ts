@@ -3,7 +3,7 @@ import { ContentRating, SourceIntents } from "@paperback/types";
 export default {
 	icon: "icon.png",
 	name: "Toonily",
-	version: "0.9.1",
+	version: "4.0.0",
 	description: "The toonily.com extension.",
 	contentRating: ContentRating.MATURE,
 	developers: [

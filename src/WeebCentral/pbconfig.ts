@@ -3,7 +3,7 @@ import { ContentRating, SourceIntents } from "@paperback/types";
 export default {
 	icon: "icon.png",
 	name: "Weebcentral",
-	version: "0.9.1",
+	version: "2.0.0",
 	description: "The weebcentral.com extension.",
 	contentRating: ContentRating.EVERYONE,
 	developers: [
