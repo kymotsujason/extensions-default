@@ -16994,7 +16994,6 @@ var source = (() => {
         method: "GET"
       };
       const $2 = await this.fetchCheerio(request);
-      throw new Error(JSON.stringify(parseMangaDetails($2, mangaId, url)));
       return parseMangaDetails($2, mangaId, url);
     }
     async getChapters(sourceManga) {
