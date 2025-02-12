@@ -16877,7 +16877,9 @@ var source = (() => {
         method: "GET"
       };
       const $2 = await this.fetchCheerio(request);
-      throw new Error($2("span:nth-child(3) > span").first().text().trim());
+      throw new Error(
+        Application.decodeHTMLEntities($2("span.averagerate").text().trim())
+      );
       return this.parser.parseMangaDetails($2, mangaId, this);
     }
     async getChapters(sourceManga) {
