@@ -16531,10 +16531,19 @@ var source = (() => {
   init_buffer();
   var import_types2 = __toESM(require_lib());
   var parseMangaDetails = ($2, mangaId, url) => {
-    const titles = [];
-    titles.push(
-      Application.decodeHTMLEntities($2("h1").first().text().trim() ?? "")
+    const title = Application.decodeHTMLEntities(
+      $2("h1").first().text().trim() ?? ""
     );
+    let altTitle = [""];
+    for (const altTitleElement of $2(
+      "section:nth-child(3) > ul > li:nth-child(2)"
+    ).toArray()) {
+      const parsedStatus2 = $2(
+        'strong:contains("Associated Name(s)")',
+        altTitleElement
+      ).text().trim();
+      altTitle.push(Application.decodeHTMLEntities(parsedStatus2));
+    }
     const image = $2("picture > img").attr("src") ?? "";
     const description = Application.decodeHTMLEntities(
       $2(".whitespace-pre-wrap").text().trim()
@@ -16582,8 +16591,8 @@ var source = (() => {
     return {
       mangaId,
       mangaInfo: {
-        primaryTitle: titles[0],
-        secondaryTitles: titles,
+        primaryTitle: title,
+        secondaryTitles: altTitle,
         thumbnailUrl: image,
         status,
         author,
@@ -16649,11 +16658,11 @@ var source = (() => {
       if (!image) continue;
       pages.push(image);
     }
-    const chapterDetails = App.createChapterDetails({
+    const chapterDetails = {
       id: chapterId,
       mangaId,
       pages
-    });
+    };
     return chapterDetails;
   };
   var parseViewMore = ($2, section) => {
@@ -16980,6 +16989,7 @@ var source = (() => {
         method: "GET"
       };
       const $2 = await this.fetchCheerio(request);
+      throw new Error(JSON.stringify(parseMangaDetails($2, mangaId, url)));
       return parseMangaDetails($2, mangaId, url);
     }
     async getChapters(sourceManga) {
