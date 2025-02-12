@@ -16847,7 +16847,7 @@ var source = (() => {
   var ToonilyExtension = class {
     constructor() {
       this.language = "\u{1F1EC}\u{1F1E7}";
-      this.searchMangaSelector = "div.page-content-listing.item-big_thumbnail > div > div > div > div";
+      this.searchMangaSelector = "div.page-content-listing.item-big_thumbnail > div > div > div";
       this.searchPagePathName = "page";
       this.chapterDetailsSelector = "div.reading-content > div > img";
       this.directoryPath = "webtoon";
@@ -16920,7 +16920,7 @@ var source = (() => {
       const mangaId = chapter.sourceManga.mangaId;
       let url;
       const slugData = await this.convertPostIdToSlug(Number(mangaId));
-      url = `${TOONILY_DOMAIN}/${slugData.path}/${slugData.slug}/${chapterId}/?style=list}`;
+      url = `${TOONILY_DOMAIN}/${slugData.path}/${slugData.slug}/${chapterId}/?style=list`;
       const request = {
         url,
         method: "GET"
