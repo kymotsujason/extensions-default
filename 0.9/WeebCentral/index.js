@@ -16658,7 +16658,6 @@ var source = (() => {
   };
   var parseViewMore = ($2, section) => {
     const manga = [];
-    const collectedIds = [];
     if (section === "latest_releases") {
       for (const hotObj of $2(
         "article.flex.gap-4",
@@ -16676,20 +16675,36 @@ var source = (() => {
           subtitle: Application.decodeHTMLEntities(subtitle)
         });
       }
-    } else {
-      for (const hotObj of $2(
-        "section.bg-base-100.max-w-7xl.w-full.flex.flex-col.lg:grid.grid-cols-3.gap-4.mb-4 > section.bg-base-200.cols-span-1.md:col-span-2.rounded > section > article"
+    } else if (section === "popular_updates") {
+      for (const recentObj of $2(
+        "article",
+        "section.cols-span-1.rounded"
       ).toArray()) {
-        const id = $2("a", hotObj).first().attr("href")?.replace(/\/$/, "")?.split("/").slice(-2)[0] ?? "";
-        const title = $2("div.font-semibold", hotObj).first().text().trim() ?? "";
-        const image = $2("source", hotObj).first().attr("srcset") ?? "";
-        const subtitle = $2("span", hotObj).last().text().trim() ?? "";
+        const id = $2("a.aspect-square", recentObj).attr("href")?.replace(/\/$/, "")?.split("/").slice(-2)[0] ?? "";
+        const title = $2("div.font-semibold", recentObj).text().trim() ?? "";
+        const image = $2("a img", recentObj).attr("src") ?? $2("a img", recentObj).attr("data-src") ?? "";
+        const subtitle = $2("span", recentObj).last().text().trim() ?? "";
         manga.push({
           type: "simpleCarouselItem",
           imageUrl: image,
           title: Application.decodeHTMLEntities(title),
           mangaId: id,
           subtitle: Application.decodeHTMLEntities(subtitle)
+        });
+      }
+    } else {
+      for (const recommendationObj of $2(
+        ".glide__slide:not(.glide__slide--clone)"
+      ).toArray()) {
+        const id = $2("a", recommendationObj).attr("href")?.replace(/\/$/, "")?.split("/").slice(-2)[0] ?? "";
+        const title = $2(".text-white", recommendationObj).text().trim() ?? "";
+        const image = $2("source", recommendationObj).first().attr("srcset") ?? $2("img", recommendationObj).attr("src") ?? "";
+        manga.push({
+          type: "simpleCarouselItem",
+          imageUrl: image,
+          title: Application.decodeHTMLEntities(title),
+          mangaId: id,
+          subtitle: ""
         });
       }
     }
@@ -17027,17 +17042,28 @@ var source = (() => {
           id: "popular_updates",
           title: "Popular Updates",
           type: import_types4.DiscoverSectionType.simpleCarousel
+        },
+        {
+          id: "recommendation",
+          title: "Recommendations",
+          type: import_types4.DiscoverSectionType.simpleCarousel
         }
       ];
     }
     async getDiscoverSectionItems(section, metadata) {
+      const page = metadata?.page ?? 1;
       let param = "";
       switch (section.id) {
         case "popular_updates":
-          metadata = void 0;
+          metadata = {
+            ...metadata,
+            page: page + 1
+          };
           break;
         case "latest_releases":
-          param = `hot-updates`;
+          metadata = void 0;
+          break;
+        case "recommendation":
           metadata = void 0;
           break;
         default:
@@ -17065,10 +17091,26 @@ var source = (() => {
           encodeURI(`&text=${query.title ?? ""}`)
         );
       } else {
-        for (const tag of query.filters) {
-          searchParams = searchParams.concat(`&included_tag=${tag.id}`);
+        let included = "";
+        let excluded = "";
+        for (const filter4 of query.filters) {
+          if (filter4.id.startsWith("tags")) {
+            const tags = filter4.value ?? {};
+            for (const tag of Object.entries(tags)) {
+              switch (tag[1]) {
+                case "excluded":
+                  excluded += `&excluded_tag=${excluded}${tag[0]}`;
+                  break;
+                case "included":
+                  included += `&included_tag=${included}${tag[0]}`;
+                  break;
+              }
+            }
+          }
         }
-        searchParams.concat(`limit=${LIMIT}&offset=${offset}`);
+        searchParams.concat(
+          `${included}${excluded}&limit=${LIMIT}&offset=${offset}`
+        );
       }
       const request = {
         url: `${WEEBCENTRAL_DOMAIN}/search/data?sort=Best%20Match&order=Ascending&display_mode=Full%20Display${searchParams}`,
