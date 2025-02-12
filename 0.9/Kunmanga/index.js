@@ -16748,7 +16748,7 @@ var source = (() => {
     async parseHomeSection($2, source) {
       const results = [];
       for (const obj of $2(
-        "div.page-content-listing.item-big_thumbnail > div > div > div"
+        "div.page-content-listing.item-big_thumbnail > div > div > div > div"
       ).toArray()) {
         const title = $2("a", obj).attr("title") ?? "";
         const image = encodeURI(
@@ -16763,7 +16763,7 @@ var source = (() => {
           type: "simpleCarouselItem",
           mangaId: postId,
           imageUrl: image,
-          title: postId,
+          title: Application.decodeHTMLEntities(postId),
           subtitle: `${rating}% ${Application.decodeHTMLEntities(
             subtitle
           )}`
