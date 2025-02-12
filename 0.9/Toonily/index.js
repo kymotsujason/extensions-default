@@ -16758,9 +16758,6 @@ var source = (() => {
           await this.getImageSrc($2("img", obj), source) ?? ""
         );
         const title = $2("a", $2("h3.h5", obj)).last().text();
-        const slug = this.idCleaner(
-          $2("a", $2("h3.h5", obj)).attr("href") ?? ""
-        );
         const postId = $2("div", obj).attr("data-post-id");
         const subtitle = $2("span.font-meta.chapter", obj).first().text().trim();
         if (isNaN(Number(postId)) || !title) {
@@ -16769,11 +16766,18 @@ var source = (() => {
           );
           continue;
         }
+        const rating = (parseFloat(
+          Application.decodeHTMLEntities(
+            $2("div.meta-item.rating > div > span", obj).last().text().trim()
+          )
+        ) * 2 * 10).toFixed(0).toString() + "%";
         items.push({
-          mangaId: String(source.usePostIds ? postId : slug),
+          mangaId: String(postId),
           image,
           title: Application.decodeHTMLEntities(title),
-          subtitle: Application.decodeHTMLEntities(subtitle)
+          subtitle: `${rating} ${Application.decodeHTMLEntities(
+            subtitle
+          )}`
         });
       }
       return items;
@@ -16997,7 +17001,6 @@ var source = (() => {
       };
       const $2 = await this.fetchCheerio(request);
       const manga = await this.parser.parseHomeSection($2, this);
-      throw new Error(JSON.stringify(manga[0]));
       metadata = manga.length >= 10 ? { page: page + 1 } : void 0;
       return {
         items: manga,
