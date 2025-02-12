@@ -16694,11 +16694,11 @@ var source = (() => {
         }
         pages.push(encodeURI(page));
       }
-      return App.createChapterDetails({
+      return {
         id: chapterId,
         mangaId,
         pages
-      });
+      };
     }
     parseTags($2, advancedSearch) {
       const genres = [];
