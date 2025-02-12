@@ -16747,19 +16747,24 @@ var source = (() => {
     }
     async parseHomeSection($2, source) {
       const results = [];
-      for (const obj of $2("div.c-tabs-item > div").toArray()) {
+      for (const obj of $2(
+        "div.page-content-listing.item-big_thumbnail > div > div > div"
+      ).toArray()) {
         const title = $2("a", obj).attr("title") ?? "";
         const image = encodeURI(
           await this.getImageSrc($2("img", obj), source)
         );
         const subtitle = $2("span.font-meta.chapter", obj).text().trim();
         const postId = $2("div", obj).attr("data-post-id");
+        const rating = parseFloat(
+          $2("div.meta-item.rating > div > span").text().trim()
+        ) * 2 / 10;
         results.push({
           type: "simpleCarouselItem",
           mangaId: postId,
           imageUrl: image,
           title: Application.decodeHTMLEntities(title),
-          subtitle: Application.decodeHTMLEntities(subtitle)
+          subtitle: rating + "% " + Application.decodeHTMLEntities(subtitle)
         });
       }
       return results;
@@ -16964,10 +16969,10 @@ var source = (() => {
       let param = "";
       switch (section.id) {
         case "new_manga":
-          param = `?s&post_type=wp-manga&m_orderby=new-manga`;
+          param = `?m_orderby=new-manga`;
           break;
         case "latest_releases":
-          param = `?s&post_type=wp-manga&m_orderby=latest`;
+          param = `?m_orderby=latest`;
           break;
         default:
           throw new Error(
@@ -16975,7 +16980,7 @@ var source = (() => {
           );
       }
       const request = {
-        url: `${KUNMANGA_DOMAIN}/page/${page}/${param}`,
+        url: `${KUNMANGA_DOMAIN}/manga/page/${page}/${param}`,
         method: "GET"
       };
       const $2 = await this.fetchCheerio(request);
