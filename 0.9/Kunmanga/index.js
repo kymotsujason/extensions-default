@@ -24472,7 +24472,7 @@ Type: ${row["type"]}`
        * each page while on a chapter page. This is the selector
        * which is looped over. This may be overridden if required.
        */
-      this.chapterDetailsSelector = "div.reading-content > div";
+      this.chapterDetailsSelector = "div.reading-content > div> img";
       /**
        * Some websites have the Cloudflare defense check enabled on specific parts of the website, these need to be loaded when using the Cloudflare bypass within the app
        */
@@ -24584,7 +24584,6 @@ Type: ${row["type"]}`
       } else {
         url = `${this.baseUrl}/${this.directoryPath}/${mangaId}/${chapterId}/${this.useListParameter ? "?style=list" : ""}`;
       }
-      throw new Error(url);
       const request = App.createRequest({
         url,
         method: "GET"
