@@ -5043,7 +5043,7 @@ var source = (() => {
         getMangaThumbnail()
       )}`;
     }
-    const rating = ratingJson.statistics ? ratingJson.statistics[mangaId].rating / 10 : void 0;
+    const rating = ratingJson.statistics ? ratingJson.statistics[mangaId].rating.average / 10 : void 0;
     return {
       mangaId,
       mangaInfo: {
