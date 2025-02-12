@@ -24796,12 +24796,11 @@ Type: ${row["type"]}`
         });
       } else {
         return App.createRequest({
-          url: new URLBuilder(this.baseUrl).addPathComponent("search").addPathComponent(
-            `${encodeURIComponent(
-              query?.title?.replace(/ /g, "-") ?? ""
-            )}`
-          ).addPathComponent(
-            `${this.searchPagePathName}${page.toString()}`
+          url: new URLBuilder(this.baseUrl).addPathComponent(this.searchPagePathName).addPathComponent(page.toString()).addQueryParameter(
+            "s",
+            encodeURIComponent(
+              query?.title?.replace(/'/g, "\u2019") ?? ""
+            )
           ).buildUrl({
             addTrailingSlash: true,
             includeUndefinedParameters: false
