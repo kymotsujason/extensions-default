@@ -24328,12 +24328,12 @@ var source = (() => {
   };
   var parseSearch = ($3, langFilter, langs, query) => {
     const mangas = [];
-    for (const obj of $3(".item", "#series-list").toArray()) {
-      const id = $3(".item-cover", obj).attr("href")?.replace("/series/", "")?.trim().split("/")[0] ?? "";
-      const title = $3(".item-title", obj).text() ?? "";
-      const mfcode = $3("em", obj).attr("data-lang") ?? "en,en_us";
-      const lang = mfcode ? MFLanguages.getLangCode(mfcode) : "\u{1F1EC}\u{1F1E7}";
-      const subtitle = lang + " " + $3(".visited", obj).text().trim();
+    for (const obj of $3("div.original.card-lg > div.unit").toArray()) {
+      const id = $3(".poster", obj).attr("href")?.replace("/manga/", "")?.trim().split("/")[0] ?? "";
+      const title = $3(".info", obj).text() ?? "";
+      const mfcode = $3("b", obj).text().toLowerCase() ?? "en";
+      const lang = mfcode ? MFLanguages.getLangCode(mfcode) : "en";
+      const subtitle = $3(".content", obj).next("li").next("a").next("span").text().trim() + ` ${lang.toUpperCase()}`;
       const image = $3("img", obj).attr("src") ?? "";
       if (!id || !title) continue;
       if (langFilter && !langs.includes(mfcode)) continue;
@@ -24544,7 +24544,7 @@ var source = (() => {
             value: languages,
             minItemCount: 1,
             maxItemCount: 100,
-            options: MFLanguages.getBTCodeList().map((x) => {
+            options: MFLanguages.getMFCodeList().map((x) => {
               return { id: x, title: MFLanguages.getName(x) };
             }),
             onValueChange: Application.Selector(
