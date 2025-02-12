@@ -16624,7 +16624,7 @@ var source = (() => {
           contentRating: import_types2.ContentRating.ADULT,
           status,
           rating,
-          shareUrl: `${source.TOONILY_DOMAIN}/?p=${mangaId}`
+          shareUrl: `${source.baseUrl}/?p=${mangaId}`
         }
       };
     }
@@ -16803,7 +16803,7 @@ var source = (() => {
       }
       image = image?.replace("-110x150", "").replace("-175x238", "").replace("-193x278", "").replace("-350x476", "");
       if (image?.startsWith("/")) {
-        image = source.TOONILY_DOMAIN + image;
+        image = source.baseUrl + image;
       }
       image = image?.trim().replace(/(\s{2,})/gi, "");
       image = image?.replace(/http:\/\/\//g, "http://");
@@ -16847,6 +16847,7 @@ var source = (() => {
   };
   var ToonilyExtension = class {
     constructor() {
+      this.baseUrl = TOONILY_DOMAIN;
       this.language = "\u{1F1EC}\u{1F1E7}";
       this.searchMangaSelector = "div.page-item-detail.manga";
       this.searchPagePathName = "page";
