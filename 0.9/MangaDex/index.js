@@ -5343,10 +5343,10 @@ var source = (() => {
         url: new URLBuilder(MANGADEX_API).addPath("statistics/manga").addPath(mangaId).build(),
         method: "GET"
       };
-      throw new Error(JSON.stringify(request));
       [_, buffer] = await Application.scheduleRequest(request);
       data = Application.arrayBufferToUTF8String(buffer);
       const rating = typeof data === "string" ? JSON.parse(data) : data;
+      throw new Error(JSON.stringify(rating));
       return parseMangaDetails(mangaId, COVER_BASE_URL, json, rating);
     }
     async getChapters(sourceManga) {
