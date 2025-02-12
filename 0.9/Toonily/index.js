@@ -16800,14 +16800,9 @@ var source = (() => {
       } else {
         image = "";
       }
-      if (source?.stateManager) {
-        const HQthumb = await source.stateManager.retrieve("HQthumb") ?? false;
-        if (HQthumb) {
-          image = image?.replace("-110x150", "").replace("-175x238", "").replace("-193x278", "").replace("-350x476", "");
-        }
-      }
+      image = image?.replace("-110x150", "").replace("-175x238", "").replace("-193x278", "").replace("-350x476", "");
       if (image?.startsWith("/")) {
-        image = source.baseUrl + image;
+        image = source.TOONILY_DOMAIN + image;
       }
       image = image?.trim().replace(/(\s{2,})/gi, "");
       image = image?.replace(/http:\/\/\//g, "http://");
@@ -16926,7 +16921,6 @@ var source = (() => {
       let url;
       const slugData = await this.convertPostIdToSlug(Number(mangaId));
       url = `${TOONILY_DOMAIN}/${slugData.path}/${slugData.slug}/${chapterId}/?style=list}`;
-      throw new Error(url);
       const request = {
         url,
         method: "GET"
