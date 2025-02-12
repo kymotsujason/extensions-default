@@ -16565,7 +16565,7 @@ var source = (() => {
         $2("div.post-title h1, div#manga-title h1").children().remove().end().text().trim()
       );
       const altTitle = Application.decodeHTMLEntities(
-        $2("div.manga-info-row > div:nth-child(2) > div.summary-content").children().remove().end().text().trim()
+        $2("div.post-content > div:nth-child(5) > div.summary-content").children().remove().end().text().trim()
       );
       const author = Application.decodeHTMLEntities(
         $2("div.author-content").first().text().replace("\\n", "").trim()
@@ -16596,9 +16596,9 @@ var source = (() => {
       }
       const rating = parseFloat(
         Application.decodeHTMLEntities(
-          $2(".averagerate").first().text().trim()
+          $2("div.post-total-rating > span").first().text().trim()
         )
-      );
+      ) * 2 / 10;
       const genres = [];
       for (const obj of $2("div.genres-content a").toArray()) {
         const label = $2(obj).text();
@@ -16621,7 +16621,7 @@ var source = (() => {
           synopsis: description,
           status,
           rating,
-          contentRating: import_types2.ContentRating.ADULT
+          contentRating: import_types2.ContentRating.EVERYONE
         }
       };
     }
@@ -16877,9 +16877,6 @@ var source = (() => {
         method: "GET"
       };
       const $2 = await this.fetchCheerio(request);
-      throw new Error(
-        Application.decodeHTMLEntities($2("#averagerate").text())
-      );
       return this.parser.parseMangaDetails($2, mangaId, this);
     }
     async getChapters(sourceManga) {
@@ -16951,8 +16948,8 @@ var source = (() => {
     async getDiscoverSections() {
       return [
         {
-          id: "new",
-          title: "New",
+          id: "new_manga",
+          title: "New Manga",
           type: import_types3.DiscoverSectionType.simpleCarousel
         },
         {
@@ -16966,7 +16963,7 @@ var source = (() => {
       const page = metadata?.page ?? 1;
       let param = "";
       switch (section.id) {
-        case "new":
+        case "new_manga":
           param = `?m_orderby=new-manga`;
           break;
         case "latest_releases":
@@ -16978,7 +16975,7 @@ var source = (() => {
           );
       }
       const request = {
-        url: `${KUNMANGA_DOMAIN}/webtoons/page/${page}/${param}`,
+        url: `${KUNMANGA_DOMAIN}/manga/page/${page}/${param}`,
         method: "GET"
       };
       const $2 = await this.fetchCheerio(request);
