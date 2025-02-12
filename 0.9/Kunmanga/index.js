@@ -24660,6 +24660,7 @@ Type: ${row["type"]}`
         }
       }
       metadata = results.length >= 10 ? { page: page + 1 } : void 0;
+      throw new Error(JSON.stringify(metadata));
       return App.createPagedResults({
         results: manga,
         metadata
