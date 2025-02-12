@@ -17003,6 +17003,7 @@ var source = (() => {
       };
       const $2 = await this.fetchCheerio(request);
       const manga = await this.parser.parseHomeSection($2, this);
+      throw new Error(JSON.stringify(manga[0]));
       metadata = manga.length >= 18 ? { page: page + 1 } : void 0;
       return {
         items: manga,
