@@ -3180,7 +3180,7 @@ var source = (() => {
             chapterId: id,
             chapNum: isNaN(chapNum) ? 0 : chapNum,
             volume: 0,
-            title: name,
+            title: name.replace(/^Chapter\s*(\d+(?:\.\d+)?)(?:\s*[-:]\s*)?/i, "").trim(),
             version: "",
             publishDate: time,
             langCode: source.languageCode,
@@ -3210,11 +3210,11 @@ var source = (() => {
             );
           pages.push(image);
         }
-        const chapterDetails = App.createChapterDetails({
+        const chapterDetails = {
           id: chapterId,
           mangaId,
           pages
-        });
+        };
         return chapterDetails;
       };
       this.parseTags = ($2, source) => {
@@ -17211,6 +17211,9 @@ var source = (() => {
         method: "GET"
       };
       const $2 = await this.fetchCheerio(request);
+      throw new Error(
+        JSON.stringify(this.parser.parseMangaDetails($2, mangaId, this))
+      );
       return this.parser.parseMangaDetails($2, mangaId, this);
     }
     async getChapters(sourceManga) {
