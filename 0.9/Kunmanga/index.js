@@ -16754,8 +16754,8 @@ var source = (() => {
         const image = encodeURI(
           await this.getImageSrc($2("img", obj), source)
         );
-        const subtitle = $2("span.font-meta.chapter", obj).text().trim();
-        const postId = $2("div", obj).attr("data-post-id");
+        const subtitle = $2("span.font-meta.chapter", obj).first().text().trim();
+        const postId = $2("div", obj).attr("data-post-id") ?? "";
         const rating = parseFloat(
           $2("div.meta-item.rating > div > span").text().trim()
         ) * 2 / 10;
@@ -16764,7 +16764,9 @@ var source = (() => {
           mangaId: postId,
           imageUrl: image,
           title: Application.decodeHTMLEntities(title),
-          subtitle: rating + "% " + Application.decodeHTMLEntities(subtitle)
+          subtitle: `${rating}% ${Application.decodeHTMLEntities(
+            subtitle
+          )}`
         });
       }
       return results;
@@ -16986,7 +16988,6 @@ var source = (() => {
       const $2 = await this.fetchCheerio(request);
       const manga = await this.parser.parseHomeSection($2, this);
       metadata = manga.length >= 10 ? { page: page + 1 } : void 0;
-      throw new Error(JSON.stringify(manga[0]));
       return {
         items: manga,
         metadata
