@@ -16860,6 +16860,12 @@ var source = (() => {
       this.globalRateLimiter.registerInterceptor();
       this.mainRequestInterceptor.registerInterceptor();
       this.cookieStorageInterceptor.registerInterceptor();
+      const cookie = {
+        name: "toonily-mature",
+        value: "1",
+        domain: TOONILY_DOMAIN
+      };
+      this.cookieStorageInterceptor.setCookie(cookie);
       if (Application.isResourceLimited) return;
       Application.registerSearchFilter({
         id: "includeOperator",
