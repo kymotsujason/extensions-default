@@ -16756,7 +16756,7 @@ var source = (() => {
         );
         const subtitle = $2("span.font-meta.chapter", obj).first().text().trim();
         const postId = $2("div", obj).attr("data-post-id") ?? "";
-        const rating = $2("div.meta-item.rating > div > span").text().trim();
+        const rating = $2("div.meta-item.rating > div > span").last().text().trim();
         results.push({
           type: "simpleCarouselItem",
           mangaId: postId,
