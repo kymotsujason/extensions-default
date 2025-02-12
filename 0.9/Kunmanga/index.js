@@ -16878,9 +16878,7 @@ var source = (() => {
       };
       const $2 = await this.fetchCheerio(request);
       throw new Error(
-        Application.decodeHTMLEntities(
-          $2("div.post-title h1, div#manga-title h1").children().remove().end().text().trim()
-        )
+        Application.decodeHTMLEntities($2("#averagerate").text())
       );
       return this.parser.parseMangaDetails($2, mangaId, this);
     }
