@@ -1,151 +1,169 @@
 import {
 	Chapter,
 	ChapterDetails,
-	HomeSection,
+	ChapterProviding,
+	Extension,
+	DiscoverSection,
+	DiscoverSectionItem,
+	DiscoverSectionType,
+	MangaProviding,
 	PagedResults,
-	SearchRequest,
 	Request,
 	Response,
-	SourceManga,
+	SearchQuery,
+	SearchResultItem,
 	SearchResultsProviding,
-	MangaProviding,
-	ChapterProviding,
-	HomePageSectionsProviding,
+	SettingsFormProviding,
+	SourceManga,
 	TagSection,
-	CompatWrapper,
-	Source,
-	DUISection,
-} from "@paperback/types/lib/compat/0.8";
-
-import { Parser } from "./WeebCentralParser";
-
-import * as cheerios from "cheerio";
+	PaperbackInterceptor,
+	BasicRateLimiter,
+	Form,
+	CloudflareBypassRequestProviding,
+	Cookie,
+	CookieStorageInterceptor,
+	CloudflareError,
+} from "@paperback/types";
+import { CheerioAPI } from "cheerio";
+import * as cheerio from "cheerio";
+import {
+	isLastPage,
+	parseChapterDetails,
+	parseChapterList,
+	parseMangaDetails,
+	parseSearch,
+	parseTags,
+	parseThumbnailUrl,
+	parseViewMore,
+} from "./WeebCentralParser";
 import {
 	getEnableProxyServer,
 	getProxyAccess,
 	getProxyServer,
-	proxySettings,
+	WeebCentralSettingsForm,
 } from "./WeebCentralSettings";
 
-const BASE_DOMAIN = "https://weebcentral.com";
+const WEEBCENTRAL_DOMAIN = "https://weebcentral.com";
 
-export class WeebCentralExtension
-	extends Source
-	implements
-		SearchResultsProviding,
-		MangaProviding,
-		ChapterProviding,
-		HomePageSectionsProviding
-{
-	baseUrl = BASE_DOMAIN;
-	requestManager = App.createRequestManager({
-		requestsPerSecond: 5,
-		requestTimeout: 20000,
-		interceptor: {
-			interceptRequest: async (request: Request): Promise<Request> => {
-				let proxyURL = await getProxyServer(this.stateManager);
-				let enableProxyServer = await getEnableProxyServer(
-					this.stateManager
-				);
-				if (enableProxyServer && proxyURL != "") {
-					request.headers = {
-						...(request.headers ?? {}),
-					};
-					return request;
-				}
-				request.headers = {
-					...(request.headers ?? {}),
-					...{
-						"user-agent":
-							await this.requestManager.getDefaultUserAgent(),
-						referer: `${this.baseUrl}/`,
-					},
-				};
-				return request;
-			},
-			interceptResponse: async (
-				response: Response
-			): Promise<Response> => {
-				return response;
-			},
-		},
-	});
+type WeebCentralImplementation = Extension &
+	SearchResultsProviding &
+	MangaProviding &
+	ChapterProviding &
+	SettingsFormProviding &
+	CloudflareBypassRequestProviding;
 
-	RETRY = 5;
-	parser = new Parser();
-	override getMangaShareUrl(mangaId: string): string {
-		return `${this.baseUrl}/series/${mangaId}`;
+class WeebCentralInterceptor extends PaperbackInterceptor {
+	override async interceptRequest(request: Request): Promise<Request> {
+		request.headers = {
+			...(request.headers ?? {}),
+			...{
+				referer: `${WEEBCENTRAL_DOMAIN}/`,
+				"user-agent": await Application.getDefaultUserAgent(),
+			},
+		};
+		return request;
 	}
 
-	stateManager = App.createSourceStateManager();
+	override async interceptResponse(
+		request: Request,
+		response: Response,
+		data: ArrayBuffer
+	): Promise<ArrayBuffer> {
+		return data;
+	}
+}
 
-	override async getSourceMenu(): Promise<DUISection> {
-		return Promise.resolve(
-			App.createDUISection({
-				id: "main",
-				header: "Source Settings",
-				isHidden: false,
-				rows: async () => [
-					proxySettings(this.stateManager, this.requestManager),
-				],
-			})
-		);
+export class WeebCentralExtension implements WeebCentralImplementation {
+	globalRateLimiter = new BasicRateLimiter("rateLimiter", {
+		numberOfRequests: 4,
+		bufferInterval: 1,
+		ignoreImages: true,
+	});
+	mainRequestInterceptor = new WeebCentralInterceptor("main");
+	cookieStorageInterceptor = new CookieStorageInterceptor({
+		storage: "stateManager",
+	});
+
+	async initialise(): Promise<void> {
+		this.globalRateLimiter.registerInterceptor();
+		this.mainRequestInterceptor.registerInterceptor();
+		this.cookieStorageInterceptor.registerInterceptor();
+
+		if (Application.isResourceLimited) return;
+
+		Application.registerSearchFilter({
+			id: "includeOperator",
+			type: "dropdown",
+			options: [
+				{ id: "AND", value: "AND" },
+				{ id: "OR", value: "OR" },
+			],
+			value: "AND",
+			title: "Include Operator",
+		});
+
+		Application.registerSearchFilter({
+			id: "excludeOperator",
+			type: "dropdown",
+			options: [
+				{ id: "AND", value: "AND" },
+				{ id: "OR", value: "OR" },
+			],
+			value: "OR",
+			title: "Exclude Operator",
+		});
+
+		for (const tags of await this.getSearchTags()) {
+			Application.registerSearchFilter({
+				type: "multiselect",
+				options: tags.tags.map((x) => ({ id: x.id, value: x.title })),
+				id: "tags-" + tags.id,
+				allowExclusion: true,
+				title: tags.title,
+				value: {},
+				allowEmptySelection: true,
+				maximum: undefined,
+			});
+		}
+	}
+
+	async getSettingsForm(): Promise<Form> {
+		return new WeebCentralSettingsForm();
 	}
 
 	async getMangaDetails(mangaId: string): Promise<SourceManga> {
-		const request = App.createRequest({
-			url: `${this.baseUrl}/series/${mangaId}`,
+		const url = `${WEEBCENTRAL_DOMAIN}/series/${mangaId}`;
+		const request = {
+			url: url,
 			method: "GET",
-		});
-		const response = await this.requestManager.schedule(
-			request,
-			this.RETRY
-		);
-		if (response.status === 404) {
-			throw new Error(`Manga with id ${mangaId} not found!`);
-		}
-		this.checkResponseError(response);
-		const $ = this.cheerio.load(response.data as string);
-		return this.parser.parseMangaDetails($, mangaId);
+		};
+		const $ = await this.fetchCheerio(request);
+		return parseMangaDetails($, mangaId, url);
 	}
 
-	async getChapters(mangaId: string): Promise<Chapter[]> {
-		const request = App.createRequest({
-			url: `${this.baseUrl}/series/${mangaId}/full-chapter-list`,
+	async getChapters(sourceManga: SourceManga): Promise<Chapter[]> {
+		const request = {
+			url: `${WEEBCENTRAL_DOMAIN}/series/${sourceManga.mangaId}/full-chapter-list`,
 			method: "GET",
-		});
-		const response = await this.requestManager.schedule(
-			request,
-			this.RETRY
-		);
-		this.checkResponseError(response);
-		const $ = this.cheerio.load(response.data as string);
-		return this.parser.parseChapters($, mangaId);
+		};
+		const $ = await this.fetchCheerio(request);
+		return parseChapterList($, sourceManga);
 	}
 
-	async getChapterDetails(
-		mangaId: string,
-		chapterId: string
-	): Promise<ChapterDetails> {
-		const request = App.createRequest({
-			url: `${this.baseUrl}/chapters/${chapterId}/images?reading_style=long_strip`,
-			method: "GET",
-		});
-		const response = await this.requestManager.schedule(
-			request,
-			this.RETRY
-		);
-		this.checkResponseError(response);
-		const $ = this.cheerio.load(response.data as string);
-		let chapters = await this.parser.parseChapterDetails(
-			$,
-			mangaId,
-			chapterId
-		);
+	async getChapterDetails(chapter: Chapter): Promise<ChapterDetails> {
+		const chapterId = chapter.chapterId;
+		const mangaId = chapter.sourceManga.mangaId;
 
-		let accessToken = await getProxyAccess(this.stateManager);
-		let proxyURL = await getProxyServer(this.stateManager);
-		let enableProxyServer = await getEnableProxyServer(this.stateManager);
+		const request = {
+			url: `${WEEBCENTRAL_DOMAIN}/chapters/${chapterId}/images?reading_style=long_strip`,
+			method: "GET",
+		};
+		const $ = await this.fetchCheerio(request);
+		let chapters = parseChapterDetails($, mangaId, chapterId);
+
+		let accessToken = getProxyAccess();
+		let proxyURL = getProxyServer();
+		let enableProxyServer = getEnableProxyServer();
 		if (enableProxyServer && proxyURL != "") {
 			let params = "?";
 			for (const page in chapters.pages) {
@@ -156,47 +174,87 @@ export class WeebCentralExtension
 				)}&`;
 			}
 			params = params.slice(0, -1);
-			const request = App.createRequest({
-				url: `${proxyURL}/generic`,
+			const request = {
+				url: `${proxyURL}/generic${params}`,
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
 					referer: `${proxyURL}/`,
 					Authorization: `Bearer ${accessToken}`,
 				},
-				param: params,
-			});
-
-			const response = await this.requestManager.schedule(request, 1);
-			const json = JSON.parse(response.data as string);
+			};
+			const [_, buffer] = await Application.scheduleRequest(request);
+			const data = Application.arrayBufferToUTF8String(buffer);
+			const json = typeof data === "string" ? JSON.parse(data) : data;
 			chapters.pages = json.processedImages;
 		}
 		return chapters;
 	}
 
-	override async getSearchTags(): Promise<TagSection[]> {
-		const request = App.createRequest({
-			url: `${this.baseUrl}/search`,
+	async getDiscoverSections(): Promise<DiscoverSection[]> {
+		return [
+			{
+				id: "latest_releases",
+				title: "Latest Releases",
+				type: DiscoverSectionType.simpleCarousel,
+			},
+			{
+				id: "popular_updates",
+				title: "Popular Updates",
+				type: DiscoverSectionType.simpleCarousel,
+			},
+			{
+				id: "recommendation",
+				title: "Recommendations",
+				type: DiscoverSectionType.simpleCarousel,
+			},
+		];
+	}
+
+	async getDiscoverSectionItems(
+		section: DiscoverSection,
+		metadata: any
+	): Promise<PagedResults<DiscoverSectionItem>> {
+		const page: number = metadata?.page ?? 1;
+		let param = "";
+		switch (section.id) {
+			case "popular_updates":
+				metadata = {
+					...metadata,
+					page: page + 1,
+				};
+				break;
+			case "latest_releases":
+				metadata = undefined;
+				break;
+			case "recommendation":
+				metadata = undefined;
+				break;
+			default:
+				throw new Error(
+					"Requested to getViewMoreItems for a section ID which doesn't exist"
+				);
+		}
+		const request = {
+			url: `${WEEBCENTRAL_DOMAIN}/${param}`,
 			method: "GET",
-		});
-		const response = await this.requestManager.schedule(
-			request,
-			this.RETRY
-		);
-		this.checkResponseError(response);
-		const $ = this.cheerio.load(response.data as string);
-		return this.parser.parseTags($);
+		};
+		const $ = await this.fetchCheerio(request);
+		const manga = parseViewMore($, section.id);
+		return {
+			items: manga,
+			metadata,
+		};
 	}
 
 	async getSearchResults(
-		query: SearchRequest,
+		query: SearchQuery,
 		metadata: any
-	): Promise<PagedResults> {
+	): Promise<PagedResults<SearchResultItem>> {
 		const LIMIT = 32;
 		const offset = metadata?.offset ?? 0;
-		let searchParams = "";
-		// Weebcentral does not play well with symbols besides dashes and apostrophes
 		const regex = /[!?()]/g;
+		let searchParams = "";
 		// Regular search
 		if (query.title) {
 			searchParams = searchParams.concat(
@@ -205,131 +263,78 @@ export class WeebCentralExtension
 		}
 		// Tag search
 		else {
-			for (const tag of query.includedTags) {
-				searchParams = searchParams.concat(`&included_tag=${tag.id}`);
+			let included = "";
+			let excluded = "";
+			for (const filter of query.filters) {
+				if (filter.id.startsWith("tags")) {
+					const tags = (filter.value ?? {}) as Record<
+						string,
+						"included" | "excluded"
+					>;
+					for (const tag of Object.entries(tags)) {
+						switch (tag[1]) {
+							case "excluded":
+								excluded += `&excluded_tag=${excluded}${tag[0]}`;
+								break;
+							case "included":
+								included += `&included_tag=${included}${tag[0]}`;
+								break;
+						}
+					}
+				}
 			}
-			searchParams.concat(`limit=${LIMIT}&offset=${offset}`);
+			searchParams.concat(
+				`${included}${excluded}&limit=${LIMIT}&offset=${offset}`
+			);
 		}
-		const request = App.createRequest({
-			url: `${this.baseUrl}/search/data?sort=Best%20Match&order=Ascending&display_mode=Full%20Display${searchParams}`,
+		const request = {
+			url: `${WEEBCENTRAL_DOMAIN}/search/data?sort=Best+Match&order=Ascending&display_mode=Full+Display${searchParams}`,
 			method: "GET",
-		});
-		const response = await this.requestManager.schedule(
-			request,
-			this.RETRY
-		);
-		this.checkResponseError(response);
-		const $ = this.cheerio.load(response.data as string);
-		const results = await this.parser.parseSearchResults($);
-		metadata = this.parser.isLastPage($)
-			? undefined
-			: { offset: offset + LIMIT };
-		return App.createPagedResults({
-			results,
+		};
+		const $ = await this.fetchCheerio(request);
+		const results = parseSearch($);
+		metadata = isLastPage($) ? undefined : { offset: offset + LIMIT };
+		return {
+			items: results,
 			metadata,
-		});
+		};
 	}
 
-	override async getHomePageSections(
-		sectionCallback: (section: HomeSection) => void
-	): Promise<void> {
-		const request = App.createRequest({
-			url: `${this.baseUrl}`,
+	async getSearchTags(): Promise<TagSection[]> {
+		const request = {
+			url: `${WEEBCENTRAL_DOMAIN}/search`,
 			method: "GET",
-		});
-		const response = await this.requestManager.schedule(
-			request,
-			this.RETRY
-		);
-		this.checkResponseError(response);
-		const $ = this.cheerio.load(response.data as string);
-		this.parser.parseHomeSections($, sectionCallback);
+		};
+		const $ = await this.fetchCheerio(request);
+		return parseTags($);
 	}
 
-	override async getViewMoreItems(
-		homepageSectionId: string,
-		metadata: any
-	): Promise<PagedResults> {
-		const page: number = metadata?.page ?? 1;
-		let param = "";
-		switch (homepageSectionId) {
-			case "recent":
-				param = `latest-updates/${page}`;
-				break;
-			default:
-				throw new Error("Section id not supported");
+	async fetchCheerio(request: Request): Promise<CheerioAPI> {
+		const [response, data] = await Application.scheduleRequest(request);
+		this.checkCloudflareStatus(response.status);
+		return cheerio.load(Application.arrayBufferToUTF8String(data));
+	}
+
+	checkCloudflareStatus(status: number): void {
+		if (status == 503 || status == 403) {
+			throw new CloudflareError({
+				url: WEEBCENTRAL_DOMAIN,
+				method: "GET",
+			});
 		}
-		const request = App.createRequest({
-			url: `${this.baseUrl}/${param}`,
-			method: "GET",
-		});
-		const response = await this.requestManager.schedule(
-			request,
-			this.RETRY
-		);
-		const $ = this.cheerio.load(response.data as string);
-		const manga = this.parser.parseViewMore($);
-		return App.createPagedResults({
-			results: manga,
-			metadata: { ...metadata, page: page + 1 },
-		});
 	}
 
-	/**
-	 * Parses a time string from a Madara source into a Date object.
-	 * Copied from Madara.ts made by gamefuzzy
-	 */
-	protected convertTime(timeAgo: string): Date {
-		let time: Date;
-		let trimmed = Number((/\d*/.exec(timeAgo) ?? [])[0]);
-		trimmed = trimmed == 0 && timeAgo.includes("a") ? 1 : trimmed;
-		if (
-			timeAgo.includes("mins") ||
-			timeAgo.includes("minutes") ||
-			timeAgo.includes("minute")
-		) {
-			time = new Date(Date.now() - trimmed * 60000);
-		} else if (timeAgo.includes("hours") || timeAgo.includes("hour")) {
-			time = new Date(Date.now() - trimmed * 3600000);
-		} else if (timeAgo.includes("days") || timeAgo.includes("day")) {
-			time = new Date(Date.now() - trimmed * 86400000);
-		} else if (timeAgo.includes("year") || timeAgo.includes("years")) {
-			time = new Date(Date.now() - trimmed * 31556952000);
-		} else {
-			time = new Date(timeAgo);
-		}
-		return time;
-	}
-
-	override async getCloudflareBypassRequestAsync() {
-		return App.createRequest({
-			url: this.baseUrl,
-			method: "GET",
-			headers: {
-				"user-agent": await this.requestManager.getDefaultUserAgent(),
-				referer: `${this.baseUrl}/`,
-				origin: `${this.baseUrl}/`,
-			},
-		});
-	}
-
-	checkResponseError(response: Response): void {
-		const status = response.status;
-		switch (status) {
-			case 403:
-			case 503:
-				throw new Error(
-					`CLOUDFLARE BYPASS ERROR:\nPlease go to the homepage of <${this.baseUrl}> and press the cloud icon.`
-				);
-			case 404:
-				throw new Error(
-					`The requested page ${response.request.url} was not found!`
-				);
+	async saveCloudflareBypassCookies(cookies: Cookie[]): Promise<void> {
+		for (const cookie of cookies) {
+			if (
+				cookie.name.startsWith("cf") ||
+				cookie.name.startsWith("_cf") ||
+				cookie.name.startsWith("__cf")
+			) {
+				this.cookieStorageInterceptor.setCookie(cookie);
+			}
 		}
 	}
 }
 
-export const WeebCentral = CompatWrapper(
-	{ registerHomeSectionsInInitialise: true },
-	new WeebCentralExtension(cheerios)
-);
+export const WeebCentral = new WeebCentralExtension();
