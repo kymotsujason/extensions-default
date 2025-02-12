@@ -24127,6 +24127,7 @@ var source = (() => {
     const artist = artistElement.length ? artistElement.children().map((_, e) => {
       return $3(e).text().trim();
     }).toArray().join(", ") : "";
+    const image = $3("div.poster > div > img").attr("src") ?? "";
     const arrayTags = [];
     for (const tag of $3('div.attr-item b:contains("Genres")').next("span").children().toArray()) {
       const label = $3(tag).text().trim();
@@ -24162,7 +24163,7 @@ var source = (() => {
       mangaInfo: {
         primaryTitle: titles[0],
         secondaryTitles: titles,
-        thumbnailUrl: `mangaId=${mangaId2}`,
+        thumbnailUrl: image,
         status,
         author,
         artist,
@@ -24178,7 +24179,7 @@ var source = (() => {
     const chapters = [];
     let sortingIndex = 0;
     for (const chapter of $3("div.list-body > ul > li").toArray()) {
-      const title = $3("span", chapter).first().text().replace(":", "").trim();
+      const title = $3("span", chapter).first().text().trim();
       const chapterId2 = $3("a", chapter).attr("href")?.replace(/\/$/, "")?.split("/").pop() ?? "";
       const groupElement = $3('div.attr-item span:contains("Magazines")').next(
         "span"
@@ -24244,7 +24245,7 @@ var source = (() => {
       if (isNaN(volumeNum)) volumeNum = 0;
       chapters.push({
         chapterId: chapterId2,
-        title,
+        title: title.split(":")[1],
         langCode: language,
         chapNum,
         publishDate: date,
@@ -24333,7 +24334,7 @@ var source = (() => {
       const title = $3(".info", obj).text() ?? "";
       const mfcode = $3("em", obj).attr("data-lang");
       const lang = mfcode ? MFLanguages.getLangCode(mfcode) : "\u{1F1EC}\u{1F1E7}";
-      const subtitle = lang + " " + $3(".visited", obj).text().trim();
+      const subtitle = lang + " " + $3("ul:nth-child(3) > li:nth-child(1) > a > span:nth-child(1)", obj).text().split("<b>")[0].trim();
       const image = $3("img", obj).attr("src") ?? "";
       if (!id || !title) continue;
       if (langFilter && !langs.includes(mfcode)) continue;
@@ -24593,23 +24594,7 @@ var source = (() => {
           "user-agent": await Application.getDefaultUserAgent()
         }
       };
-      if (request.url.includes("mangaId=")) {
-        const mangaId2 = request.url.replace("mangaId=", "");
-        if (mangaId2) request.url = await this.getThumbnailUrl(mangaId2);
-      }
       return request;
-    }
-    async getThumbnailUrl(mangaId2) {
-      const request = {
-        url: `${MANGAFIRE_DOMAIN}/series/${mangaId2}`,
-        method: "GET"
-      };
-      const [response, data2] = await Application.scheduleRequest(request);
-      if (response.status == 503 || response.status == 403) {
-        throw new import_types4.CloudflareError({ url: MANGAFIRE_DOMAIN, method: "GET" });
-      }
-      const $3 = load(Application.arrayBufferToUTF8String(data2));
-      return parseThumbnailUrl($3);
     }
     async interceptResponse(request, response, data2) {
       return data2;
@@ -24686,10 +24671,11 @@ var source = (() => {
       return parseChapterList($3, sourceManga);
     }
     async getChapterDetails(chapter) {
+      throw new Error(JSON.stringify(chapter));
       const chapterId2 = chapter.chapterId;
       const mangaId2 = chapter.sourceManga.mangaId;
       const request = {
-        url: `${MANGAFIRE_DOMAIN}/chapter/${chapterId2}`,
+        url: `${MANGAFIRE_DOMAIN}/read/${chapterId2}`,
         method: "GET"
       };
       const $3 = await this.fetchCheerio(request);
