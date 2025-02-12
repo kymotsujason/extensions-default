@@ -5043,8 +5043,7 @@ var source = (() => {
         getMangaThumbnail()
       )}`;
     }
-    const statistics = ratingJson.data.statistics;
-    const rating = statistics && statistics[mangaId] && statistics[mangaId].rating;
+    const rating = ratingJson.data.statistics ? ratingJson.data.statistics[mangaId].rating / 10 : void 0;
     return {
       mangaId,
       mangaInfo: {
@@ -5059,7 +5058,7 @@ var source = (() => {
         contentRating: import_types2.ContentRating.EVERYONE,
         // TODO: apply proper rating
         shareUrl: `https://mangadex.org/title/${mangaId}`,
-        rating: rating / 10
+        rating
       }
     };
   };
@@ -5344,6 +5343,7 @@ var source = (() => {
         url: new URLBuilder(MANGADEX_API).addPath("statistics/manga").addPath(mangaId).build(),
         method: "GET"
       };
+      throw new Error(JSON.stringify(request));
       [_, buffer] = await Application.scheduleRequest(request);
       data = Application.arrayBufferToUTF8String(buffer);
       const rating = typeof data === "string" ? JSON.parse(data) : data;
