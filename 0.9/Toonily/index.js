@@ -16640,10 +16640,7 @@ var source = (() => {
         let chapNum = chapNumRegex && chapNumRegex[1] ? chapNumRegex[1].replace(/[-_]/gm, ".") : chapNumRegex?.[2] ?? "0";
         chapNum = parseFloat(chapNum) ?? 0;
         let mangaTime;
-        const timeSelector = $2(
-          "span.chapter-release-date > a, span.chapter-release-date > span.c-new-tag > a",
-          obj
-        ).attr("title");
+        const timeSelector = $2("span > i", obj).text();
         if (typeof timeSelector !== "undefined") {
           mangaTime = this.parseDate(timeSelector ?? "");
         } else {
@@ -16739,7 +16736,7 @@ var source = (() => {
         const subtitle = $2("span.font-meta.chapter", obj).text().trim();
         const rating = (parseFloat(
           Application.decodeHTMLEntities(
-            $2("#averagerate", obj).first().text().trim()
+            $2("#averagerate", obj).text().trim()
           )
         ) * 2 / 10).toFixed(0).toString() + "%";
         results.push({
@@ -16848,7 +16845,7 @@ var source = (() => {
   var ToonilyExtension = class {
     constructor() {
       this.language = "\u{1F1EC}\u{1F1E7}";
-      this.searchMangaSelector = "div.page-item-detail.manga";
+      this.searchMangaSelector = "div.page-content-listing.item-big_thumbnail > div > div > div > div";
       this.searchPagePathName = "page";
       this.chapterDetailsSelector = "div.reading-content > div";
       this.directoryPath = "manga";
