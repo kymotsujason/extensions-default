@@ -16770,7 +16770,7 @@ var source = (() => {
         }
         const rating = (parseFloat(
           Application.decodeHTMLEntities(
-            $2("div.meta-item.rating > div > span", obj).text().trim()
+            $2("#averagerate", obj).text().trim()
           )
         ) * 2 * 10).toFixed(0).toString() + "%";
         items.push({
