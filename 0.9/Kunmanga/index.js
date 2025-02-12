@@ -16764,9 +16764,9 @@ var source = (() => {
           mangaId: postId,
           imageUrl: image,
           title: Application.decodeHTMLEntities(title),
-          subtitle: `${rating}% ${Application.decodeHTMLEntities(
-            subtitle
-          )}`
+          subtitle: `${rating.toFixed(
+            0
+          )}% ${Application.decodeHTMLEntities(subtitle)}`
         });
       }
       return results;
