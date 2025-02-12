@@ -16660,10 +16660,7 @@ var source = (() => {
           chapterId: id,
           langCode: source.language,
           chapNum,
-          title: chapName ? Application.decodeHTMLEntities(chapName).replace(
-            /^Chapter\s*(\d+(?:\.\d+)?)?/i,
-            ""
-          ) : "",
+          title: chapName ? Application.decodeHTMLEntities(chapName).replace(/^Chapter\s*(\d+(?:\.\d+)?)?/i, "").replace("-", "").trim() : "",
           publishDate: mangaTime,
           sortingIndex,
           volume: 0,
