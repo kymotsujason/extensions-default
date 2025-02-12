@@ -16758,12 +16758,12 @@ var source = (() => {
         const postId = $2("div", obj).attr("data-post-id") ?? "";
         const rating = (parseFloat(
           $2("div.meta-item.rating > div > span").last().text().trim()
-        ) * 2 / 10).toFixed(0).toString();
+        ) * 2 * 10).toFixed(0).toString();
         results.push({
           type: "simpleCarouselItem",
           mangaId: postId,
           imageUrl: image,
-          title: Application.decodeHTMLEntities(postId),
+          title: postId,
           subtitle: `${rating}% ${Application.decodeHTMLEntities(
             subtitle
           )}`
