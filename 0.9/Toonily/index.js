@@ -16736,9 +16736,9 @@ var source = (() => {
         const subtitle = $2("span.font-meta.chapter", obj).text().trim();
         const rating = (parseFloat(
           Application.decodeHTMLEntities(
-            $2("#averagerate", obj).text().trim()
+            $2("div.meta-item.rating > div > span", obj).last().text().trim()
           )
-        ) * 2 / 10).toFixed(0).toString() + "%";
+        ) * 2 * 10).toFixed(0).toString() + "%";
         results.push({
           slug,
           path,
@@ -16997,6 +16997,7 @@ var source = (() => {
       };
       const $2 = await this.fetchCheerio(request);
       const manga = await this.parser.parseHomeSection($2, this);
+      throw new Error(JSON.stringify(manga[0]));
       metadata = manga.length >= 10 ? { page: page + 1 } : void 0;
       return {
         items: manga,
