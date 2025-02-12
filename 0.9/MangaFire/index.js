@@ -24178,7 +24178,7 @@ var source = (() => {
     const chapters = [];
     let sortingIndex = 0;
     for (const chapter of $3("div.list-body > ul > li").toArray()) {
-      const title = "Chapter 10";
+      const title = $3("span", chapter).first().text().replace(":", "").trim();
       const chapterId2 = $3("a", chapter).attr("href")?.replace(/\/$/, "")?.split("/").pop() ?? "";
       const groupElement = $3('div.attr-item span:contains("Magazines")').next(
         "span"
