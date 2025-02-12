@@ -17,6 +17,5 @@ export default {
 		SourceIntents.MANGA_CHAPTERS,
 		SourceIntents.HOMEPAGE_SECTIONS,
 		SourceIntents.MANGA_SEARCH,
-		SourceIntents.SETTINGS_UI,
 	],
 };

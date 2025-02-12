@@ -1,33 +1,28 @@
 import {
 	Chapter,
 	ChapterDetails,
-	PartialSourceManga,
-	SearchRequest,
+	SearchResultItem,
+	SearchQuery,
 	SourceManga,
 	Tag,
 	TagSection,
-} from "@paperback/types/lib/compat/0.8";
-
-import { decodeHTML } from "entities";
-
-import { MangaBox } from "./main";
-
+	ContentRating,
+} from "@paperback/types";
 import { relevanceScore } from "./RelevanceScore";
 
 export class MangaBoxParser {
 	parseManga = (
 		$: any,
-		source: MangaBox,
-		query?: SearchRequest
-	): PartialSourceManga[] => {
-		const mangaItems: { manga: PartialSourceManga; relevance: number }[] =
-			[];
+		source: any,
+		query?: SearchQuery
+	): SearchResultItem[] => {
+		const mangaItems: { manga: SearchResultItem; relevance: number }[] = [];
 		const collecedIds: string[] = [];
 
 		for (const manga of $(source.mangaListSelector).toArray()) {
 			const mangaId = $("a", manga).first().attr("href");
 			const image = $("img", manga).first().attr("src")?.trim() ?? "";
-			const title = decodeHTML(
+			const title = Application.decodeHTMLEntities(
 				$("a", manga).first().attr("title")?.trim() ?? ""
 			);
 			const subtitle =
@@ -36,12 +31,12 @@ export class MangaBoxParser {
 
 			if (!mangaId || !title || collecedIds.includes(mangaId)) continue;
 			collecedIds.push(mangaId);
-			const partialManga = App.createPartialSourceManga({
+			const partialManga: SearchResultItem = {
 				mangaId: mangaId,
-				image: image,
+				imageUrl: image,
 				title: title,
 				subtitle: subtitle ? subtitle : "No Chapters",
-			});
+			};
 
 			let relevance = 0;
 			if (query?.title) {
@@ -58,21 +53,16 @@ export class MangaBoxParser {
 		return mangaItems.map((r) => r.manga);
 	};
 
-	parseMangaDetails = (
-		$: any,
-		mangaId: string,
-		source: MangaBox
-	): SourceManga => {
+	parseMangaDetails = ($: any, mangaId: string, source: any): SourceManga => {
 		const mangaRootSelector = $(source.mangaRootSelector);
 
 		const image = $(source.mangaThumbnailSelector).attr("src") ?? "";
 
-		const titles = [];
-		titles.push(
-			decodeHTML(
-				$(source.mangaTitleSelector, mangaRootSelector).text().trim()
-			)
+		const title: string = Application.decodeHTMLEntities(
+			$(source.mangaTitleSelector, mangaRootSelector).text().trim()
 		);
+
+		const altTitles: string[] = [];
 
 		// Alternative Titles
 		for (const altTitle of $(
@@ -82,7 +72,7 @@ export class MangaBoxParser {
 			.text()
 			?.split(/,|;|\//)) {
 			if (altTitle == "") continue;
-			titles.push(decodeHTML(altTitle.trim()));
+			altTitles.push(Application.decodeHTMLEntities(altTitle.trim()));
 		}
 
 		const rawStatus =
@@ -107,7 +97,7 @@ export class MangaBoxParser {
 				.map((x: any) => $(x).text().trim())
 				.join(", ") ?? "";
 
-		const desc = decodeHTML(
+		const desc = Application.decodeHTMLEntities(
 			$(source.mangaDescSelector)
 				.first()
 				.children()
@@ -126,38 +116,58 @@ export class MangaBoxParser {
 			const label = $(tag).text().trim();
 
 			if (!id || !label) continue;
-			tags.push({ id: id, label: label });
+			tags.push({ id: id, title: label });
 		}
 		const TagSection: TagSection[] = [
-			App.createTagSection({
+			{
 				id: "0",
-				label: "genres",
-				tags: tags.map((t) => App.createTag(t)),
-			}),
+				title: "genres",
+				tags: tags.map((t) => t),
+			},
 		];
 
-		return App.createSourceManga({
-			id: mangaId,
-			mangaInfo: App.createMangaInfo({
-				image: image,
-				titles: titles,
+		const rating: number =
+			(parseFloat(
+				Application.decodeHTMLEntities(
+					$("em:nth-child(2) > em > em:nth-child(1)").text().trim()
+				)
+			) *
+				2) /
+			10;
+
+		return {
+			mangaId: mangaId,
+			mangaInfo: {
+				thumbnailUrl: image,
+				primaryTitle: title,
+				secondaryTitles: altTitles,
 				status: status,
 				author: author ? author : "Unkown",
-				desc: desc,
-				tags: TagSection,
-			}),
-		});
+				synopsis: desc,
+				tagGroups: TagSection,
+				contentRating: ContentRating.EVERYONE,
+				shareUrl: `${mangaId}`,
+				rating: rating,
+			},
+		};
 	};
 
-	parseChapters = ($: any, mangaId: string, source: MangaBox): Chapter[] => {
+	parseChapters = (
+		$: any,
+		sourceManga: SourceManga,
+		source: any
+	): Chapter[] => {
 		const chapters: Chapter[] = [];
+		const mangaId = sourceManga.mangaId;
 		let sortingIndex = 0;
 
 		for (const chapter of $(source.chapterListSelector).toArray()) {
 			const id = $("a", chapter).attr("href") ?? "";
 			if (!id) continue;
 
-			const name = decodeHTML($("a", chapter).text().trim());
+			const name = Application.decodeHTMLEntities(
+				$("a", chapter).text().trim()
+			);
 			const time = this.parseDate(
 				$(source.chapterTimeSelector, chapter).last().text().trim() ??
 					""
@@ -169,14 +179,17 @@ export class MangaBoxParser {
 				chapNum = Number(chapRegex[1].replace(/\\/g, "."));
 
 			chapters.push({
-				id: id,
+				chapterId: id,
 				chapNum: isNaN(chapNum) ? 0 : chapNum,
 				volume: 0,
-				name: name,
-				group: "",
-				time: time,
+				title: name
+					.replace(/^Chapter\s*(\d+(?:\.\d+)?)(?:\s*[-:]\s*)?/i, "")
+					.trim(),
+				version: "",
+				publishDate: time,
 				langCode: source.languageCode,
 				sortingIndex: sortingIndex,
+				sourceManga: sourceManga,
 			});
 			sortingIndex--;
 		}
@@ -189,8 +202,8 @@ export class MangaBoxParser {
 		}
 
 		return chapters.map((chapter) => {
-			chapter.sortingIndex += chapters.length;
-			return App.createChapter(chapter);
+			chapter.sortingIndex! += chapters.length;
+			return chapter;
 		});
 	};
 
@@ -198,7 +211,7 @@ export class MangaBoxParser {
 		$: any,
 		mangaId: string,
 		chapterId: string,
-		source: MangaBox
+		source: any
 	): Promise<ChapterDetails> => {
 		const pages: string[] = [];
 
@@ -212,30 +225,30 @@ export class MangaBoxParser {
 			pages.push(image);
 		}
 
-		const chapterDetails = App.createChapterDetails({
+		const chapterDetails = {
 			id: chapterId,
 			mangaId: mangaId,
 			pages: pages,
-		});
+		};
 
 		return chapterDetails;
 	};
 
-	parseTags = ($: any, source: MangaBox): TagSection[] => {
+	parseTags = ($: any, source: any): TagSection[] => {
 		const genres: Tag[] = [];
 		for (const genre of $(source.genreListSelector).toArray()) {
 			const id = $(genre).attr("data-i");
 			const label = $(genre).text().trim();
 			if (!id || !label) continue;
-			genres.push({ id: id, label: label });
+			genres.push({ id: id, title: label });
 		}
 
 		const TagSection: TagSection[] = [
-			App.createTagSection({
+			{
 				id: "0",
-				label: "genres",
-				tags: genres.map((t) => App.createTag(t)),
-			}),
+				title: "genres",
+				tags: genres.map((t) => t),
+			},
 		];
 		return TagSection;
 	};

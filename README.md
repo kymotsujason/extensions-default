@@ -5,7 +5,7 @@ Paperback 0.9 Sources and Tracker
 Sources added from others:
 
 - [Mangadex](https://github.com/paperback-community/general-extensions/tree/master) (0.9) (Improved search sorting) (Proxy server for cropping)
-- [Manganato](https://github.com/TheNetsky/extensions-generic-0.8/tree/mangabox) (compatibility) (Improved search sorting) (Proxy server for cropping)
+- [Manganato](https://github.com/TheNetsky/extensions-generic-0.8/tree/mangabox) (0.9) (Improved search sorting)
 - [BatoTo](https://github.com/TheNetsky/community-extensions/tree/0.8) (0.9) (Improved search sorting) (Proxy server for cropping)
 - [WeebCentral](https://github.com/GabrielCWT/gabe-extensions) (0.9) (Improved search matching) (Proxy server for cropping)
 - [Toonily](https://github.com/TheNetsky/extensions-generic-0.8/tree/madara) (0.9)
