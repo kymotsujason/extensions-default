@@ -66,7 +66,8 @@ export const parseMangaList = async (
 export const parseMangaDetails = (
 	mangaId: string,
 	COVER_BASE_URL: string,
-	json: any
+	json: any,
+	ratingJson: any
 ): SourceManga => {
 	const mangaDetails = json.data.attributes;
 
@@ -111,6 +112,10 @@ export const parseMangaDetails = (
 		)}`;
 	}
 
+	const rating = ratingJson.statistics
+		? ratingJson.statistics[mangaId].rating.average / 10
+		: undefined;
+
 	return {
 		mangaId: mangaId,
 		mangaInfo: {
@@ -124,6 +129,7 @@ export const parseMangaDetails = (
 			tagGroups: [{ id: "tags", title: "Tags", tags: tags }],
 			contentRating: ContentRating.EVERYONE, // TODO: apply proper rating
 			shareUrl: `https://mangadex.org/title/${mangaId}`,
+			rating: rating,
 		},
 	};
 };
