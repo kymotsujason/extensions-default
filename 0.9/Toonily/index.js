@@ -16753,7 +16753,9 @@ var source = (() => {
     }
     async parseHomeSection($2, source) {
       const items = [];
-      for (const obj of $2("div.page-item-detail").toArray()) {
+      for (const obj of $2(
+        "div.page-content-listing.item-big_thumbnail > div > div > div > div"
+      ).toArray()) {
         const image = encodeURI(
           await this.getImageSrc($2("img", obj), source) ?? ""
         );
@@ -17001,7 +17003,7 @@ var source = (() => {
       };
       const $2 = await this.fetchCheerio(request);
       const manga = await this.parser.parseHomeSection($2, this);
-      metadata = manga.length >= 10 ? { page: page + 1 } : void 0;
+      metadata = manga.length >= 18 ? { page: page + 1 } : void 0;
       return {
         items: manga,
         metadata
