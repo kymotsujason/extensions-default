@@ -16926,6 +16926,7 @@ var source = (() => {
       let url;
       const slugData = await this.convertPostIdToSlug(Number(mangaId));
       url = `${TOONILY_DOMAIN}/${slugData.path}/${slugData.slug}/${chapterId}/?style=list}`;
+      throw new Error(url);
       const request = {
         url,
         method: "GET"
