@@ -16849,7 +16849,7 @@ var source = (() => {
       this.language = "\u{1F1EC}\u{1F1E7}";
       this.searchMangaSelector = "div.page-content-listing.item-big_thumbnail > div > div > div > div";
       this.searchPagePathName = "page";
-      this.chapterDetailsSelector = "div.reading-content > div";
+      this.chapterDetailsSelector = "div.reading-content > div > img";
       this.directoryPath = "webtoon";
       this.parser = new Parser3();
       this.globalRateLimiter = new import_types3.BasicRateLimiter("rateLimiter", {
