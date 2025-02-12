@@ -16898,7 +16898,9 @@ var source = (() => {
       };
       const $2 = await this.fetchCheerio(request);
       throw new Error(
-        JSON.stringify(this.parser.parseMangaDetails($2, mangaId, this))
+        JSON.stringify(
+          await this.parser.parseMangaDetails($2, mangaId, this)
+        )
       );
       return this.parser.parseMangaDetails($2, mangaId, this);
     }
