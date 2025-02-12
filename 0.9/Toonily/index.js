@@ -16830,7 +16830,6 @@ var source = (() => {
       request.cookies = {
         "toonily-mature": "1"
       };
-      throw new Error(JSON.stringify(request));
       return request;
     }
     async interceptResponse(request, response, data2) {
