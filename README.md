@@ -10,7 +10,7 @@ Sources added from others:
 - [WeebCentral](https://github.com/GabrielCWT/gabe-extensions) (compatibility) (Improved search matching) (Proxy server for cropping)
 - [Toonily](https://github.com/TheNetsky/extensions-generic-0.8/tree/madara) (compatibility)
 - [Komga](https://github.com/Paperback-iOS/extensions-default/tree/0.9) (compatibility)
-- [Kunmanga](https://github.com/TheNetsky/extensions-generic-0.8/tree/madara) (compatibility)
+- [Kunmanga](https://github.com/TheNetsky/extensions-generic-0.8/tree/madara) (0.9)
 
 Trackers added from others:
 

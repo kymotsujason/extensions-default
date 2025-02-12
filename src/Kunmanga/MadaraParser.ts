@@ -4,13 +4,11 @@ import {
 	Tag,
 	TagSection,
 	SourceManga,
-	PartialSourceManga,
-} from "@paperback/types/lib/compat/0.8";
-import { decode as decodeHTMLEntity } from "html-entities";
+	ContentRating,
+	DiscoverSectionItem,
+} from "@paperback/types";
 import { CheerioAPI, Cheerio } from "cheerio";
 import { Element } from "domhandler"; // Import Element from domhandler
-
-import { extractVariableValues, decryptData } from "./MadaraDecrypter";
 
 export class Parser {
 	async parseMangaDetails(
@@ -18,7 +16,7 @@ export class Parser {
 		mangaId: string,
 		source: any
 	): Promise<SourceManga> {
-		const title: string = decodeHTMLEntity(
+		const title: string = Application.decodeHTMLEntities(
 			$("div.post-title h1, div#manga-title h1")
 				.children()
 				.remove()
@@ -26,13 +24,21 @@ export class Parser {
 				.text()
 				.trim()
 		);
-		const author: string = decodeHTMLEntity(
+		const altTitle: string = Application.decodeHTMLEntities(
+			$("div.post-content > div:nth-child(5) > div.summary-content")
+				.children()
+				.remove()
+				.end()
+				.text()
+				.trim()
+		);
+		const author: string = Application.decodeHTMLEntities(
 			$("div.author-content").first().text().replace("\\n", "").trim()
 		).replace("Updating", "");
-		const artist: string = decodeHTMLEntity(
+		const artist: string = Application.decodeHTMLEntities(
 			$("div.artist-content").first().text().replace("\\n", "").trim()
 		).replace("Updating", "");
-		const description: string = decodeHTMLEntity(
+		const description: string = Application.decodeHTMLEntities(
 			$(
 				"div.description-summary, div.summary-container, div.manga-excerpt"
 			)
@@ -61,6 +67,14 @@ export class Parser {
 				status = "Ongoing";
 				break;
 		}
+		const rating: number =
+			(parseFloat(
+				Application.decodeHTMLEntities(
+					$("div.post-total-rating > span").first().text().trim()
+				)
+			) *
+				2) /
+			10;
 
 		const genres: Tag[] = [];
 		for (const obj of $("div.genres-content a").toArray()) {
@@ -68,29 +82,37 @@ export class Parser {
 			const id = $(obj).attr("href")?.split("/")[4] ?? label;
 
 			if (!label || !id) continue;
-			genres.push(App.createTag({ label: label, id: id }));
+			genres.push({ title: label, id: id });
 		}
 		const tagSections: TagSection[] = [
-			App.createTagSection({ id: "0", label: "genres", tags: genres }),
+			{ id: "0", title: "genres", tags: genres },
 		];
 
-		return App.createSourceManga({
-			id: mangaId,
-			mangaInfo: App.createMangaInfo({
-				titles: [title],
-				image: image,
+		return {
+			mangaId: mangaId,
+			mangaInfo: {
+				primaryTitle: title,
+				secondaryTitles: altTitle.split(","),
+				thumbnailUrl: image,
 				author: author,
 				artist: artist,
-				tags: tagSections,
-				desc: description,
+				tagGroups: tagSections,
+				synopsis: description,
 				status: status,
-			}),
-		});
+				rating: rating,
+				contentRating: ContentRating.EVERYONE,
+			},
+		};
 	}
 
-	parseChapterList($: CheerioAPI, mangaId: string, source: any): Chapter[] {
+	parseChapterList(
+		$: CheerioAPI,
+		sourceManga: SourceManga,
+		source: any
+	): Chapter[] {
 		const chapters: Chapter[] = [];
 		let sortingIndex = 0;
+		const mangaId = sourceManga.mangaId;
 
 		// For each available chapter..
 		for (const obj of $("li.wp-manga-chapter  ").toArray()) {
@@ -134,14 +156,15 @@ export class Parser {
 			}
 
 			chapters.push({
-				id: id,
+				chapterId: id,
 				langCode: source.language,
 				chapNum: chapNum,
-				name: chapName ? decodeHTMLEntity(chapName) : "",
-				time: mangaTime,
+				title: chapName ? Application.decodeHTMLEntities(chapName) : "",
+				publishDate: mangaTime,
 				sortingIndex,
 				volume: 0,
-				group: "",
+				version: "",
+				sourceManga: sourceManga,
 			});
 			sortingIndex--;
 		}
@@ -153,8 +176,8 @@ export class Parser {
 		}
 
 		return chapters.map((chapter) => {
-			chapter.sortingIndex += chapters.length;
-			return App.createChapter(chapter);
+			chapter.sortingIndex! += chapters.length;
+			return chapter;
 		});
 	}
 
@@ -181,58 +204,11 @@ export class Parser {
 			pages.push(encodeURI(page));
 		}
 
-		return App.createChapterDetails({
+		return {
 			id: chapterId,
 			mangaId: mangaId,
 			pages: pages,
-		});
-	}
-
-	async parseProtectedChapterDetails(
-		$: CheerioAPI,
-		mangaId: string,
-		chapterId: string,
-		selector: string,
-		source: any
-	): Promise<ChapterDetails> {
-		if (!$(selector).length) {
-			return this.parseChapterDetails(
-				$,
-				mangaId,
-				chapterId,
-				selector,
-				source
-			);
-		}
-
-		const variables = extractVariableValues(
-			// @ts-expect-error
-			$(selector).get()[0].children[0].data
-		);
-		if (
-			!("chapter_data" in variables) ||
-			!("wpmangaprotectornonce" in variables)
-		) {
-			throw new Error(
-				`Could not parse page for postId:${mangaId} chapterId:${chapterId}. Reason: Lacks sufficient data`
-			);
-		}
-
-		const chapterList = decryptData(
-			<string>variables["chapter_data"],
-			<string>variables["wpmangaprotectornonce"]
-		);
-		const pages: string[] = [];
-
-		chapterList.forEach((page: string) => {
-			pages.push(encodeURI(page));
-		});
-
-		return App.createChapterDetails({
-			id: chapterId,
-			mangaId: mangaId,
-			pages: pages,
-		});
+		};
 	}
 
 	parseTags($: CheerioAPI, advancedSearch: boolean): TagSection[] {
@@ -241,7 +217,7 @@ export class Parser {
 			for (const obj of $(".checkbox-group div label").toArray()) {
 				const label = $(obj).text().trim();
 				const id = $(obj).attr("for") ?? label;
-				genres.push(App.createTag({ label: label, id: id }));
+				genres.push({ title: label, id: id });
 			}
 		} else {
 			for (const obj of $(
@@ -250,12 +226,10 @@ export class Parser {
 			).toArray()) {
 				const label = $(obj).text().trim();
 				const id = $(obj).attr("href")?.split("/")[4] ?? label;
-				genres.push(App.createTag({ label: label, id: id }));
+				genres.push({ title: label, id: id });
 			}
 		}
-		return [
-			App.createTagSection({ id: "0", label: "genres", tags: genres }),
-		];
+		return [{ id: "0", title: "genres", tags: genres }];
 	}
 
 	async parseSearchResults($: CheerioAPI, source: any): Promise<any[]> {
@@ -287,12 +261,28 @@ export class Parser {
 				.text()
 				.trim();
 
+			const rating: string =
+				(
+					parseFloat(
+						$("div.meta-item.rating > div > span", obj)
+							.last()
+							.text()
+							.trim()
+					) *
+					2 *
+					10
+				)
+					.toFixed(0)
+					.toString() + "%";
+
 			results.push({
 				slug: slug,
 				path: path,
 				image: image,
-				title: decodeHTMLEntity(title),
-				subtitle: decodeHTMLEntity(subtitle),
+				title: Application.decodeHTMLEntities(title),
+				subtitle: `${rating} ${Application.decodeHTMLEntities(
+					subtitle
+				)}`,
 			});
 		}
 
@@ -302,41 +292,43 @@ export class Parser {
 	async parseHomeSection(
 		$: CheerioAPI,
 		source: any
-	): Promise<PartialSourceManga[]> {
-		const items: PartialSourceManga[] = [];
+	): Promise<DiscoverSectionItem[]> {
+		const results: any[] = [];
 
-		for (const obj of $("div.page-item-detail").toArray()) {
-			const image = encodeURI(
-				(await this.getImageSrc($("img", obj), source)) ?? ""
+		for (const obj of $(
+			"div.page-content-listing.item-big_thumbnail > div > div > div > div"
+		).toArray()) {
+			const title: string = $("a", obj).attr("title") ?? "";
+			const image: string = encodeURI(
+				await this.getImageSrc($("img", obj), source)
 			);
-			const title = $("a", $("h3.h5", obj)).last().text();
-
-			const slug = this.idCleaner(
-				$("a", $("h3.h5", obj)).attr("href") ?? ""
-			);
-			const postId = $("div", obj).attr("data-post-id");
-			const subtitle = $("span.font-meta.chapter", obj)
+			const subtitle: string = $("span.font-meta.chapter", obj)
 				.first()
 				.text()
 				.trim();
+			const postId = $("div", obj).attr("data-post-id") ?? "";
+			const rating: string = (
+				parseFloat(
+					$("div.meta-item.rating > div > span").last().text().trim()
+				) *
+				2 *
+				10
+			)
+				.toFixed(0)
+				.toString();
 
-			if (isNaN(Number(postId)) || !title) {
-				console.log(
-					`Failed to parse homepage sections for ${source.baseUrl}`
-				);
-				continue;
-			}
-
-			items.push(
-				App.createPartialSourceManga({
-					mangaId: String(source.usePostIds ? postId : slug),
-					image: image,
-					title: decodeHTMLEntity(title),
-					subtitle: decodeHTMLEntity(subtitle),
-				})
-			);
+			results.push({
+				type: "simpleCarouselItem",
+				mangaId: postId,
+				imageUrl: image,
+				title: Application.decodeHTMLEntities(title),
+				subtitle: `${rating}% ${Application.decodeHTMLEntities(
+					subtitle
+				)}`,
+			});
 		}
-		return items;
+
+		return results;
 	}
 
 	async getImageSrc(
@@ -374,8 +366,7 @@ export class Parser {
 		}
 
 		if (source?.stateManager) {
-			const HQthumb =
-				(await source.stateManager.retrieve("HQthumb")) ?? false;
+			const HQthumb = true;
 			if (HQthumb) {
 				image = image
 					?.replace("-110x150", "")
@@ -396,7 +387,7 @@ export class Parser {
 		// Malforumed url fix (Turns https:///example.com into https://example.com (or the http:// equivalent))
 		image = image?.replace(/https:\/\/\//g, "https://"); // only changes urls with https protocol
 
-		return decodeURI(decodeHTMLEntity(image ?? ""));
+		return decodeURI(Application.decodeHTMLEntities(image ?? ""));
 	}
 
 	parseDate = (date: string): Date => {
