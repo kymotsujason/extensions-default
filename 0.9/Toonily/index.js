@@ -16847,7 +16847,7 @@ var source = (() => {
   var ToonilyExtension = class {
     constructor() {
       this.language = "\u{1F1EC}\u{1F1E7}";
-      this.searchMangaSelector = "div.page-content-listing.item-big_thumbnail > div > div > div";
+      this.searchMangaSelector = "div.page-content-listing.item-big_thumbnail > div > div > div > div";
       this.searchPagePathName = "page";
       this.chapterDetailsSelector = "div.reading-content > div > img";
       this.directoryPath = "webtoon";
@@ -17008,9 +17008,7 @@ var source = (() => {
     // Utility
     constructSearchRequest(page, query) {
       if (query.title == "") {
-        let url = `${TOONILY_DOMAIN}/webtoon/${this.searchPagePathName}/${page.toString()}/?s=${encodeURIComponent(
-          query?.title ?? ""
-        )}&post_type=wp-manga`;
+        let url = `${TOONILY_DOMAIN}/${this.searchPagePathName}/${page.toString()}/?s=${encodeURIComponent(query?.title ?? "")}`;
         let included = "&";
         for (const filter4 of query.filters) {
           if (filter4.id.startsWith("tags")) {
@@ -17031,9 +17029,9 @@ var source = (() => {
         };
       } else {
         return {
-          url: `${TOONILY_DOMAIN}/webtoon/${this.searchPagePathName}/${page.toString()}/?s=${encodeURIComponent(
+          url: `${TOONILY_DOMAIN}/${this.searchPagePathName}/${page.toString()}/?s=${encodeURIComponent(
             query?.title?.replace(/'/g, "\u2019") ?? ""
-          )}&post_type=wp-manga`,
+          )}`,
           method: "GET"
         };
       }
