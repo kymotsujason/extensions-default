@@ -16736,7 +16736,7 @@ var source = (() => {
         );
         const subtitle = $2("span.font-meta.chapter", obj).text().trim();
         const rating = (parseFloat(
-          $2("div.meta-item.rating > div > span").last().text().trim()
+          $2("span.score.font-meta.total_votes").text().trim()
         ) * 2 * 10).toFixed(0).toString() + "%";
         results.push({
           slug,
