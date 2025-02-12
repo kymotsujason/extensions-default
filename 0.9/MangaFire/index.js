@@ -23189,7 +23189,7 @@ var source = (() => {
       this.Languages = [
         {
           name: "English",
-          MFCode: "en,en_us",
+          MFCode: "en",
           lang: "\u{1F1EC}\u{1F1E7}",
           default: true
         },
@@ -24671,11 +24671,10 @@ var source = (() => {
       return parseChapterList($3, sourceManga);
     }
     async getChapterDetails(chapter) {
-      throw new Error(JSON.stringify(chapter));
       const chapterId2 = chapter.chapterId;
       const mangaId2 = chapter.sourceManga.mangaId;
       const request = {
-        url: `${MANGAFIRE_DOMAIN}/read/${chapterId2}`,
+        url: `${MANGAFIRE_DOMAIN}/read/${mangaId2}/${MFLanguages.getDefault()}/${chapterId2}`,
         method: "GET"
       };
       const $3 = await this.fetchCheerio(request);
