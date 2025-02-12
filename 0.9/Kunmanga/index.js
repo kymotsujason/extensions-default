@@ -16747,7 +16747,9 @@ var source = (() => {
     }
     async parseHomeSection($2, source) {
       const results = [];
-      for (const obj of $2(source.searchMangaSelector).toArray()) {
+      for (const obj of $2(
+        "div.page-content-listing.item-big_thumbnail > div > div > div"
+      ).toArray()) {
         const title = $2("a", obj).attr("title") ?? "";
         const image = encodeURI(
           await this.getImageSrc($2("img", obj), source)
@@ -16989,7 +16991,7 @@ var source = (() => {
     // Utility
     constructSearchRequest(page, query) {
       if (query.title == "") {
-        let url = `${KUNMANGA_DOMAIN}/${this.searchPagePathName}/${page.toString()}/?s=${encodeURIComponent(
+        let url = `${KUNMANGA_DOMAIN}/manga/${this.searchPagePathName}/${page.toString()}/?s=${encodeURIComponent(
           query?.title ?? ""
         )}&post_type=wp-manga&`;
         let included = "";
@@ -17012,9 +17014,9 @@ var source = (() => {
         };
       } else {
         return {
-          url: `${KUNMANGA_DOMAIN}/${this.searchPagePathName}/${page.toString()}/?s=${encodeURIComponent(
+          url: `${KUNMANGA_DOMAIN}/manga/${this.searchPagePathName}/${page.toString()}/?s=${encodeURIComponent(
             query?.title?.replace(/'/g, "\u2019") ?? ""
-          )}&post_type=wp-manga/`,
+          )}&post_type=wp-manga`,
           method: "GET"
         };
       }
