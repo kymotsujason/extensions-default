@@ -24038,7 +24038,7 @@ Type: ${row["type"]}`
     }
     async parseMangaDetails($2, mangaId, source) {
       const title = (0, import_html_entities.decode)(
-        $2("div.post-title h1, div#manga-title h1").children().remove().end().text().trim()
+        $2("div.post-title > h1").children().remove().end().text().trim()
       );
       const author = (0, import_html_entities.decode)(
         $2("div.author-content").first().text().replace("\\n", "").trim()
@@ -24437,7 +24437,7 @@ Type: ${row["type"]}`
        * each manga object while on a search result page. This is the selector
        * which is looped over. This may be overridden if required.
        */
-      this.searchMangaSelector = "div.page-item-detail.manga";
+      this.searchMangaSelector = "div.c-tabs-item > div";
       /**
        * Set to true if your source has advanced search functionality built in.
        * If this is not true, no genre tags will be shown on the homepage!
@@ -24472,7 +24472,7 @@ Type: ${row["type"]}`
        * each page while on a chapter page. This is the selector
        * which is looped over. This may be overridden if required.
        */
-      this.chapterDetailsSelector = "div.page-break > img";
+      this.chapterDetailsSelector = "div.reading-content > div";
       /**
        * Some websites have the Cloudflare defense check enabled on specific parts of the website, these need to be loaded when using the Cloudflare bypass within the app
        */
