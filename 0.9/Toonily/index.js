@@ -16614,7 +16614,7 @@ var source = (() => {
       return {
         mangaId,
         mangaInfo: {
-          primaryTitle: altTitle,
+          primaryTitle: title,
           secondaryTitles: altTitle.split(","),
           thumbnailUrl: image,
           author,
@@ -16737,12 +16737,19 @@ var source = (() => {
           await this.getImageSrc($2("img", obj), source)
         );
         const subtitle = $2("span.font-meta.chapter", obj).text().trim();
+        const rating = (parseFloat(
+          Application.decodeHTMLEntities(
+            $2("#averagerate", obj).first().text().trim()
+          )
+        ) * 2 / 10).toFixed(0).toString() + "%";
         results.push({
           slug,
           path,
           image,
           title: Application.decodeHTMLEntities(title),
-          subtitle: Application.decodeHTMLEntities(subtitle)
+          subtitle: `${rating} ${Application.decodeHTMLEntities(
+            subtitle
+          )}`
         });
       }
       return results;
@@ -16988,7 +16995,7 @@ var source = (() => {
           );
       }
       const request = {
-        url: `${TOONILY_DOMAIN}/manga/page/${page}/${param}`,
+        url: `${TOONILY_DOMAIN}/webtoons/page/${page}/${param}`,
         method: "GET"
       };
       const $2 = await this.fetchCheerio(request);
