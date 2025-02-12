@@ -5043,6 +5043,8 @@ var source = (() => {
         getMangaThumbnail()
       )}`;
     }
+    const statistics = ratingJson.data.statistics;
+    const rating = statistics && statistics[mangaId] && statistics[mangaId].rating;
     return {
       mangaId,
       mangaInfo: {
@@ -5057,7 +5059,7 @@ var source = (() => {
         contentRating: import_types2.ContentRating.EVERYONE,
         // TODO: apply proper rating
         shareUrl: `https://mangadex.org/title/${mangaId}`,
-        rating: 10
+        rating: rating / 10
       }
     };
   };
