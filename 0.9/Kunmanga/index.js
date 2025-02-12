@@ -24584,6 +24584,7 @@ Type: ${row["type"]}`
       } else {
         url = `${this.baseUrl}/${this.directoryPath}/${mangaId}/${chapterId}/${this.useListParameter ? "?style=list" : ""}`;
       }
+      throw new Error(url);
       const request = App.createRequest({
         url,
         method: "GET"
