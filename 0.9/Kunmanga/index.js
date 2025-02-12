@@ -17036,10 +17036,10 @@ var source = (() => {
         const postId2 = await this.convertSlugToPostId(slug, path);
         const existingMappedSlug = Application.getState(postId2);
         if (existingMappedSlug != null) {
-          await Application.setState(void 0, slug);
+          Application.setState(void 0, slug);
         }
-        await Application.setState(slug, postId2);
-        await Application.setState(postId2, slug);
+        Application.setState(slug, postId2);
+        Application.setState(postId2, slug);
       }
       const postId = Application.getState(slug);
       if (!postId) throw new Error(`Unable to fetch postId for slug:${slug}`);
