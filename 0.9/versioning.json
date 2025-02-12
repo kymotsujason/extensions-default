@@ -1,5 +1,5 @@
 {
-  "buildTime": "2025-02-12T03:41:00.550Z",
+  "buildTime": "2025-02-12T03:53:15.708Z",
   "builtWith": {
     "toolchain": "1.0.0-alpha.33",
     "types": "1.0.0-alpha.33"
@@ -107,6 +107,28 @@
       ],
       "capabilities": 39,
       "id": "Komga"
+    },
+    {
+      "icon": "icon.png",
+      "name": "Kun Manga",
+      "version": "0.9.1",
+      "description": "The kunmanga.com extension.",
+      "contentRating": "MATURE",
+      "developers": [
+        {
+          "name": "Netsky",
+          "website": "http://github.com/TheNetsky"
+        }
+      ],
+      "badges": [],
+      "capabilities": [
+        1,
+        4,
+        64,
+        32,
+        16
+      ],
+      "id": "Kunmanga"
     },
     {
       "icon": "icon.png",
