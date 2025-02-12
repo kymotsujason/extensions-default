@@ -3,6 +3,9 @@ import {
 	Chapter,
 	ChapterDetails,
 	ChapterProviding,
+	DiscoverSection,
+	DiscoverSectionItem,
+	DiscoverSectionType,
 	Extension,
 	MangaProviding,
 	PagedResults,
@@ -206,96 +209,59 @@ export class ManganatoExtension implements ManganatoImplementation {
 		);
 	}
 
-	// override async getHomePageSections(
-	// 	sectionCallback: (section: HomeSection) => void
-	// ): Promise<void> {
-	// 	const sections = [
-	// 		{
-	// 			request: App.createRequest({
-	// 				url: new URLBuilder(this.baseURL)
-	// 					.addPathComponent(this.mangaListPath)
-	// 					.addQueryParameter("type", "latest")
-	// 					.buildUrl(),
-	// 				method: "GET",
-	// 			}),
-	// 			section: App.createHomeSection({
-	// 				id: "latest",
-	// 				title: "Latest Updates",
-	// 				type: HomeSectionType.singleRowLarge,
-	// 				containsMoreItems: true,
-	// 			}),
-	// 		},
-	// 		{
-	// 			request: App.createRequest({
-	// 				url: new URLBuilder(this.baseURL)
-	// 					.addPathComponent(this.mangaListPath)
-	// 					.addQueryParameter("type", "newest")
-	// 					.buildUrl(),
-	// 				method: "GET",
-	// 			}),
-	// 			section: App.createHomeSection({
-	// 				id: "newest",
-	// 				title: "New Titles",
-	// 				type: HomeSectionType.singleRowNormal,
-	// 				containsMoreItems: true,
-	// 			}),
-	// 		},
-	// 		{
-	// 			request: App.createRequest({
-	// 				url: new URLBuilder(this.baseURL)
-	// 					.addPathComponent(this.mangaListPath)
-	// 					.addQueryParameter("type", "topview")
-	// 					.buildUrl(),
-	// 				method: "GET",
-	// 			}),
-	// 			section: App.createHomeSection({
-	// 				id: "topview",
-	// 				title: "Most Popular",
-	// 				type: HomeSectionType.singleRowNormal,
-	// 				containsMoreItems: true,
-	// 			}),
-	// 		},
-	// 	];
+	async getDiscoverSections(): Promise<DiscoverSection[]> {
+		return [
+			{
+				id: "latest_releases",
+				title: "Latest Releases",
+				type: DiscoverSectionType.simpleCarousel,
+			},
+			{
+				id: "popular_manga",
+				title: "Popular Manga",
+				type: DiscoverSectionType.simpleCarousel,
+			},
+			{
+				id: "newest_release",
+				title: "Newest Releases",
+				type: DiscoverSectionType.simpleCarousel,
+			},
+		];
+	}
 
-	// 	const promises: Promise<void>[] = [];
-
-	// 	for (const section of sections) {
-	// 		sectionCallback(section.section);
-	// 		promises.push(
-	// 			this.requestManager
-	// 				.schedule(section.request, 1)
-	// 				.then((response) => {
-	// 					const $ = this.cheerio.load(response.data as string);
-	// 					const items = this.parser.parseManga($, this);
-	// 					section.section.items = items;
-	// 					sectionCallback(section.section);
-	// 				})
-	// 		);
-	// 	}
-	// }
-
-	// override async getViewMoreItems(
-	// 	homePageSectionId: string,
-	// 	metadata: any
-	// ): Promise<PagedResults> {
-	// 	const page: number = metadata?.page ?? 1;
-
-	// 	const request = {
-	// 		url: new URLBuilder(this.baseURL)
-	// 			.addPathComponent(`${this.mangaListPath}/${page}`)
-	// 			.addQueryParameter("type", homePageSectionId)
-	// 			.buildUrl(),
-	// 		method: "GET",
-	// 	};
-	// 	const $ = await this.fetchCheerio(request);
-	// 	const results = this.parser.parseManga($, this);
-
-	// 	metadata = !this.parser.isLastPage($) ? { page: page + 1 } : undefined;
-	// 	return {
-	// 		results: results,
-	// 		metadata: metadata,
-	// 	};
-	// }
+	async getDiscoverSectionItems(
+		section: DiscoverSection,
+		metadata: any
+	): Promise<PagedResults<DiscoverSectionItem>> {
+		const page: number = metadata?.page ?? 1;
+		let param = "";
+		switch (section.id) {
+			case "popular_manga":
+				param = `/genre-all/${page}?type=topview`;
+				break;
+			case "latest_releases":
+				param = `/genre-all/${page}`;
+				break;
+			case "newest_release":
+				param = `/genre-all/${page}?type=newest`;
+				break;
+			default:
+				throw new Error(
+					"Requested to getViewMoreItems for a section ID which doesn't exist"
+				);
+		}
+		const request = {
+			url: `${this.baseURL}${param}`,
+			method: "GET",
+		};
+		const $ = await this.fetchCheerio(request);
+		const manga = this.parser.parseViewMore($, this);
+		metadata = !this.parser.isLastPage($) ? { page: page + 1 } : undefined;
+		return {
+			items: manga,
+			metadata,
+		};
+	}
 
 	async supportsTagExclusion(): Promise<boolean> {
 		return true;

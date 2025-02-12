@@ -4,24 +4,16 @@ Paperback 0.9 Sources and Tracker
 
 Sources added from others:
 
-- [Mangadex](https://github.com/paperback-community/general-extensions/tree/master) (0.9) (Improved search sorting) (Proxy server for cropping)
-- [Manganato](https://github.com/TheNetsky/extensions-generic-0.8/tree/mangabox) (0.9) (Improved search sorting)
-- [BatoTo](https://github.com/TheNetsky/community-extensions/tree/0.8) (0.9) (Improved search sorting) (Proxy server for cropping)
-- [WeebCentral](https://github.com/GabrielCWT/gabe-extensions) (0.9) (Improved search matching) (Proxy server for cropping)
-- [Toonily](https://github.com/TheNetsky/extensions-generic-0.8/tree/madara) (0.9)
-- [Komga](https://github.com/Paperback-iOS/extensions-default/tree/0.9) (compatibility)
-- [Kunmanga](https://github.com/TheNetsky/extensions-generic-0.8/tree/madara) (0.9)
+- [Mangadex](https://github.com/paperback-community/general-extensions/tree/master) (Improved search sorting) (Proxy server for cropping)
+- [Manganato](https://github.com/TheNetsky/extensions-generic-0.8/tree/mangabox) (Improved search sorting)
+- [BatoTo](https://github.com/TheNetsky/community-extensions/tree/0.8) (Improved search sorting) (Proxy server for cropping)
+- [WeebCentral](https://github.com/GabrielCWT/gabe-extensions) (Improved search matching) (Proxy server for cropping)
+- [Toonily](https://github.com/TheNetsky/extensions-generic-0.8/tree/madara)
+- [Kunmanga](https://github.com/TheNetsky/extensions-generic-0.8/tree/madara)
 
 Trackers added from others:
 
-- [Anilist](https://github.com/Paperback-iOS/extensions) (0.9) (Improved search sorting) (Automatic entry on new reads)
-
-TODO:
-
-- Rewrite stuff for 0.9, search filter requirement breaks search compatibility
-- Replace input rows with stepper rows once paper implements it
-- Rewrite to use the states for updates, it's just hacked together atm
-- More testing
+- [Anilist](https://github.com/Paperback-iOS/extensions) (Improved search sorting) (Automatic entry on new reads)
 
 # Preview
 

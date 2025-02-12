@@ -7,6 +7,7 @@ import {
 	Tag,
 	TagSection,
 	ContentRating,
+	DiscoverSectionItem,
 } from "@paperback/types";
 import { relevanceScore } from "./RelevanceScore";
 
@@ -232,6 +233,34 @@ export class MangaBoxParser {
 		};
 
 		return chapterDetails;
+	};
+
+	parseViewMore = ($: any, source: any): DiscoverSectionItem[] => {
+		const mangaItems: DiscoverSectionItem[] = [];
+		const collecedIds: string[] = [];
+
+		for (const manga of $(source.mangaListSelector).toArray()) {
+			const mangaId = $("a", manga).first().attr("href");
+			const image = $("img", manga).first().attr("src")?.trim() ?? "";
+			const title = Application.decodeHTMLEntities(
+				$("a", manga).first().attr("title")?.trim() ?? ""
+			);
+			const subtitle =
+				$(source.mangaSubtitleSelector, manga).first().text().trim() ??
+				"";
+
+			if (!mangaId || !title || collecedIds.includes(mangaId)) continue;
+			collecedIds.push(mangaId);
+
+			mangaItems.push({
+				type: "simpleCarouselItem",
+				mangaId: mangaId,
+				imageUrl: image,
+				title: title,
+				subtitle: subtitle ? subtitle : "No Chapters",
+			});
+		}
+		return mangaItems;
 	};
 
 	parseTags = ($: any, source: any): TagSection[] => {
