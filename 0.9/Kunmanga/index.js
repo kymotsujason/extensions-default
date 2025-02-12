@@ -16735,12 +16735,17 @@ var source = (() => {
           await this.getImageSrc($2("img", obj), source)
         );
         const subtitle = $2("span.font-meta.chapter", obj).text().trim();
+        const rating = (parseFloat(
+          $2("div.meta-item.rating > div > span").last().text().trim()
+        ) * 2 * 10).toFixed(0).toString() + "%";
         results.push({
           slug,
           path,
           image,
           title: Application.decodeHTMLEntities(title),
-          subtitle: Application.decodeHTMLEntities(subtitle)
+          subtitle: `${rating} ${Application.decodeHTMLEntities(
+            subtitle
+          )}`
         });
       }
       return results;
@@ -16763,7 +16768,7 @@ var source = (() => {
           type: "simpleCarouselItem",
           mangaId: postId,
           imageUrl: image,
-          title: Application.decodeHTMLEntities(postId),
+          title: Application.decodeHTMLEntities(title),
           subtitle: `${rating}% ${Application.decodeHTMLEntities(
             subtitle
           )}`
