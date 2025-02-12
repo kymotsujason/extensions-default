@@ -4995,11 +4995,10 @@ var source = (() => {
       const image = coverFileName ? `${COVER_BASE_URL2}/${mangaId}/${coverFileName}${MDImageQuality.getEnding(
         thumbnailSelector()
       )}` : "https://mangadex.org/_nuxt/img/cover-placeholder.d12c3c5.jpg";
-      const subtitle = parseChapterTitle({
-        title: void 0,
-        volume: mangaDetails.lastVolume,
-        chapter: mangaDetails.lastChapter
-      });
+      const subtitle = parseChapterTitle(
+        mangaDetails.lastVolume,
+        mangaDetails.lastChapter
+      );
       let relevance = 0;
       if (query?.title) {
         relevance = relevanceScore(title, query.title);
@@ -5062,11 +5061,8 @@ var source = (() => {
       }
     };
   };
-  var parseChapterTitle = (info) => {
-    if (!info) {
-      return "Not found";
-    }
-    return `asd asd`.trim();
+  var parseChapterTitle = (volume, chapter) => {
+    return `${volume ? `Vol. ${volume}` : ""} ${chapter ? `Ch. ${chapter}` : ""}`.trim();
   };
 
   // src/MangaDex/main.ts
