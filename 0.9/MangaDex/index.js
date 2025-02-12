@@ -5371,7 +5371,6 @@ var source = (() => {
         if (json.data === void 0)
           throw new Error(`Failed to parse json results for ${mangaId}`);
         for (const chapter of json.data) {
-          throw new Error(JSON.stringify(chapter));
           const chapterId = chapter.id;
           const chapterDetails = chapter.attributes;
           const name = Application.decodeHTMLEntities(chapterDetails.title) ?? "";
@@ -5386,6 +5385,7 @@ var source = (() => {
           const identifier = `${volume}-${chapNum}-${chapterDetails.translatedLanguage}`;
           if (collectedChapters.has(identifier) && skipSameChapter)
             continue;
+          throw new Error(name);
           if (pages > 0) {
             chapters.push({
               chapterId,
