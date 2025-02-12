@@ -5373,7 +5373,9 @@ var source = (() => {
         for (const chapter of json.data) {
           const chapterId = chapter.id;
           const chapterDetails = chapter.attributes;
-          const name = Application.decodeHTMLEntities(chapterDetails.title) ?? "";
+          const name = Application.decodeHTMLEntities(
+            chapterDetails.title ?? ""
+          ) ?? "";
           const chapNum = Number(chapterDetails?.chapter);
           const volume = Number(chapterDetails?.volume);
           const langCode = MDLanguages.getFlagCode(
@@ -5385,7 +5387,6 @@ var source = (() => {
           const identifier = `${volume}-${chapNum}-${chapterDetails.translatedLanguage}`;
           if (collectedChapters.has(identifier) && skipSameChapter)
             continue;
-          throw new Error(name);
           if (pages > 0) {
             chapters.push({
               chapterId,
