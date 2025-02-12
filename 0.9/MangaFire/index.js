@@ -24121,7 +24121,7 @@ var source = (() => {
     const author = authorElement.length ? authorElement.children().map((_, e) => {
       return $3(e).text().trim();
     }).toArray().join(", ") : "";
-    const artistElement = $3('div.attr-item span:contains("Artists")').next(
+    const artistElement = $3('div.attr-item span:contains("Artist")').next(
       "span"
     );
     const artist = artistElement.length ? artistElement.children().map((_, e) => {
@@ -24178,7 +24178,7 @@ var source = (() => {
     const chapters = [];
     let sortingIndex = 0;
     for (const chapter of $3("div.list-body > ul > li").toArray()) {
-      const title = $3("a", chapter).next("span").text().replace(":", "").trim();
+      const title = "Chapter 10";
       const chapterId2 = $3("a", chapter).attr("href")?.replace(/\/$/, "")?.split("/").pop() ?? "";
       const groupElement = $3('div.attr-item span:contains("Magazines")').next(
         "span"
@@ -24331,9 +24331,9 @@ var source = (() => {
     for (const obj of $3("div.original.card-lg > div.unit").toArray()) {
       const id = $3(".poster", obj).attr("href")?.replace("/manga/", "")?.trim().split("/")[0] ?? "";
       const title = $3(".info", obj).text() ?? "";
-      const mfcode = $3("b", obj).text().toLowerCase() ?? "en";
-      const lang = mfcode ? MFLanguages.getLangCode(mfcode) : "en";
-      const subtitle = $3(".content", obj).next("li").next("a").next("span").text().trim() + ` ${lang.toUpperCase()}`;
+      const mfcode = $3("em", obj).attr("data-lang");
+      const lang = mfcode ? MFLanguages.getLangCode(mfcode) : "\u{1F1EC}\u{1F1E7}";
+      const subtitle = lang + " " + $3(".visited", obj).text().trim();
       const image = $3("img", obj).attr("src") ?? "";
       if (!id || !title) continue;
       if (langFilter && !langs.includes(mfcode)) continue;
