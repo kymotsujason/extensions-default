@@ -16736,11 +16736,9 @@ var source = (() => {
         mangaId: id,
         subtitle
       };
-      mangas.push({
-        manga: partialManga
-      });
+      mangas.push(partialManga);
     }
-    return mangas.map((r) => r.manga);
+    return mangas;
   };
   var isLastPage = ($2) => {
     return $2(".page-item").last().hasClass("disabled");
