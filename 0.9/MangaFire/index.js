@@ -24798,7 +24798,7 @@ var source = (() => {
         excluded = excluded.slice(0, -1);
         included = included.slice(0, -1);
         request = {
-          url: `${url}${included}|${excluded}&page=${page}`,
+          url: `${url}${included}${excluded}&page=${page}`,
           method: "GET"
         };
       }
