@@ -5018,7 +5018,7 @@ var source = (() => {
     results.sort((a, b) => b.relevance - a.relevance);
     return results.map((r) => r.manga);
   };
-  var parseMangaDetails = (mangaId, COVER_BASE_URL2, json) => {
+  var parseMangaDetails = (mangaId, COVER_BASE_URL2, json, ratingJson) => {
     const mangaDetails = json.data.attributes;
     const secondaryTitles = mangaDetails.altTitles.flatMap((x) => Object.values(x)).map((x) => Application.decodeHTMLEntities(x));
     const primaryTitle = mangaDetails.title["en"] ?? Object.values(mangaDetails.title)[0];
@@ -5056,7 +5056,8 @@ var source = (() => {
         tagGroups: [{ id: "tags", title: "Tags", tags }],
         contentRating: import_types2.ContentRating.EVERYONE,
         // TODO: apply proper rating
-        shareUrl: `https://mangadex.org/title/${mangaId}`
+        shareUrl: `https://mangadex.org/title/${mangaId}`,
+        rating: ratingJson.data.statistics[mangaId].rating.average * 10
       }
     };
   };
@@ -5330,14 +5331,21 @@ var source = (() => {
     }
     async getMangaDetails(mangaId) {
       this.checkId(mangaId);
-      const request = {
+      let request = {
         url: new URLBuilder(MANGADEX_API).addPath("manga").addPath(mangaId).addQuery("includes", ["author", "artist", "cover_art"]).build(),
         method: "GET"
       };
-      const [_, buffer] = await Application.scheduleRequest(request);
-      const data = Application.arrayBufferToUTF8String(buffer);
-      const json = typeof data === "string" ? JSON.parse(data) : data;
-      return parseMangaDetails(mangaId, COVER_BASE_URL, json);
+      let [_, buffer] = await Application.scheduleRequest(request);
+      let data = Application.arrayBufferToUTF8String(buffer);
+      let json = typeof data === "string" ? JSON.parse(data) : data;
+      request = {
+        url: new URLBuilder(MANGADEX_API).addPath("statistics/manga").addPath(mangaId).build(),
+        method: "GET"
+      };
+      [_, buffer] = await Application.scheduleRequest(request);
+      data = Application.arrayBufferToUTF8String(buffer);
+      const rating = typeof data === "string" ? JSON.parse(data) : data;
+      return parseMangaDetails(mangaId, COVER_BASE_URL, json, rating);
     }
     async getChapters(sourceManga) {
       const mangaId = sourceManga.mangaId;
