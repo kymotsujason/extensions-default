@@ -16770,16 +16770,17 @@ var source = (() => {
         }
         const rating = (parseFloat(
           Application.decodeHTMLEntities(
-            $2("div.meta-item.rating > div > span", obj).last().text().trim()
+            $2("div.meta-item.rating > div > span", obj).text().trim()
           )
         ) * 2 * 10).toFixed(0).toString() + "%";
         items.push({
           mangaId: String(postId),
-          image,
+          imageUrl: image,
           title: Application.decodeHTMLEntities(title),
           subtitle: `${rating} ${Application.decodeHTMLEntities(
             subtitle
-          )}`
+          )}`,
+          type: "simpleCarouselItem"
         });
       }
       return items;
@@ -17003,7 +17004,6 @@ var source = (() => {
       };
       const $2 = await this.fetchCheerio(request);
       const manga = await this.parser.parseHomeSection($2, this);
-      throw new Error(JSON.stringify(manga[0]));
       metadata = manga.length >= 18 ? { page: page + 1 } : void 0;
       return {
         items: manga,
