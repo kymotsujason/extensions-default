@@ -3138,6 +3138,11 @@ var source = (() => {
             tags: tags.map((t) => t)
           }
         ];
+        const rating = parseFloat(
+          Application.decodeHTMLEntities(
+            $2("em:nth-child(2) > em > em:nth-child(1)").text().trim()
+          )
+        ) * 2 / 10;
         return {
           mangaId,
           mangaInfo: {
@@ -3148,7 +3153,9 @@ var source = (() => {
             author: author ? author : "Unkown",
             synopsis: desc,
             tagGroups: TagSection3,
-            contentRating: import_types.ContentRating.EVERYONE
+            contentRating: import_types.ContentRating.EVERYONE,
+            shareUrl: `${mangaId}`,
+            rating
           }
         };
       };
