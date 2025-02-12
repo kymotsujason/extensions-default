@@ -5057,7 +5057,7 @@ var source = (() => {
         contentRating: import_types2.ContentRating.EVERYONE,
         // TODO: apply proper rating
         shareUrl: `https://mangadex.org/title/${mangaId}`,
-        rating: ratingJson.data.statistics[mangaId].rating.average * 10
+        rating: 10
       }
     };
   };
