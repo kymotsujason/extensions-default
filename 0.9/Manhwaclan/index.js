@@ -24633,7 +24633,7 @@ Type: ${row["type"]}`
       this.checkResponseError(response);
       const $2 = this.cheerio.load(response.data);
       const results = await this.parser.parseSearchResults($2, this);
-      throw new Error(`${results.length} results found. Parsing...`);
+      throw new Error(`${JSON.stringify(request)}`);
       const manga = [];
       for (const result of results) {
         if (this.usePostIds) {
