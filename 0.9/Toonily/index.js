@@ -16736,7 +16736,7 @@ var source = (() => {
         const subtitle = $2("span.font-meta.chapter", obj).text().trim();
         const rating = (parseFloat(
           Application.decodeHTMLEntities(
-            $2("div.meta-item.rating > div > span", obj).last().text().trim()
+            $2("#averagerate", obj).text().trim()
           )
         ) * 2 * 10).toFixed(0).toString() + "%";
         results.push({
