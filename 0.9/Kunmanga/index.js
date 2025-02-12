@@ -16747,9 +16747,7 @@ var source = (() => {
     }
     async parseHomeSection($2, source) {
       const results = [];
-      for (const obj of $2(
-        "div.page-content-listing.item-big_thumbnail > div > div > div"
-      ).toArray()) {
+      for (const obj of $2("div.c-tabs-item > div").toArray()) {
         const title = $2("a", obj).attr("title") ?? "";
         const image = encodeURI(
           await this.getImageSrc($2("img", obj), source)
