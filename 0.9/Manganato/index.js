@@ -17099,7 +17099,7 @@ var source = (() => {
   var load = getLoad(parse5, (dom, options) => options._useHtmlParser2 ? esm_default(dom, options) : renderWithParse5(dom));
 
   // src/Manganato/main.ts
-  var MANGANATO_DOMAIN = "https://batocomic.org";
+  var MANGANATO_DOMAIN = "https://manganato.com";
   var ManganatoInterceptor = class extends import_types3.PaperbackInterceptor {
     async interceptRequest(request) {
       request.headers = {
