@@ -16756,12 +16756,14 @@ var source = (() => {
         );
         const subtitle = $2("span.font-meta.chapter", obj).first().text().trim();
         const postId = $2("div", obj).attr("data-post-id") ?? "";
-        const rating = $2("div.meta-item.rating > div > span").last().text().trim();
+        const rating = (parseFloat(
+          $2("div.meta-item.rating > div > span").last().text().trim()
+        ) * 2 / 10).toFixed(0).toString();
         results.push({
           type: "simpleCarouselItem",
           mangaId: postId,
           imageUrl: image,
-          title: Application.decodeHTMLEntities(title),
+          title: Application.decodeHTMLEntities(postId),
           subtitle: `${rating}% ${Application.decodeHTMLEntities(
             subtitle
           )}`
