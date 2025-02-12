@@ -2067,7 +2067,7 @@ var source = (() => {
       init_buffer();
       Object.defineProperty(exports, "__esModule", { value: true });
       exports.PaperbackInterceptor = void 0;
-      var PaperbackInterceptor = class {
+      var PaperbackInterceptor2 = class {
         id;
         constructor(id) {
           this.id = id;
@@ -2079,7 +2079,7 @@ var source = (() => {
           Application.unregisterInterceptor(this.id);
         }
       };
-      exports.PaperbackInterceptor = PaperbackInterceptor;
+      exports.PaperbackInterceptor = PaperbackInterceptor2;
     }
   });
 
@@ -2140,7 +2140,7 @@ var source = (() => {
       exports.BasicRateLimiter = void 0;
       var Lock_1 = require_Lock();
       var PaperbackInterceptor_1 = require_PaperbackInterceptor();
-      var BasicRateLimiter = class extends PaperbackInterceptor_1.PaperbackInterceptor {
+      var BasicRateLimiter2 = class extends PaperbackInterceptor_1.PaperbackInterceptor {
         options;
         promise;
         currentRequestsMade = 0;
@@ -2180,7 +2180,7 @@ var source = (() => {
           }
         }
       };
-      exports.BasicRateLimiter = BasicRateLimiter;
+      exports.BasicRateLimiter = BasicRateLimiter2;
     }
   });
 
@@ -2569,12 +2569,12 @@ var source = (() => {
         SourceIntents2[SourceIntents2["SETTINGS_UI"] = 32] = "SETTINGS_UI";
         SourceIntents2[SourceIntents2["MANGA_SEARCH"] = 64] = "MANGA_SEARCH";
       })(SourceIntents || (exports.SourceIntents = SourceIntents = {}));
-      var ContentRating;
-      (function(ContentRating2) {
-        ContentRating2["EVERYONE"] = "SAFE";
-        ContentRating2["MATURE"] = "MATURE";
-        ContentRating2["ADULT"] = "ADULT";
-      })(ContentRating || (exports.ContentRating = ContentRating = {}));
+      var ContentRating2;
+      (function(ContentRating3) {
+        ContentRating3["EVERYONE"] = "SAFE";
+        ContentRating3["MATURE"] = "MATURE";
+        ContentRating3["ADULT"] = "ADULT";
+      })(ContentRating2 || (exports.ContentRating = ContentRating2 = {}));
     }
   });
 
@@ -2662,667 +2662,6 @@ var source = (() => {
     }
   });
 
-  // node_modules/@paperback/types/lib/compat/0.8/types.js
-  var require_types = __commonJS({
-    "node_modules/@paperback/types/lib/compat/0.8/types.js"(exports) {
-      "use strict";
-      init_buffer();
-      Object.defineProperty(exports, "__esModule", { value: true });
-      exports.BadgeColor = exports.ContentRating = exports.SourceIntents = exports.HomeSectionType = exports.Source = void 0;
-      exports.convertTime = convertTime;
-      exports.urlEncodeObject = urlEncodeObject;
-      var Source2 = class {
-        cheerio;
-        constructor(cheerio) {
-          this.cheerio = cheerio;
-        }
-        /**
-         * @deprecated use {@link Source.getSearchResults getSearchResults} instead
-         */
-        searchRequest(query, metadata) {
-          return this.getSearchResults(query, metadata);
-        }
-        /**
-         * @deprecated use {@link Source.getSearchTags} instead
-         */
-        async getTags() {
-          return this.getSearchTags?.();
-        }
-      };
-      exports.Source = Source2;
-      function convertTime(timeAgo) {
-        let time;
-        let trimmed = Number((/\d*/.exec(timeAgo) ?? [])[0]);
-        trimmed = trimmed == 0 && timeAgo.includes("a") ? 1 : trimmed;
-        if (timeAgo.includes("minutes")) {
-          time = new Date(Date.now() - trimmed * 6e4);
-        } else if (timeAgo.includes("hours")) {
-          time = new Date(Date.now() - trimmed * 36e5);
-        } else if (timeAgo.includes("days")) {
-          time = new Date(Date.now() - trimmed * 864e5);
-        } else if (timeAgo.includes("year") || timeAgo.includes("years")) {
-          time = new Date(Date.now() - trimmed * 31556952e3);
-        } else {
-          time = new Date(Date.now());
-        }
-        return time;
-      }
-      function urlEncodeObject(obj) {
-        let ret = {};
-        for (const entry of Object.entries(obj)) {
-          ret[encodeURIComponent(entry[0])] = encodeURIComponent(entry[1]);
-        }
-        return ret;
-      }
-      var HomeSectionType2;
-      (function(HomeSectionType3) {
-        HomeSectionType3["singleRowNormal"] = "singleRowNormal";
-        HomeSectionType3["singleRowLarge"] = "singleRowLarge";
-        HomeSectionType3["doubleRow"] = "doubleRow";
-        HomeSectionType3["featured"] = "featured";
-      })(HomeSectionType2 || (exports.HomeSectionType = HomeSectionType2 = {}));
-      var SourceIntents;
-      (function(SourceIntents2) {
-        SourceIntents2[SourceIntents2["MANGA_CHAPTERS"] = 1] = "MANGA_CHAPTERS";
-        SourceIntents2[SourceIntents2["MANGA_TRACKING"] = 2] = "MANGA_TRACKING";
-        SourceIntents2[SourceIntents2["HOMEPAGE_SECTIONS"] = 4] = "HOMEPAGE_SECTIONS";
-        SourceIntents2[SourceIntents2["COLLECTION_MANAGEMENT"] = 8] = "COLLECTION_MANAGEMENT";
-        SourceIntents2[SourceIntents2["CLOUDFLARE_BYPASS_REQUIRED"] = 16] = "CLOUDFLARE_BYPASS_REQUIRED";
-        SourceIntents2[SourceIntents2["SETTINGS_UI"] = 32] = "SETTINGS_UI";
-      })(SourceIntents || (exports.SourceIntents = SourceIntents = {}));
-      var ContentRating;
-      (function(ContentRating2) {
-        ContentRating2["EVERYONE"] = "EVERYONE";
-        ContentRating2["MATURE"] = "MATURE";
-        ContentRating2["ADULT"] = "ADULT";
-      })(ContentRating || (exports.ContentRating = ContentRating = {}));
-      var BadgeColor;
-      (function(BadgeColor2) {
-        BadgeColor2["BLUE"] = "default";
-        BadgeColor2["GREEN"] = "success";
-        BadgeColor2["GREY"] = "info";
-        BadgeColor2["YELLOW"] = "warning";
-        BadgeColor2["RED"] = "danger";
-      })(BadgeColor || (exports.BadgeColor = BadgeColor = {}));
-      var index_1 = require_lib();
-      var AppCompat = {};
-      AppCompat.createSourceStateManager = function() {
-        return {
-          keychain: {
-            async store(key, value) {
-              Application.setSecureState(value, key);
-            },
-            async retrieve(key) {
-              return Application.getSecureState(key);
-            }
-          },
-          async store(key, value) {
-            Application.setState(value, key);
-          },
-          async retrieve(key) {
-            return Application.getState(key);
-          }
-        };
-      };
-      AppCompat.createRequestManager = function(info) {
-        const interceptor = new class extends index_1.PaperbackInterceptor {
-          legacyInterceptor;
-          constructor(legacyInterceptor) {
-            super("main");
-            this.legacyInterceptor = legacyInterceptor;
-          }
-          async interceptRequest(request) {
-            if (!this.legacyInterceptor)
-              return request;
-            const oldRequest = {
-              url: request.url,
-              method: request.method,
-              headers: request.headers ?? {},
-              cookies: Object.keys(request.cookies ?? {}).map((x) => ({
-                name: x,
-                value: request.cookies[x],
-                domain: ""
-              }))
-            };
-            const interceptedRequest = await this.legacyInterceptor.interceptRequest(oldRequest);
-            let url = interceptedRequest.url;
-            if (interceptedRequest.param) {
-              url += interceptedRequest.param;
-            }
-            const cookies = {};
-            for (const cookie of interceptedRequest.cookies ?? []) {
-              cookies[cookie.name] = cookie.value;
-            }
-            return {
-              url,
-              method: interceptedRequest.method,
-              body: interceptedRequest.data,
-              headers: interceptedRequest.headers,
-              cookies
-            };
-          }
-          async interceptResponse(request, response, data2) {
-            if (!this.legacyInterceptor)
-              return data2;
-            return data2;
-          }
-        }(info.interceptor);
-        const rateLimiter = new index_1.BasicRateLimiter("rateLimit", {
-          numberOfRequests: info.requestsPerSecond ?? 2,
-          bufferInterval: 1,
-          ignoreImages: true
-        });
-        const cookieStore = new index_1.CookieStorageInterceptor({ storage: "memory" });
-        interceptor.registerInterceptor();
-        rateLimiter.registerInterceptor();
-        cookieStore.registerInterceptor();
-        return {
-          __backing_interceptor: interceptor,
-          __backing_rateLimit: rateLimiter,
-          __backing_cookieStore: cookieStore,
-          interceptor: info.interceptor,
-          cookieStore: {
-            // @ts-expect-error
-            getAllCookies() {
-              return cookieStore.cookies;
-            },
-            addCookie(cookies) {
-              cookieStore.setCookie(cookies);
-            },
-            removeCookie(cookie) {
-              cookieStore.deleteCookie(cookie);
-            }
-          },
-          async getDefaultUserAgent() {
-            return Application.getDefaultUserAgent();
-          },
-          requestsPerSecond: info.requestsPerSecond ?? 2,
-          requestTimeout: info.requestTimeout ?? 3e4,
-          async schedule(request, retry) {
-            const cookies = {};
-            for (const cookie of request.cookies ?? []) {
-              cookies[cookie.name] = cookie.value;
-            }
-            let url = request.url;
-            if (request.param) {
-              url += request.param;
-            }
-            console.log("[COMPAT] SCHEDULING REQUEST TO " + url);
-            const [response, data2] = await Application.scheduleRequest({
-              url,
-              method: request.method,
-              body: request.data,
-              headers: request.headers,
-              cookies
-            });
-            return {
-              request,
-              headers: response.headers,
-              status: response.status,
-              data: Application.arrayBufferToUTF8String(data2),
-              get rawData() {
-                return new Uint8Array(data2);
-              }
-            };
-          }
-        };
-      };
-      globalThis.App = new Proxy(AppCompat, {
-        get(target, p) {
-          if (target[p]) {
-            return target[p];
-          }
-          if (typeof p === "string" && p.startsWith("create")) {
-            if (p.startsWith("createDUI")) {
-              const type = p.slice(6);
-              return (anyProps) => {
-                return Object.defineProperty(anyProps, "type", {
-                  enumerable: true,
-                  value: type
-                });
-              };
-            }
-            return (anyProps) => anyProps;
-          }
-          return void 0;
-        }
-      });
-    }
-  });
-
-  // node_modules/@paperback/types/lib/compat/0.8/wrapper.js
-  var require_wrapper = __commonJS({
-    "node_modules/@paperback/types/lib/compat/0.8/wrapper.js"(exports) {
-      "use strict";
-      init_buffer();
-      Object.defineProperty(exports, "__esModule", { value: true });
-      exports.CompatWrapper = CompatWrapper2;
-      var index_1 = require_lib();
-      var _CompatWrapper = class {
-        legacySource;
-        homepageItemCache = {};
-        constructor(legacySource) {
-          this.legacySource = legacySource;
-        }
-        async initialise() {
-        }
-        async getDiscoverSections() {
-          const discoverSections = [];
-          await this.legacySource.getHomePageSections?.((section) => {
-            discoverSections.push({
-              id: section.id,
-              title: section.title,
-              type: index_1.DiscoverSectionType.simpleCarousel
-            });
-            if (!section.containsMoreItems && section.items && section.items.length > 0) {
-              this.homepageItemCache[section.id] = section.items.map((x) => {
-                return {
-                  type: "simpleCarouselItem",
-                  title: x.title,
-                  subtitle: x.subtitle,
-                  mangaId: x.mangaId,
-                  imageUrl: x.image
-                };
-              });
-            }
-          });
-          return discoverSections;
-        }
-        async getDiscoverSectionItems(section, metadata) {
-          const cachedItems = this.homepageItemCache[section.id];
-          if (cachedItems) {
-            return { items: cachedItems };
-          }
-          const result = await this.legacySource.getViewMoreItems?.(section.id, metadata);
-          if (result) {
-            return {
-              items: result.results.map((x) => {
-                return {
-                  type: "simpleCarouselItem",
-                  title: x.title,
-                  subtitle: x.subtitle,
-                  mangaId: x.mangaId,
-                  imageUrl: x.image
-                };
-              }),
-              metadata: result.metadata
-            };
-          } else {
-            return index_1.EndOfPageResults;
-          }
-        }
-        async getMangaDetails(mangaId) {
-          const legacyManga = await this.legacySource.getMangaDetails(mangaId);
-          return {
-            mangaId: legacyManga.id,
-            mangaInfo: {
-              contentRating: index_1.ContentRating.EVERYONE,
-              primaryTitle: legacyManga.mangaInfo.titles.shift(),
-              secondaryTitles: legacyManga.mangaInfo.titles,
-              synopsis: legacyManga.mangaInfo.desc,
-              thumbnailUrl: legacyManga.mangaInfo.image,
-              status: legacyManga.mangaInfo.status
-            }
-          };
-        }
-        async getSearchResults(query, metadata) {
-          const legacyQuery = {
-            title: query.title,
-            includedTags: [],
-            excludedTags: [],
-            parameters: {}
-          };
-          for (const filter4 of query.filters) {
-            if (typeof filter4.value === "string") {
-              legacyQuery.parameters[filter4.id] = filter4.value;
-            } else {
-              for (const tag of Object.keys(filter4.value)) {
-                if (filter4.value[tag] === "included") {
-                  legacyQuery.includedTags.push({ id: tag, label: tag });
-                } else {
-                  legacyQuery.excludedTags.push({ id: tag, label: tag });
-                }
-              }
-            }
-          }
-          const legacyResults = await this.legacySource.getSearchResults(legacyQuery, metadata);
-          return {
-            items: legacyResults.results.map((x) => {
-              return {
-                imageUrl: x.image,
-                title: x.title,
-                mangaId: x.mangaId,
-                subtitle: x.subtitle
-              };
-            }),
-            metadata: legacyResults.metadata
-          };
-        }
-        async getChapters(sourceManga, sinceDate) {
-          const legacyChapters = await this.legacySource.getChapters(sourceManga.mangaId);
-          return legacyChapters.map((x) => {
-            return {
-              chapNum: x.chapNum,
-              volume: x.volume,
-              sourceManga,
-              publishDate: x.time,
-              chapterId: x.id,
-              langCode: x.langCode,
-              title: x.name,
-              version: x.group,
-              sortingIndex: x.sortingIndex
-            };
-          });
-        }
-        async getChapterDetails(chapter) {
-          return await this.legacySource.getChapterDetails(chapter.sourceManga.mangaId, chapter.chapterId);
-        }
-        async getSettingsForm() {
-          if (this.legacySource.getSourceMenu) {
-            let rootSection = await this.legacySource.getSourceMenu();
-            return new _CompatForm({
-              async sections() {
-                return [rootSection];
-              }
-            });
-          } else {
-            throw new Error("Not Supported");
-          }
-        }
-      };
-      var _CompatSection = class {
-        form;
-        section;
-        id;
-        header;
-        footer;
-        bindingValueCache = {};
-        items = [];
-        proxies = {};
-        constructor(form, section) {
-          this.form = form;
-          this.section = section;
-          this.id = section.id;
-          this.header = section.header;
-          this.footer = section.footer;
-          this.reloadRows();
-        }
-        reloadRows() {
-          const newItems = [];
-          this.items = newItems;
-          console.log("reloadForm CALLED FROM reloadRows");
-          this.form.reloadForm();
-          this.section.rows().then((rows) => {
-            if (this.items !== newItems)
-              return;
-            newItems.push(...rows.map((row) => {
-              const rowId = row["id"] ?? "unknown";
-              switch (row["type"]) {
-                case "DUIHeader": {
-                  const header = row;
-                  return (0, index_1.LabelRow)(rowId, {
-                    title: header.title,
-                    subtitle: header.subtitle
-                  });
-                }
-                case "DUILabel":
-                case "DUIMultilineLabel": {
-                  const label = row;
-                  return (0, index_1.LabelRow)(rowId, {
-                    title: label.label,
-                    subtitle: label.value
-                  });
-                }
-                case "DUIOAuthButton": {
-                  const button = row;
-                  return (0, index_1.OAuthButtonRow)(rowId, {
-                    title: button.label,
-                    authorizeEndpoint: button.authorizeEndpoint,
-                    clientId: button.clientId,
-                    responseType: button.responseType,
-                    redirectUri: button.redirectUri,
-                    scopes: button.scopes,
-                    onSuccess: this.proxifiedClosureSelector(rowId, button, "successHandler")
-                  });
-                }
-                case "DUIButton": {
-                  const button = row;
-                  return (0, index_1.ButtonRow)(rowId, {
-                    title: button.label,
-                    onSelect: this.proxifiedClosureSelector(rowId, button, "onTap")
-                  });
-                }
-                case "DUISecureInputField":
-                case "DUIInputField": {
-                  const input = row;
-                  input.value.get().then((value) => {
-                    if (this.bindingValueCache[rowId] !== value) {
-                      console.log(`NEW VALUE BY ${rowId}, ${this.bindingValueCache[rowId]}, ${value}`);
-                      this.bindingValueCache[rowId] = value;
-                      this.reloadRows();
-                    }
-                  }).catch((e) => {
-                    console.log("ERROR:" + e);
-                  });
-                  return (0, index_1.InputRow)(rowId, {
-                    title: input.label,
-                    value: this.bindingValueCache[rowId] ?? "",
-                    onValueChange: this.proxifiedClosureSelector(rowId, input.value, "set")
-                  });
-                }
-                case "DUINavigationButton": {
-                  const button = row;
-                  return (0, index_1.NavigationRow)(rowId, {
-                    title: button.label,
-                    form: new _CompatForm(button.form)
-                  });
-                }
-                case "DUISwitch": {
-                  const toggle = row;
-                  toggle.value.get().then((value) => {
-                    console.log("NEW VALUE: " + value);
-                    if (this.bindingValueCache[rowId] !== value) {
-                      console.log(`NEW VALUE BY ${rowId}, ${this.bindingValueCache[rowId]}, ${value}`);
-                      this.bindingValueCache[rowId] = value;
-                      this.reloadRows();
-                    }
-                  }).catch((e) => {
-                    console.log("ERROR:" + e);
-                  });
-                  return (0, index_1.ToggleRow)(rowId, {
-                    title: toggle.label,
-                    value: this.bindingValueCache[rowId] ?? false,
-                    onValueChange: this.proxifiedClosureSelector(rowId, toggle.value, "set")
-                  });
-                }
-                default: {
-                  return (0, index_1.LabelRow)(rowId, {
-                    title: "Unsupported 0.8 Row",
-                    subtitle: `ID: ${rowId};
-Type: ${row["type"]}`
-                  });
-                }
-              }
-            }));
-            this.form.reloadForm();
-          }).catch((e) => {
-            console.log("ERROR:" + e);
-          });
-        }
-        proxifiedClosureSelector(id, obj, method) {
-          const form = this;
-          const key = "__proxied_" + method;
-          this.proxies[id] = Object.defineProperty(obj, key, {
-            enumerable: true,
-            value: function() {
-              const ret = obj[method](...arguments);
-              console.log(`CALLING ${method} WITH ${JSON.stringify(arguments)}`);
-              if (ret.then) {
-                ret.then((_) => form.reloadRows());
-              } else {
-                form.reloadRows();
-              }
-              return ret;
-            }
-          });
-          return Application.Selector(this.proxies[id], key);
-        }
-      };
-      var _CompatForm = class extends index_1.Form {
-        form;
-        sections = [];
-        constructor(form) {
-          super();
-          this.form = form;
-        }
-        getSections() {
-          if (this.sections.length == 0) {
-            return [(0, index_1.Section)("loading", [
-              (0, index_1.LabelRow)("loading", {
-                title: "Loading Sections..."
-              })
-            ])];
-          }
-          return this.sections;
-        }
-        reloadSections() {
-          const newSections = [];
-          this.sections = newSections;
-          console.log("reloadForm CALLED FROM reloadSections");
-          this.reloadForm();
-          this.form.sections().then((sections) => {
-            if (this.sections !== newSections)
-              return;
-            this.sections.push(...sections.map((section) => {
-              return new _CompatSection(this, section);
-            }));
-            this.reloadForm();
-          });
-        }
-        formWillAppear() {
-          this.reloadSections();
-        }
-      };
-      function CompatWrapper2(info, legacySource, newSource = void 0) {
-        const wrapper = new _CompatWrapper(legacySource);
-        return new Proxy(newSource ?? {}, {
-          has(target, p) {
-            console.log(`[COMPAT] has CALLED WITH '${p.toString()}'`);
-            return target[p] !== void 0 || wrapper[p] !== void 0;
-          },
-          get(target, p, receiver) {
-            console.log(`[COMPAT] get CALLED WITH '${p.toString()}'`);
-            if (typeof p === "string" && p === "initialise") {
-              return async () => {
-                if (info.registerHomeSectionsInInitialise) {
-                  await wrapper.initialise();
-                }
-                await target[p]?.();
-              };
-            }
-            if (target[p]) {
-              return target[p];
-            } else if (wrapper[p]) {
-              return wrapper[p];
-            }
-            return void 0;
-          }
-        });
-      }
-    }
-  });
-
-  // node_modules/@paperback/types/lib/compat/0.8/sourceInfo.js
-  var require_sourceInfo = __commonJS({
-    "node_modules/@paperback/types/lib/compat/0.8/sourceInfo.js"(exports) {
-      "use strict";
-      init_buffer();
-      Object.defineProperty(exports, "__esModule", { value: true });
-      exports.SourceInfoWrapper = void 0;
-      var types_1 = require_types();
-      var SourceInfo_1 = require_SourceInfo();
-      var SourceInfoWrapper = class {
-        version;
-        name;
-        icon;
-        description;
-        contentRating;
-        developers;
-        language;
-        badges;
-        capabilities;
-        constructor(legacySourceInfo) {
-          this.version = legacySourceInfo.version;
-          this.name = legacySourceInfo.name;
-          this.icon = legacySourceInfo.name;
-          this.description = legacySourceInfo.description;
-          switch (legacySourceInfo.contentRating) {
-            case types_1.ContentRating.EVERYONE:
-              this.contentRating = SourceInfo_1.ContentRating.EVERYONE;
-              break;
-            case types_1.ContentRating.MATURE:
-              this.contentRating = SourceInfo_1.ContentRating.MATURE;
-              break;
-            case types_1.ContentRating.ADULT:
-              this.contentRating = SourceInfo_1.ContentRating.ADULT;
-              break;
-          }
-          this.developers = [
-            {
-              name: legacySourceInfo.author,
-              website: legacySourceInfo.authorWebsite
-            }
-          ];
-          this.badges = legacySourceInfo.sourceTags?.map((x) => {
-            switch (x.type) {
-              case types_1.BadgeColor.BLUE:
-                return { label: x.text, backgroundColor: "#1E40AF", textColor: "#ffffff" };
-              case types_1.BadgeColor.GREEN:
-                return { label: x.text, backgroundColor: "#15803d", textColor: "#ffffff" };
-              case types_1.BadgeColor.GREY:
-                return { label: x.text, backgroundColor: "#1F2937", textColor: "#ffffff" };
-              case types_1.BadgeColor.RED:
-                return { label: x.text, backgroundColor: "#991B1B", textColor: "#ffffff" };
-              case types_1.BadgeColor.YELLOW:
-                return { label: x.text, backgroundColor: "#EAB308", textColor: "#000000" };
-            }
-          }) ?? [];
-          this.badges.unshift({ label: "LEGACY (0.8)", backgroundColor: "#000000", textColor: "#ffffff" });
-          this.capabilities = legacySourceInfo.intents ?? [];
-        }
-      };
-      exports.SourceInfoWrapper = SourceInfoWrapper;
-    }
-  });
-
-  // node_modules/@paperback/types/lib/compat/0.8/index.js
-  var require__ = __commonJS({
-    "node_modules/@paperback/types/lib/compat/0.8/index.js"(exports) {
-      "use strict";
-      init_buffer();
-      var __createBinding = exports && exports.__createBinding || (Object.create ? function(o, m, k, k2) {
-        if (k2 === void 0) k2 = k;
-        var desc = Object.getOwnPropertyDescriptor(m, k);
-        if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
-          desc = { enumerable: true, get: function() {
-            return m[k];
-          } };
-        }
-        Object.defineProperty(o, k2, desc);
-      } : function(o, m, k, k2) {
-        if (k2 === void 0) k2 = k;
-        o[k2] = m[k];
-      });
-      var __exportStar = exports && exports.__exportStar || function(m, exports2) {
-        for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports2, p)) __createBinding(exports2, m, p);
-      };
-      Object.defineProperty(exports, "__esModule", { value: true });
-      __exportStar(require_types(), exports);
-      __exportStar(require_wrapper(), exports);
-      __exportStar(require_sourceInfo(), exports);
-    }
-  });
-
   // node_modules/boolbase/index.js
   var require_boolbase = __commonJS({
     "node_modules/boolbase/index.js"(exports, module) {
@@ -3341,13 +2680,1080 @@ Type: ${row["type"]}`
   // src/Manganato/main.ts
   var main_exports = {};
   __export(main_exports, {
-    MangaBox: () => MangaBox,
-    Manganato: () => Manganato
+    Manganato: () => Manganato,
+    ManganatoExtension: () => ManganatoExtension
   });
   init_buffer();
-  var import__ = __toESM(require__());
+  var import_types3 = __toESM(require_lib());
 
   // src/Manganato/MangaBoxParser.ts
+  init_buffer();
+  var import_types = __toESM(require_lib());
+
+  // src/Manganato/RelevanceScore.ts
+  init_buffer();
+
+  // node_modules/stemmer/index.js
+  init_buffer();
+  var step2list = {
+    ational: "ate",
+    tional: "tion",
+    enci: "ence",
+    anci: "ance",
+    izer: "ize",
+    bli: "ble",
+    alli: "al",
+    entli: "ent",
+    eli: "e",
+    ousli: "ous",
+    ization: "ize",
+    ation: "ate",
+    ator: "ate",
+    alism: "al",
+    iveness: "ive",
+    fulness: "ful",
+    ousness: "ous",
+    aliti: "al",
+    iviti: "ive",
+    biliti: "ble",
+    logi: "log"
+  };
+  var step3list = {
+    icate: "ic",
+    ative: "",
+    alize: "al",
+    iciti: "ic",
+    ical: "ic",
+    ful: "",
+    ness: ""
+  };
+  var consonant = "[^aeiou]";
+  var vowel = "[aeiouy]";
+  var consonants = "(" + consonant + "[^aeiouy]*)";
+  var vowels = "(" + vowel + "[aeiou]*)";
+  var gt0 = new RegExp("^" + consonants + "?" + vowels + consonants);
+  var eq1 = new RegExp(
+    "^" + consonants + "?" + vowels + consonants + vowels + "?$"
+  );
+  var gt1 = new RegExp("^" + consonants + "?(" + vowels + consonants + "){2,}");
+  var vowelInStem = new RegExp("^" + consonants + "?" + vowel);
+  var consonantLike = new RegExp("^" + consonants + vowel + "[^aeiouwxy]$");
+  var sfxLl = /ll$/;
+  var sfxE = /^(.+?)e$/;
+  var sfxY = /^(.+?)y$/;
+  var sfxIon = /^(.+?(s|t))(ion)$/;
+  var sfxEdOrIng = /^(.+?)(ed|ing)$/;
+  var sfxAtOrBlOrIz = /(at|bl|iz)$/;
+  var sfxEED = /^(.+?)eed$/;
+  var sfxS = /^.+?[^s]s$/;
+  var sfxSsesOrIes = /^.+?(ss|i)es$/;
+  var sfxMultiConsonantLike = /([^aeiouylsz])\1$/;
+  var step2 = /^(.+?)(ational|tional|enci|anci|izer|bli|alli|entli|eli|ousli|ization|ation|ator|alism|iveness|fulness|ousness|aliti|iviti|biliti|logi)$/;
+  var step3 = /^(.+?)(icate|ative|alize|iciti|ical|ful|ness)$/;
+  var step4 = /^(.+?)(al|ance|ence|er|ic|able|ible|ant|ement|ment|ent|ou|ism|ate|iti|ous|ive|ize)$/;
+  function stemmer(value) {
+    let result = String(value).toLowerCase();
+    if (result.length < 3) {
+      return result;
+    }
+    let firstCharacterWasLowerCaseY = false;
+    if (result.codePointAt(0) === 121) {
+      firstCharacterWasLowerCaseY = true;
+      result = "Y" + result.slice(1);
+    }
+    if (sfxSsesOrIes.test(result)) {
+      result = result.slice(0, -2);
+    } else if (sfxS.test(result)) {
+      result = result.slice(0, -1);
+    }
+    let match;
+    if (match = sfxEED.exec(result)) {
+      if (gt0.test(match[1])) {
+        result = result.slice(0, -1);
+      }
+    } else if ((match = sfxEdOrIng.exec(result)) && vowelInStem.test(match[1])) {
+      result = match[1];
+      if (sfxAtOrBlOrIz.test(result)) {
+        result += "e";
+      } else if (sfxMultiConsonantLike.test(result)) {
+        result = result.slice(0, -1);
+      } else if (consonantLike.test(result)) {
+        result += "e";
+      }
+    }
+    if ((match = sfxY.exec(result)) && vowelInStem.test(match[1])) {
+      result = match[1] + "i";
+    }
+    if ((match = step2.exec(result)) && gt0.test(match[1])) {
+      result = match[1] + step2list[match[2]];
+    }
+    if ((match = step3.exec(result)) && gt0.test(match[1])) {
+      result = match[1] + step3list[match[2]];
+    }
+    if (match = step4.exec(result)) {
+      if (gt1.test(match[1])) {
+        result = match[1];
+      }
+    } else if ((match = sfxIon.exec(result)) && gt1.test(match[1])) {
+      result = match[1];
+    }
+    if ((match = sfxE.exec(result)) && (gt1.test(match[1]) || eq1.test(match[1]) && !consonantLike.test(match[1]))) {
+      result = match[1];
+    }
+    if (sfxLl.test(result) && gt1.test(result)) {
+      result = result.slice(0, -1);
+    }
+    if (firstCharacterWasLowerCaseY) {
+      result = "y" + result.slice(1);
+    }
+    return result;
+  }
+
+  // node_modules/fastest-levenshtein/esm/mod.js
+  init_buffer();
+  var peq = new Uint32Array(65536);
+  var myers_32 = (a, b) => {
+    const n = a.length;
+    const m = b.length;
+    const lst = 1 << n - 1;
+    let pv = -1;
+    let mv = 0;
+    let sc = n;
+    let i = n;
+    while (i--) {
+      peq[a.charCodeAt(i)] |= 1 << i;
+    }
+    for (i = 0; i < m; i++) {
+      let eq2 = peq[b.charCodeAt(i)];
+      const xv = eq2 | mv;
+      eq2 |= (eq2 & pv) + pv ^ pv;
+      mv |= ~(eq2 | pv);
+      pv &= eq2;
+      if (mv & lst) {
+        sc++;
+      }
+      if (pv & lst) {
+        sc--;
+      }
+      mv = mv << 1 | 1;
+      pv = pv << 1 | ~(xv | mv);
+      mv &= xv;
+    }
+    i = n;
+    while (i--) {
+      peq[a.charCodeAt(i)] = 0;
+    }
+    return sc;
+  };
+  var myers_x = (b, a) => {
+    const n = a.length;
+    const m = b.length;
+    const mhc = [];
+    const phc = [];
+    const hsize = Math.ceil(n / 32);
+    const vsize = Math.ceil(m / 32);
+    for (let i = 0; i < hsize; i++) {
+      phc[i] = -1;
+      mhc[i] = 0;
+    }
+    let j = 0;
+    for (; j < vsize - 1; j++) {
+      let mv2 = 0;
+      let pv2 = -1;
+      const start2 = j * 32;
+      const vlen2 = Math.min(32, m) + start2;
+      for (let k = start2; k < vlen2; k++) {
+        peq[b.charCodeAt(k)] |= 1 << k;
+      }
+      for (let i = 0; i < n; i++) {
+        const eq2 = peq[a.charCodeAt(i)];
+        const pb = phc[i / 32 | 0] >>> i & 1;
+        const mb = mhc[i / 32 | 0] >>> i & 1;
+        const xv = eq2 | mv2;
+        const xh = ((eq2 | mb) & pv2) + pv2 ^ pv2 | eq2 | mb;
+        let ph = mv2 | ~(xh | pv2);
+        let mh = pv2 & xh;
+        if (ph >>> 31 ^ pb) {
+          phc[i / 32 | 0] ^= 1 << i;
+        }
+        if (mh >>> 31 ^ mb) {
+          mhc[i / 32 | 0] ^= 1 << i;
+        }
+        ph = ph << 1 | pb;
+        mh = mh << 1 | mb;
+        pv2 = mh | ~(xv | ph);
+        mv2 = ph & xv;
+      }
+      for (let k = start2; k < vlen2; k++) {
+        peq[b.charCodeAt(k)] = 0;
+      }
+    }
+    let mv = 0;
+    let pv = -1;
+    const start = j * 32;
+    const vlen = Math.min(32, m - start) + start;
+    for (let k = start; k < vlen; k++) {
+      peq[b.charCodeAt(k)] |= 1 << k;
+    }
+    let score = m;
+    for (let i = 0; i < n; i++) {
+      const eq2 = peq[a.charCodeAt(i)];
+      const pb = phc[i / 32 | 0] >>> i & 1;
+      const mb = mhc[i / 32 | 0] >>> i & 1;
+      const xv = eq2 | mv;
+      const xh = ((eq2 | mb) & pv) + pv ^ pv | eq2 | mb;
+      let ph = mv | ~(xh | pv);
+      let mh = pv & xh;
+      score += ph >>> m - 1 & 1;
+      score -= mh >>> m - 1 & 1;
+      if (ph >>> 31 ^ pb) {
+        phc[i / 32 | 0] ^= 1 << i;
+      }
+      if (mh >>> 31 ^ mb) {
+        mhc[i / 32 | 0] ^= 1 << i;
+      }
+      ph = ph << 1 | pb;
+      mh = mh << 1 | mb;
+      pv = mh | ~(xv | ph);
+      mv = ph & xv;
+    }
+    for (let k = start; k < vlen; k++) {
+      peq[b.charCodeAt(k)] = 0;
+    }
+    return score;
+  };
+  var distance = (a, b) => {
+    if (a.length < b.length) {
+      const tmp = b;
+      b = a;
+      a = tmp;
+    }
+    if (b.length === 0) {
+      return a.length;
+    }
+    if (a.length <= 32) {
+      return myers_32(a, b);
+    }
+    return myers_x(a, b);
+  };
+
+  // src/Manganato/RelevanceScore.ts
+  var relevanceScore = (title, queryTitle) => {
+    const titleWords = tokenize(title);
+    const queryWords = tokenize(queryTitle);
+    const titleStripped = titleWords.join("");
+    const queryStripped = queryWords.join("");
+    if (titleStripped === queryStripped) {
+      return 100;
+    }
+    const titlePhrase = titleWords.join(" ");
+    const queryPhrase = queryWords.join(" ");
+    const phraseAtStartRegex = new RegExp(`^\\b${queryPhrase}\\b`, "i");
+    if (phraseAtStartRegex.test(titlePhrase)) {
+      return 100;
+    }
+    const phraseAnywhereRegex = new RegExp(`\\b${queryPhrase}\\b`, "i");
+    if (phraseAnywhereRegex.test(titlePhrase)) {
+      return 95;
+    }
+    const adjacentSequencePosition = getAdjacentSequencePosition(
+      titleWords,
+      queryWords
+    );
+    if (adjacentSequencePosition === 0) {
+      return 90;
+    } else if (adjacentSequencePosition > 0) {
+      return 85;
+    }
+    if (wordsAppearInOrder(titleWords, queryWords)) {
+      return 80;
+    }
+    if (allWordsPresent(titleWords, queryWords)) {
+      return 75;
+    }
+    let totalSimilarity = 0;
+    for (const queryWord of queryWords) {
+      let maxSimilarity = 0;
+      for (const titleWord of titleWords) {
+        const similarity = wordSimilarity(queryWord, titleWord);
+        if (similarity > maxSimilarity) {
+          maxSimilarity = similarity;
+        }
+      }
+      totalSimilarity += maxSimilarity;
+    }
+    const averageSimilarity = totalSimilarity / queryWords.length;
+    const finalScore = averageSimilarity * 70;
+    return Math.max(0, Math.min(70, finalScore));
+  };
+  var wordSimilarity = (word1, word2) => {
+    const stemmedWord1 = stemmer(word1);
+    const stemmedWord2 = stemmer(word2);
+    if (stemmedWord1 === stemmedWord2) {
+      return 1;
+    }
+    const maxLen = Math.max(stemmedWord1.length, stemmedWord2.length);
+    const distance2 = distance(stemmedWord1, stemmedWord2);
+    const similarity = (maxLen - distance2) / maxLen;
+    if (similarity >= 0.6) {
+      return similarity;
+    }
+    return 0;
+  };
+  var tokenize = (text3) => {
+    return text3.toLowerCase().replace(/[\u2019']/g, "").replace(/[^\w\s]/g, "").split(/\s+/).filter((word) => word.length > 0);
+  };
+  var allWordsPresent = (titleWords, queryWords) => {
+    for (const queryWord of queryWords) {
+      let found = false;
+      for (const titleWord of titleWords) {
+        if (wordSimilarity(queryWord, titleWord) >= 0.7) {
+          found = true;
+          break;
+        }
+      }
+      if (!found) {
+        return false;
+      }
+    }
+    return true;
+  };
+  var wordsAppearInOrder = (titleWords, queryWords) => {
+    let titleIndex = 0;
+    for (let i = 0; i < queryWords.length; i++) {
+      const queryWord = queryWords[i];
+      while (titleIndex < titleWords.length) {
+        if (wordSimilarity(
+          queryWord,
+          titleWords[titleIndex]
+        ) >= 0.7) {
+          titleIndex++;
+          break;
+        }
+        titleIndex++;
+      }
+      if (titleIndex === titleWords.length && i < queryWords.length - 1) {
+        return false;
+      }
+    }
+    return true;
+  };
+  var getAdjacentSequencePosition = (titleWords, queryWords) => {
+    for (let i = 0; i <= titleWords.length - queryWords.length; i++) {
+      let match = true;
+      for (let j = 0; j < queryWords.length; j++) {
+        if (wordSimilarity(
+          queryWords[j],
+          titleWords[i + j]
+        ) < 0.7) {
+          match = false;
+          break;
+        }
+      }
+      if (match) {
+        return i;
+      }
+    }
+    return -1;
+  };
+
+  // src/Manganato/MangaBoxParser.ts
+  var MangaBoxParser = class {
+    constructor() {
+      this.parseManga = ($2, source, query) => {
+        const mangaItems = [];
+        const collecedIds = [];
+        for (const manga of $2(source.mangaListSelector).toArray()) {
+          const mangaId = $2("a", manga).first().attr("href");
+          const image = $2("img", manga).first().attr("src")?.trim() ?? "";
+          const title = Application.decodeHTMLEntities(
+            $2("a", manga).first().attr("title")?.trim() ?? ""
+          );
+          const subtitle = $2(source.mangaSubtitleSelector, manga).first().text().trim() ?? "";
+          if (!mangaId || !title || collecedIds.includes(mangaId)) continue;
+          collecedIds.push(mangaId);
+          const partialManga = {
+            mangaId,
+            imageUrl: image,
+            title,
+            subtitle: subtitle ? subtitle : "No Chapters"
+          };
+          let relevance = 0;
+          if (query?.title) {
+            relevance = relevanceScore(title, query.title);
+          }
+          mangaItems.push({
+            manga: partialManga,
+            relevance
+          });
+        }
+        mangaItems.sort((a, b) => b.relevance - a.relevance);
+        return mangaItems.map((r) => r.manga);
+      };
+      this.parseMangaDetails = ($2, mangaId, source) => {
+        const mangaRootSelector = $2(source.mangaRootSelector);
+        const image = $2(source.mangaThumbnailSelector).attr("src") ?? "";
+        const title = Application.decodeHTMLEntities(
+          $2(source.mangaTitleSelector, mangaRootSelector).text().trim()
+        );
+        const altTitles = [];
+        for (const altTitle of $2(
+          source.mangaAltTitleSelector,
+          mangaRootSelector
+        ).text()?.split(/,|;|\//)) {
+          if (altTitle == "") continue;
+          altTitles.push(Application.decodeHTMLEntities(altTitle.trim()));
+        }
+        const rawStatus = $2(source.mangaStatusSelector, mangaRootSelector).text().trim() ?? "ONGOING";
+        let status = "ONGOING";
+        switch (rawStatus.toUpperCase()) {
+          case "ONGOING":
+            status = "Ongoing";
+            break;
+          case "COMPLETED":
+            status = "Completed";
+            break;
+          default:
+            status = "Ongoing";
+            break;
+        }
+        const author = $2(source.mangaAuthorSelector, mangaRootSelector).toArray().map((x) => $2(x).text().trim()).join(", ") ?? "";
+        const desc = Application.decodeHTMLEntities(
+          $2(source.mangaDescSelector).first().children().remove().end().text().trim()
+        );
+        const tags = [];
+        for (const tag of $2(
+          source.mangaGenresSelector,
+          mangaRootSelector
+        ).toArray()) {
+          const id = $2(tag).attr("href");
+          const label = $2(tag).text().trim();
+          if (!id || !label) continue;
+          tags.push({ id, title: label });
+        }
+        const TagSection3 = [
+          {
+            id: "0",
+            title: "genres",
+            tags: tags.map((t) => t)
+          }
+        ];
+        return {
+          mangaId,
+          mangaInfo: {
+            thumbnailUrl: image,
+            primaryTitle: title,
+            secondaryTitles: altTitles,
+            status,
+            author: author ? author : "Unkown",
+            synopsis: desc,
+            tagGroups: TagSection3,
+            contentRating: import_types.ContentRating.EVERYONE
+          }
+        };
+      };
+      this.parseChapters = ($2, sourceManga, source) => {
+        const chapters = [];
+        const mangaId = sourceManga.mangaId;
+        let sortingIndex = 0;
+        for (const chapter of $2(source.chapterListSelector).toArray()) {
+          const id = $2("a", chapter).attr("href") ?? "";
+          if (!id) continue;
+          const name = Application.decodeHTMLEntities(
+            $2("a", chapter).text().trim()
+          );
+          const time = this.parseDate(
+            $2(source.chapterTimeSelector, chapter).last().text().trim() ?? ""
+          );
+          let chapNum = 0;
+          const chapRegex = id.match(/(?:chap.*)[-_](\d+\.?\d?)/);
+          if (chapRegex && chapRegex[1])
+            chapNum = Number(chapRegex[1].replace(/\\/g, "."));
+          chapters.push({
+            chapterId: id,
+            chapNum: isNaN(chapNum) ? 0 : chapNum,
+            volume: 0,
+            title: name,
+            version: "",
+            publishDate: time,
+            langCode: source.languageCode,
+            sortingIndex,
+            sourceManga
+          });
+          sortingIndex--;
+        }
+        if (chapters.length == 0) {
+          throw new Error(
+            `Couldn't find any chapters for mangaId: ${mangaId}!`
+          );
+        }
+        return chapters.map((chapter) => {
+          chapter.sortingIndex += chapters.length;
+          return chapter;
+        });
+      };
+      this.parseChapterDetails = async ($2, mangaId, chapterId, source) => {
+        const pages = [];
+        for (const img of $2(source.chapterImagesSelector).toArray()) {
+          let image = $2(img).attr("src") ?? "";
+          if (!image) image = $2(img).attr("data-src") ?? "";
+          if (!image)
+            throw new Error(
+              `Unable to parse image(s) for Chapter ID: ${chapterId}`
+            );
+          pages.push(image);
+        }
+        const chapterDetails = App.createChapterDetails({
+          id: chapterId,
+          mangaId,
+          pages
+        });
+        return chapterDetails;
+      };
+      this.parseTags = ($2, source) => {
+        const genres = [];
+        for (const genre of $2(source.genreListSelector).toArray()) {
+          const id = $2(genre).attr("data-i");
+          const label = $2(genre).text().trim();
+          if (!id || !label) continue;
+          genres.push({ id, title: label });
+        }
+        const TagSection3 = [
+          {
+            id: "0",
+            title: "genres",
+            tags: genres.map((t) => t)
+          }
+        ];
+        return TagSection3;
+      };
+      this.parseDate = (date) => {
+        let time;
+        let number = Number((/\d*/.exec(date) ?? [])[0]);
+        number = number == 0 && date.includes("a") ? 1 : number;
+        date = date.toUpperCase();
+        if (date.includes("MINUTE") || date.includes("MINUTES") || date.includes("MINS")) {
+          time = new Date(Date.now() - number * 6e4);
+        } else if (date.includes("HOUR") || date.includes("HOURS")) {
+          time = new Date(Date.now() - number * 36e5);
+        } else if (date.includes("DAY") || date.includes("DAYS")) {
+          time = new Date(Date.now() - number * 864e5);
+        } else if (date.includes("YEAR") || date.includes("YEARS")) {
+          time = new Date(Date.now() - number * 31556952e3);
+        } else {
+          time = new Date(date);
+        }
+        return time;
+      };
+      this.isLastPage = ($2) => {
+        const currentPage = $2(".page-select, .page_select").text();
+        let totalPages = $2(".page-last, .page_last").text();
+        if (currentPage) {
+          totalPages = (/(\d+)/g.exec(totalPages) ?? [""])[0];
+          return +totalPages == +currentPage;
+        }
+        return true;
+      };
+    }
+  };
+
+  // node_modules/cheerio/dist/browser/index.js
+  init_buffer();
+
+  // node_modules/cheerio/dist/browser/static.js
+  var static_exports = {};
+  __export(static_exports, {
+    contains: () => contains,
+    extract: () => extract,
+    html: () => html,
+    merge: () => merge,
+    parseHTML: () => parseHTML,
+    root: () => root,
+    text: () => text,
+    xml: () => xml
+  });
+  init_buffer();
+
+  // node_modules/domutils/lib/esm/index.js
+  var esm_exports2 = {};
+  __export(esm_exports2, {
+    DocumentPosition: () => DocumentPosition,
+    append: () => append,
+    appendChild: () => appendChild,
+    compareDocumentPosition: () => compareDocumentPosition,
+    existsOne: () => existsOne,
+    filter: () => filter,
+    find: () => find,
+    findAll: () => findAll,
+    findOne: () => findOne,
+    findOneChild: () => findOneChild,
+    getAttributeValue: () => getAttributeValue,
+    getChildren: () => getChildren,
+    getElementById: () => getElementById,
+    getElements: () => getElements,
+    getElementsByClassName: () => getElementsByClassName,
+    getElementsByTagName: () => getElementsByTagName,
+    getElementsByTagType: () => getElementsByTagType,
+    getFeed: () => getFeed,
+    getInnerHTML: () => getInnerHTML,
+    getName: () => getName,
+    getOuterHTML: () => getOuterHTML,
+    getParent: () => getParent,
+    getSiblings: () => getSiblings,
+    getText: () => getText,
+    hasAttrib: () => hasAttrib,
+    hasChildren: () => hasChildren,
+    innerText: () => innerText,
+    isCDATA: () => isCDATA,
+    isComment: () => isComment,
+    isDocument: () => isDocument,
+    isTag: () => isTag2,
+    isText: () => isText,
+    nextElementSibling: () => nextElementSibling,
+    prepend: () => prepend,
+    prependChild: () => prependChild,
+    prevElementSibling: () => prevElementSibling,
+    removeElement: () => removeElement,
+    removeSubsets: () => removeSubsets,
+    replaceElement: () => replaceElement,
+    testElement: () => testElement,
+    textContent: () => textContent,
+    uniqueSort: () => uniqueSort
+  });
+  init_buffer();
+
+  // node_modules/domutils/lib/esm/stringify.js
+  init_buffer();
+
+  // node_modules/domhandler/lib/esm/index.js
+  init_buffer();
+
+  // node_modules/domelementtype/lib/esm/index.js
+  init_buffer();
+  var ElementType;
+  (function(ElementType2) {
+    ElementType2["Root"] = "root";
+    ElementType2["Text"] = "text";
+    ElementType2["Directive"] = "directive";
+    ElementType2["Comment"] = "comment";
+    ElementType2["Script"] = "script";
+    ElementType2["Style"] = "style";
+    ElementType2["Tag"] = "tag";
+    ElementType2["CDATA"] = "cdata";
+    ElementType2["Doctype"] = "doctype";
+  })(ElementType || (ElementType = {}));
+  function isTag(elem) {
+    return elem.type === ElementType.Tag || elem.type === ElementType.Script || elem.type === ElementType.Style;
+  }
+  var Root = ElementType.Root;
+  var Text = ElementType.Text;
+  var Directive = ElementType.Directive;
+  var Comment = ElementType.Comment;
+  var Script = ElementType.Script;
+  var Style = ElementType.Style;
+  var Tag2 = ElementType.Tag;
+  var CDATA = ElementType.CDATA;
+  var Doctype = ElementType.Doctype;
+
+  // node_modules/domhandler/lib/esm/node.js
+  init_buffer();
+  var Node = class {
+    constructor() {
+      this.parent = null;
+      this.prev = null;
+      this.next = null;
+      this.startIndex = null;
+      this.endIndex = null;
+    }
+    // Read-write aliases for properties
+    /**
+     * Same as {@link parent}.
+     * [DOM spec](https://dom.spec.whatwg.org)-compatible alias.
+     */
+    get parentNode() {
+      return this.parent;
+    }
+    set parentNode(parent2) {
+      this.parent = parent2;
+    }
+    /**
+     * Same as {@link prev}.
+     * [DOM spec](https://dom.spec.whatwg.org)-compatible alias.
+     */
+    get previousSibling() {
+      return this.prev;
+    }
+    set previousSibling(prev2) {
+      this.prev = prev2;
+    }
+    /**
+     * Same as {@link next}.
+     * [DOM spec](https://dom.spec.whatwg.org)-compatible alias.
+     */
+    get nextSibling() {
+      return this.next;
+    }
+    set nextSibling(next2) {
+      this.next = next2;
+    }
+    /**
+     * Clone this node, and optionally its children.
+     *
+     * @param recursive Clone child nodes as well.
+     * @returns A clone of the node.
+     */
+    cloneNode(recursive = false) {
+      return cloneNode(this, recursive);
+    }
+  };
+  var DataNode = class extends Node {
+    /**
+     * @param data The content of the data node
+     */
+    constructor(data2) {
+      super();
+      this.data = data2;
+    }
+    /**
+     * Same as {@link data}.
+     * [DOM spec](https://dom.spec.whatwg.org)-compatible alias.
+     */
+    get nodeValue() {
+      return this.data;
+    }
+    set nodeValue(data2) {
+      this.data = data2;
+    }
+  };
+  var Text2 = class extends DataNode {
+    constructor() {
+      super(...arguments);
+      this.type = ElementType.Text;
+    }
+    get nodeType() {
+      return 3;
+    }
+  };
+  var Comment2 = class extends DataNode {
+    constructor() {
+      super(...arguments);
+      this.type = ElementType.Comment;
+    }
+    get nodeType() {
+      return 8;
+    }
+  };
+  var ProcessingInstruction = class extends DataNode {
+    constructor(name, data2) {
+      super(data2);
+      this.name = name;
+      this.type = ElementType.Directive;
+    }
+    get nodeType() {
+      return 1;
+    }
+  };
+  var NodeWithChildren = class extends Node {
+    /**
+     * @param children Children of the node. Only certain node types can have children.
+     */
+    constructor(children2) {
+      super();
+      this.children = children2;
+    }
+    // Aliases
+    /** First child of the node. */
+    get firstChild() {
+      var _a2;
+      return (_a2 = this.children[0]) !== null && _a2 !== void 0 ? _a2 : null;
+    }
+    /** Last child of the node. */
+    get lastChild() {
+      return this.children.length > 0 ? this.children[this.children.length - 1] : null;
+    }
+    /**
+     * Same as {@link children}.
+     * [DOM spec](https://dom.spec.whatwg.org)-compatible alias.
+     */
+    get childNodes() {
+      return this.children;
+    }
+    set childNodes(children2) {
+      this.children = children2;
+    }
+  };
+  var CDATA2 = class extends NodeWithChildren {
+    constructor() {
+      super(...arguments);
+      this.type = ElementType.CDATA;
+    }
+    get nodeType() {
+      return 4;
+    }
+  };
+  var Document = class extends NodeWithChildren {
+    constructor() {
+      super(...arguments);
+      this.type = ElementType.Root;
+    }
+    get nodeType() {
+      return 9;
+    }
+  };
+  var Element = class extends NodeWithChildren {
+    /**
+     * @param name Name of the tag, eg. `div`, `span`.
+     * @param attribs Object mapping attribute names to attribute values.
+     * @param children Children of the node.
+     */
+    constructor(name, attribs, children2 = [], type = name === "script" ? ElementType.Script : name === "style" ? ElementType.Style : ElementType.Tag) {
+      super(children2);
+      this.name = name;
+      this.attribs = attribs;
+      this.type = type;
+    }
+    get nodeType() {
+      return 1;
+    }
+    // DOM Level 1 aliases
+    /**
+     * Same as {@link name}.
+     * [DOM spec](https://dom.spec.whatwg.org)-compatible alias.
+     */
+    get tagName() {
+      return this.name;
+    }
+    set tagName(name) {
+      this.name = name;
+    }
+    get attributes() {
+      return Object.keys(this.attribs).map((name) => {
+        var _a2, _b;
+        return {
+          name,
+          value: this.attribs[name],
+          namespace: (_a2 = this["x-attribsNamespace"]) === null || _a2 === void 0 ? void 0 : _a2[name],
+          prefix: (_b = this["x-attribsPrefix"]) === null || _b === void 0 ? void 0 : _b[name]
+        };
+      });
+    }
+  };
+  function isTag2(node) {
+    return isTag(node);
+  }
+  function isCDATA(node) {
+    return node.type === ElementType.CDATA;
+  }
+  function isText(node) {
+    return node.type === ElementType.Text;
+  }
+  function isComment(node) {
+    return node.type === ElementType.Comment;
+  }
+  function isDirective(node) {
+    return node.type === ElementType.Directive;
+  }
+  function isDocument(node) {
+    return node.type === ElementType.Root;
+  }
+  function hasChildren(node) {
+    return Object.prototype.hasOwnProperty.call(node, "children");
+  }
+  function cloneNode(node, recursive = false) {
+    let result;
+    if (isText(node)) {
+      result = new Text2(node.data);
+    } else if (isComment(node)) {
+      result = new Comment2(node.data);
+    } else if (isTag2(node)) {
+      const children2 = recursive ? cloneChildren(node.children) : [];
+      const clone2 = new Element(node.name, { ...node.attribs }, children2);
+      children2.forEach((child) => child.parent = clone2);
+      if (node.namespace != null) {
+        clone2.namespace = node.namespace;
+      }
+      if (node["x-attribsNamespace"]) {
+        clone2["x-attribsNamespace"] = { ...node["x-attribsNamespace"] };
+      }
+      if (node["x-attribsPrefix"]) {
+        clone2["x-attribsPrefix"] = { ...node["x-attribsPrefix"] };
+      }
+      result = clone2;
+    } else if (isCDATA(node)) {
+      const children2 = recursive ? cloneChildren(node.children) : [];
+      const clone2 = new CDATA2(children2);
+      children2.forEach((child) => child.parent = clone2);
+      result = clone2;
+    } else if (isDocument(node)) {
+      const children2 = recursive ? cloneChildren(node.children) : [];
+      const clone2 = new Document(children2);
+      children2.forEach((child) => child.parent = clone2);
+      if (node["x-mode"]) {
+        clone2["x-mode"] = node["x-mode"];
+      }
+      result = clone2;
+    } else if (isDirective(node)) {
+      const instruction = new ProcessingInstruction(node.name, node.data);
+      if (node["x-name"] != null) {
+        instruction["x-name"] = node["x-name"];
+        instruction["x-publicId"] = node["x-publicId"];
+        instruction["x-systemId"] = node["x-systemId"];
+      }
+      result = instruction;
+    } else {
+      throw new Error(`Not implemented yet: ${node.type}`);
+    }
+    result.startIndex = node.startIndex;
+    result.endIndex = node.endIndex;
+    if (node.sourceCodeLocation != null) {
+      result.sourceCodeLocation = node.sourceCodeLocation;
+    }
+    return result;
+  }
+  function cloneChildren(childs) {
+    const children2 = childs.map((child) => cloneNode(child, true));
+    for (let i = 1; i < children2.length; i++) {
+      children2[i].prev = children2[i - 1];
+      children2[i - 1].next = children2[i];
+    }
+    return children2;
+  }
+
+  // node_modules/domhandler/lib/esm/index.js
+  var defaultOpts = {
+    withStartIndices: false,
+    withEndIndices: false,
+    xmlMode: false
+  };
+  var DomHandler = class {
+    /**
+     * @param callback Called once parsing has completed.
+     * @param options Settings for the handler.
+     * @param elementCB Callback whenever a tag is closed.
+     */
+    constructor(callback, options, elementCB) {
+      this.dom = [];
+      this.root = new Document(this.dom);
+      this.done = false;
+      this.tagStack = [this.root];
+      this.lastNode = null;
+      this.parser = null;
+      if (typeof options === "function") {
+        elementCB = options;
+        options = defaultOpts;
+      }
+      if (typeof callback === "object") {
+        options = callback;
+        callback = void 0;
+      }
+      this.callback = callback !== null && callback !== void 0 ? callback : null;
+      this.options = options !== null && options !== void 0 ? options : defaultOpts;
+      this.elementCB = elementCB !== null && elementCB !== void 0 ? elementCB : null;
+    }
+    onparserinit(parser) {
+      this.parser = parser;
+    }
+    // Resets the handler back to starting state
+    onreset() {
+      this.dom = [];
+      this.root = new Document(this.dom);
+      this.done = false;
+      this.tagStack = [this.root];
+      this.lastNode = null;
+      this.parser = null;
+    }
+    // Signals the handler that parsing is done
+    onend() {
+      if (this.done)
+        return;
+      this.done = true;
+      this.parser = null;
+      this.handleCallback(null);
+    }
+    onerror(error) {
+      this.handleCallback(error);
+    }
+    onclosetag() {
+      this.lastNode = null;
+      const elem = this.tagStack.pop();
+      if (this.options.withEndIndices) {
+        elem.endIndex = this.parser.endIndex;
+      }
+      if (this.elementCB)
+        this.elementCB(elem);
+    }
+    onopentag(name, attribs) {
+      const type = this.options.xmlMode ? ElementType.Tag : void 0;
+      const element = new Element(name, attribs, void 0, type);
+      this.addNode(element);
+      this.tagStack.push(element);
+    }
+    ontext(data2) {
+      const { lastNode } = this;
+      if (lastNode && lastNode.type === ElementType.Text) {
+        lastNode.data += data2;
+        if (this.options.withEndIndices) {
+          lastNode.endIndex = this.parser.endIndex;
+        }
+      } else {
+        const node = new Text2(data2);
+        this.addNode(node);
+        this.lastNode = node;
+      }
+    }
+    oncomment(data2) {
+      if (this.lastNode && this.lastNode.type === ElementType.Comment) {
+        this.lastNode.data += data2;
+        return;
+      }
+      const node = new Comment2(data2);
+      this.addNode(node);
+      this.lastNode = node;
+    }
+    oncommentend() {
+      this.lastNode = null;
+    }
+    oncdatastart() {
+      const text3 = new Text2("");
+      const node = new CDATA2([text3]);
+      this.addNode(node);
+      text3.parent = node;
+      this.lastNode = text3;
+    }
+    oncdataend() {
+      this.lastNode = null;
+    }
+    onprocessinginstruction(name, data2) {
+      const node = new ProcessingInstruction(name, data2);
+      this.addNode(node);
+    }
+    handleCallback(error) {
+      if (typeof this.callback === "function") {
+        this.callback(error, this.dom);
+      } else if (error) {
+        throw error;
+      }
+    }
+    addNode(node) {
+      const parent2 = this.tagStack[this.tagStack.length - 1];
+      const previousSibling = parent2.children[parent2.children.length - 1];
+      if (this.options.withStartIndices) {
+        node.startIndex = this.parser.startIndex;
+      }
+      if (this.options.withEndIndices) {
+        node.endIndex = this.parser.endIndex;
+      }
+      parent2.children.push(node);
+      if (previousSibling) {
+        node.prev = previousSibling;
+        previousSibling.next = node;
+      }
+      node.parent = parent2;
+      this.lastNode = null;
+    }
+  };
+
+  // node_modules/dom-serializer/lib/esm/index.js
   init_buffer();
 
   // node_modules/entities/lib/esm/index.js
@@ -3788,9 +4194,6 @@ Type: ${row["type"]}`
   }
   var htmlDecoder = getDecoder(decode_data_html_default);
   var xmlDecoder = getDecoder(decode_data_xml_default);
-  function decodeHTML(str, mode = DecodingMode.Legacy) {
-    return htmlDecoder(str, mode);
-  }
 
   // node_modules/entities/lib/esm/encode.js
   init_buffer();
@@ -3882,1290 +4285,6 @@ Type: ${row["type"]}`
     EncodingMode2[EncodingMode2["Attribute"] = 3] = "Attribute";
     EncodingMode2[EncodingMode2["Text"] = 4] = "Text";
   })(EncodingMode || (EncodingMode = {}));
-
-  // src/Manganato/RelevanceScore.ts
-  init_buffer();
-
-  // node_modules/stemmer/index.js
-  init_buffer();
-  var step2list = {
-    ational: "ate",
-    tional: "tion",
-    enci: "ence",
-    anci: "ance",
-    izer: "ize",
-    bli: "ble",
-    alli: "al",
-    entli: "ent",
-    eli: "e",
-    ousli: "ous",
-    ization: "ize",
-    ation: "ate",
-    ator: "ate",
-    alism: "al",
-    iveness: "ive",
-    fulness: "ful",
-    ousness: "ous",
-    aliti: "al",
-    iviti: "ive",
-    biliti: "ble",
-    logi: "log"
-  };
-  var step3list = {
-    icate: "ic",
-    ative: "",
-    alize: "al",
-    iciti: "ic",
-    ical: "ic",
-    ful: "",
-    ness: ""
-  };
-  var consonant = "[^aeiou]";
-  var vowel = "[aeiouy]";
-  var consonants = "(" + consonant + "[^aeiouy]*)";
-  var vowels = "(" + vowel + "[aeiou]*)";
-  var gt0 = new RegExp("^" + consonants + "?" + vowels + consonants);
-  var eq1 = new RegExp(
-    "^" + consonants + "?" + vowels + consonants + vowels + "?$"
-  );
-  var gt1 = new RegExp("^" + consonants + "?(" + vowels + consonants + "){2,}");
-  var vowelInStem = new RegExp("^" + consonants + "?" + vowel);
-  var consonantLike = new RegExp("^" + consonants + vowel + "[^aeiouwxy]$");
-  var sfxLl = /ll$/;
-  var sfxE = /^(.+?)e$/;
-  var sfxY = /^(.+?)y$/;
-  var sfxIon = /^(.+?(s|t))(ion)$/;
-  var sfxEdOrIng = /^(.+?)(ed|ing)$/;
-  var sfxAtOrBlOrIz = /(at|bl|iz)$/;
-  var sfxEED = /^(.+?)eed$/;
-  var sfxS = /^.+?[^s]s$/;
-  var sfxSsesOrIes = /^.+?(ss|i)es$/;
-  var sfxMultiConsonantLike = /([^aeiouylsz])\1$/;
-  var step2 = /^(.+?)(ational|tional|enci|anci|izer|bli|alli|entli|eli|ousli|ization|ation|ator|alism|iveness|fulness|ousness|aliti|iviti|biliti|logi)$/;
-  var step3 = /^(.+?)(icate|ative|alize|iciti|ical|ful|ness)$/;
-  var step4 = /^(.+?)(al|ance|ence|er|ic|able|ible|ant|ement|ment|ent|ou|ism|ate|iti|ous|ive|ize)$/;
-  function stemmer(value) {
-    let result = String(value).toLowerCase();
-    if (result.length < 3) {
-      return result;
-    }
-    let firstCharacterWasLowerCaseY = false;
-    if (result.codePointAt(0) === 121) {
-      firstCharacterWasLowerCaseY = true;
-      result = "Y" + result.slice(1);
-    }
-    if (sfxSsesOrIes.test(result)) {
-      result = result.slice(0, -2);
-    } else if (sfxS.test(result)) {
-      result = result.slice(0, -1);
-    }
-    let match;
-    if (match = sfxEED.exec(result)) {
-      if (gt0.test(match[1])) {
-        result = result.slice(0, -1);
-      }
-    } else if ((match = sfxEdOrIng.exec(result)) && vowelInStem.test(match[1])) {
-      result = match[1];
-      if (sfxAtOrBlOrIz.test(result)) {
-        result += "e";
-      } else if (sfxMultiConsonantLike.test(result)) {
-        result = result.slice(0, -1);
-      } else if (consonantLike.test(result)) {
-        result += "e";
-      }
-    }
-    if ((match = sfxY.exec(result)) && vowelInStem.test(match[1])) {
-      result = match[1] + "i";
-    }
-    if ((match = step2.exec(result)) && gt0.test(match[1])) {
-      result = match[1] + step2list[match[2]];
-    }
-    if ((match = step3.exec(result)) && gt0.test(match[1])) {
-      result = match[1] + step3list[match[2]];
-    }
-    if (match = step4.exec(result)) {
-      if (gt1.test(match[1])) {
-        result = match[1];
-      }
-    } else if ((match = sfxIon.exec(result)) && gt1.test(match[1])) {
-      result = match[1];
-    }
-    if ((match = sfxE.exec(result)) && (gt1.test(match[1]) || eq1.test(match[1]) && !consonantLike.test(match[1]))) {
-      result = match[1];
-    }
-    if (sfxLl.test(result) && gt1.test(result)) {
-      result = result.slice(0, -1);
-    }
-    if (firstCharacterWasLowerCaseY) {
-      result = "y" + result.slice(1);
-    }
-    return result;
-  }
-
-  // node_modules/fastest-levenshtein/esm/mod.js
-  init_buffer();
-  var peq = new Uint32Array(65536);
-  var myers_32 = (a, b) => {
-    const n = a.length;
-    const m = b.length;
-    const lst = 1 << n - 1;
-    let pv = -1;
-    let mv = 0;
-    let sc = n;
-    let i = n;
-    while (i--) {
-      peq[a.charCodeAt(i)] |= 1 << i;
-    }
-    for (i = 0; i < m; i++) {
-      let eq2 = peq[b.charCodeAt(i)];
-      const xv = eq2 | mv;
-      eq2 |= (eq2 & pv) + pv ^ pv;
-      mv |= ~(eq2 | pv);
-      pv &= eq2;
-      if (mv & lst) {
-        sc++;
-      }
-      if (pv & lst) {
-        sc--;
-      }
-      mv = mv << 1 | 1;
-      pv = pv << 1 | ~(xv | mv);
-      mv &= xv;
-    }
-    i = n;
-    while (i--) {
-      peq[a.charCodeAt(i)] = 0;
-    }
-    return sc;
-  };
-  var myers_x = (b, a) => {
-    const n = a.length;
-    const m = b.length;
-    const mhc = [];
-    const phc = [];
-    const hsize = Math.ceil(n / 32);
-    const vsize = Math.ceil(m / 32);
-    for (let i = 0; i < hsize; i++) {
-      phc[i] = -1;
-      mhc[i] = 0;
-    }
-    let j = 0;
-    for (; j < vsize - 1; j++) {
-      let mv2 = 0;
-      let pv2 = -1;
-      const start2 = j * 32;
-      const vlen2 = Math.min(32, m) + start2;
-      for (let k = start2; k < vlen2; k++) {
-        peq[b.charCodeAt(k)] |= 1 << k;
-      }
-      for (let i = 0; i < n; i++) {
-        const eq2 = peq[a.charCodeAt(i)];
-        const pb = phc[i / 32 | 0] >>> i & 1;
-        const mb = mhc[i / 32 | 0] >>> i & 1;
-        const xv = eq2 | mv2;
-        const xh = ((eq2 | mb) & pv2) + pv2 ^ pv2 | eq2 | mb;
-        let ph = mv2 | ~(xh | pv2);
-        let mh = pv2 & xh;
-        if (ph >>> 31 ^ pb) {
-          phc[i / 32 | 0] ^= 1 << i;
-        }
-        if (mh >>> 31 ^ mb) {
-          mhc[i / 32 | 0] ^= 1 << i;
-        }
-        ph = ph << 1 | pb;
-        mh = mh << 1 | mb;
-        pv2 = mh | ~(xv | ph);
-        mv2 = ph & xv;
-      }
-      for (let k = start2; k < vlen2; k++) {
-        peq[b.charCodeAt(k)] = 0;
-      }
-    }
-    let mv = 0;
-    let pv = -1;
-    const start = j * 32;
-    const vlen = Math.min(32, m - start) + start;
-    for (let k = start; k < vlen; k++) {
-      peq[b.charCodeAt(k)] |= 1 << k;
-    }
-    let score = m;
-    for (let i = 0; i < n; i++) {
-      const eq2 = peq[a.charCodeAt(i)];
-      const pb = phc[i / 32 | 0] >>> i & 1;
-      const mb = mhc[i / 32 | 0] >>> i & 1;
-      const xv = eq2 | mv;
-      const xh = ((eq2 | mb) & pv) + pv ^ pv | eq2 | mb;
-      let ph = mv | ~(xh | pv);
-      let mh = pv & xh;
-      score += ph >>> m - 1 & 1;
-      score -= mh >>> m - 1 & 1;
-      if (ph >>> 31 ^ pb) {
-        phc[i / 32 | 0] ^= 1 << i;
-      }
-      if (mh >>> 31 ^ mb) {
-        mhc[i / 32 | 0] ^= 1 << i;
-      }
-      ph = ph << 1 | pb;
-      mh = mh << 1 | mb;
-      pv = mh | ~(xv | ph);
-      mv = ph & xv;
-    }
-    for (let k = start; k < vlen; k++) {
-      peq[b.charCodeAt(k)] = 0;
-    }
-    return score;
-  };
-  var distance = (a, b) => {
-    if (a.length < b.length) {
-      const tmp = b;
-      b = a;
-      a = tmp;
-    }
-    if (b.length === 0) {
-      return a.length;
-    }
-    if (a.length <= 32) {
-      return myers_32(a, b);
-    }
-    return myers_x(a, b);
-  };
-
-  // src/Manganato/RelevanceScore.ts
-  var relevanceScore = (title, queryTitle) => {
-    const titleWords = tokenize(title);
-    const queryWords = tokenize(queryTitle);
-    const titleStripped = titleWords.join("");
-    const queryStripped = queryWords.join("");
-    if (titleStripped === queryStripped) {
-      return 100;
-    }
-    const titlePhrase = titleWords.join(" ");
-    const queryPhrase = queryWords.join(" ");
-    const phraseAtStartRegex = new RegExp(`^\\b${queryPhrase}\\b`, "i");
-    if (phraseAtStartRegex.test(titlePhrase)) {
-      return 100;
-    }
-    const phraseAnywhereRegex = new RegExp(`\\b${queryPhrase}\\b`, "i");
-    if (phraseAnywhereRegex.test(titlePhrase)) {
-      return 95;
-    }
-    const adjacentSequencePosition = getAdjacentSequencePosition(
-      titleWords,
-      queryWords
-    );
-    if (adjacentSequencePosition === 0) {
-      return 90;
-    } else if (adjacentSequencePosition > 0) {
-      return 85;
-    }
-    if (wordsAppearInOrder(titleWords, queryWords)) {
-      return 80;
-    }
-    if (allWordsPresent(titleWords, queryWords)) {
-      return 75;
-    }
-    let totalSimilarity = 0;
-    for (const queryWord of queryWords) {
-      let maxSimilarity = 0;
-      for (const titleWord of titleWords) {
-        const similarity = wordSimilarity(queryWord, titleWord);
-        if (similarity > maxSimilarity) {
-          maxSimilarity = similarity;
-        }
-      }
-      totalSimilarity += maxSimilarity;
-    }
-    const averageSimilarity = totalSimilarity / queryWords.length;
-    const finalScore = averageSimilarity * 70;
-    return Math.max(0, Math.min(70, finalScore));
-  };
-  var wordSimilarity = (word1, word2) => {
-    const stemmedWord1 = stemmer(word1);
-    const stemmedWord2 = stemmer(word2);
-    if (stemmedWord1 === stemmedWord2) {
-      return 1;
-    }
-    const maxLen = Math.max(stemmedWord1.length, stemmedWord2.length);
-    const distance2 = distance(stemmedWord1, stemmedWord2);
-    const similarity = (maxLen - distance2) / maxLen;
-    if (similarity >= 0.6) {
-      return similarity;
-    }
-    return 0;
-  };
-  var tokenize = (text3) => {
-    return text3.toLowerCase().replace(/[\u2019']/g, "").replace(/[^\w\s]/g, "").split(/\s+/).filter((word) => word.length > 0);
-  };
-  var allWordsPresent = (titleWords, queryWords) => {
-    for (const queryWord of queryWords) {
-      let found = false;
-      for (const titleWord of titleWords) {
-        if (wordSimilarity(queryWord, titleWord) >= 0.7) {
-          found = true;
-          break;
-        }
-      }
-      if (!found) {
-        return false;
-      }
-    }
-    return true;
-  };
-  var wordsAppearInOrder = (titleWords, queryWords) => {
-    let titleIndex = 0;
-    for (let i = 0; i < queryWords.length; i++) {
-      const queryWord = queryWords[i];
-      while (titleIndex < titleWords.length) {
-        if (wordSimilarity(
-          queryWord,
-          titleWords[titleIndex]
-        ) >= 0.7) {
-          titleIndex++;
-          break;
-        }
-        titleIndex++;
-      }
-      if (titleIndex === titleWords.length && i < queryWords.length - 1) {
-        return false;
-      }
-    }
-    return true;
-  };
-  var getAdjacentSequencePosition = (titleWords, queryWords) => {
-    for (let i = 0; i <= titleWords.length - queryWords.length; i++) {
-      let match = true;
-      for (let j = 0; j < queryWords.length; j++) {
-        if (wordSimilarity(
-          queryWords[j],
-          titleWords[i + j]
-        ) < 0.7) {
-          match = false;
-          break;
-        }
-      }
-      if (match) {
-        return i;
-      }
-    }
-    return -1;
-  };
-
-  // src/Manganato/MangaBoxParser.ts
-  var MangaBoxParser = class {
-    constructor() {
-      this.parseManga = ($2, source, query) => {
-        const mangaItems = [];
-        const collecedIds = [];
-        for (const manga of $2(source.mangaListSelector).toArray()) {
-          const mangaId = $2("a", manga).first().attr("href");
-          const image = $2("img", manga).first().attr("src")?.trim() ?? "";
-          const title = decodeHTML(
-            $2("a", manga).first().attr("title")?.trim() ?? ""
-          );
-          const subtitle = $2(source.mangaSubtitleSelector, manga).first().text().trim() ?? "";
-          if (!mangaId || !title || collecedIds.includes(mangaId)) continue;
-          collecedIds.push(mangaId);
-          const partialManga = App.createPartialSourceManga({
-            mangaId,
-            image,
-            title,
-            subtitle: subtitle ? subtitle : "No Chapters"
-          });
-          let relevance = 0;
-          if (query?.title) {
-            relevance = relevanceScore(title, query.title);
-          }
-          mangaItems.push({
-            manga: partialManga,
-            relevance
-          });
-        }
-        mangaItems.sort((a, b) => b.relevance - a.relevance);
-        return mangaItems.map((r) => r.manga);
-      };
-      this.parseMangaDetails = ($2, mangaId, source) => {
-        const mangaRootSelector = $2(source.mangaRootSelector);
-        const image = $2(source.mangaThumbnailSelector).attr("src") ?? "";
-        const titles = [];
-        titles.push(
-          decodeHTML(
-            $2(source.mangaTitleSelector, mangaRootSelector).text().trim()
-          )
-        );
-        for (const altTitle of $2(
-          source.mangaAltTitleSelector,
-          mangaRootSelector
-        ).text()?.split(/,|;|\//)) {
-          if (altTitle == "") continue;
-          titles.push(decodeHTML(altTitle.trim()));
-        }
-        const rawStatus = $2(source.mangaStatusSelector, mangaRootSelector).text().trim() ?? "ONGOING";
-        let status = "ONGOING";
-        switch (rawStatus.toUpperCase()) {
-          case "ONGOING":
-            status = "Ongoing";
-            break;
-          case "COMPLETED":
-            status = "Completed";
-            break;
-          default:
-            status = "Ongoing";
-            break;
-        }
-        const author = $2(source.mangaAuthorSelector, mangaRootSelector).toArray().map((x) => $2(x).text().trim()).join(", ") ?? "";
-        const desc = decodeHTML(
-          $2(source.mangaDescSelector).first().children().remove().end().text().trim()
-        );
-        const tags = [];
-        for (const tag of $2(
-          source.mangaGenresSelector,
-          mangaRootSelector
-        ).toArray()) {
-          const id = $2(tag).attr("href");
-          const label = $2(tag).text().trim();
-          if (!id || !label) continue;
-          tags.push({ id, label });
-        }
-        const TagSection2 = [
-          App.createTagSection({
-            id: "0",
-            label: "genres",
-            tags: tags.map((t) => App.createTag(t))
-          })
-        ];
-        return App.createSourceManga({
-          id: mangaId,
-          mangaInfo: App.createMangaInfo({
-            image,
-            titles,
-            status,
-            author: author ? author : "Unkown",
-            desc,
-            tags: TagSection2
-          })
-        });
-      };
-      this.parseChapters = ($2, mangaId, source) => {
-        const chapters = [];
-        let sortingIndex = 0;
-        for (const chapter of $2(source.chapterListSelector).toArray()) {
-          const id = $2("a", chapter).attr("href") ?? "";
-          if (!id) continue;
-          const name = decodeHTML($2("a", chapter).text().trim());
-          const time = this.parseDate(
-            $2(source.chapterTimeSelector, chapter).last().text().trim() ?? ""
-          );
-          let chapNum = 0;
-          const chapRegex = id.match(/(?:chap.*)[-_](\d+\.?\d?)/);
-          if (chapRegex && chapRegex[1])
-            chapNum = Number(chapRegex[1].replace(/\\/g, "."));
-          chapters.push({
-            id,
-            chapNum: isNaN(chapNum) ? 0 : chapNum,
-            volume: 0,
-            name,
-            group: "",
-            time,
-            langCode: source.languageCode,
-            sortingIndex
-          });
-          sortingIndex--;
-        }
-        if (chapters.length == 0) {
-          throw new Error(
-            `Couldn't find any chapters for mangaId: ${mangaId}!`
-          );
-        }
-        return chapters.map((chapter) => {
-          chapter.sortingIndex += chapters.length;
-          return App.createChapter(chapter);
-        });
-      };
-      this.parseChapterDetails = async ($2, mangaId, chapterId, source) => {
-        const pages = [];
-        for (const img of $2(source.chapterImagesSelector).toArray()) {
-          let image = $2(img).attr("src") ?? "";
-          if (!image) image = $2(img).attr("data-src") ?? "";
-          if (!image)
-            throw new Error(
-              `Unable to parse image(s) for Chapter ID: ${chapterId}`
-            );
-          pages.push(image);
-        }
-        const chapterDetails = App.createChapterDetails({
-          id: chapterId,
-          mangaId,
-          pages
-        });
-        return chapterDetails;
-      };
-      this.parseTags = ($2, source) => {
-        const genres = [];
-        for (const genre of $2(source.genreListSelector).toArray()) {
-          const id = $2(genre).attr("data-i");
-          const label = $2(genre).text().trim();
-          if (!id || !label) continue;
-          genres.push({ id, label });
-        }
-        const TagSection2 = [
-          App.createTagSection({
-            id: "0",
-            label: "genres",
-            tags: genres.map((t) => App.createTag(t))
-          })
-        ];
-        return TagSection2;
-      };
-      this.parseDate = (date) => {
-        let time;
-        let number = Number((/\d*/.exec(date) ?? [])[0]);
-        number = number == 0 && date.includes("a") ? 1 : number;
-        date = date.toUpperCase();
-        if (date.includes("MINUTE") || date.includes("MINUTES") || date.includes("MINS")) {
-          time = new Date(Date.now() - number * 6e4);
-        } else if (date.includes("HOUR") || date.includes("HOURS")) {
-          time = new Date(Date.now() - number * 36e5);
-        } else if (date.includes("DAY") || date.includes("DAYS")) {
-          time = new Date(Date.now() - number * 864e5);
-        } else if (date.includes("YEAR") || date.includes("YEARS")) {
-          time = new Date(Date.now() - number * 31556952e3);
-        } else {
-          time = new Date(date);
-        }
-        return time;
-      };
-      this.isLastPage = ($2) => {
-        const currentPage = $2(".page-select, .page_select").text();
-        let totalPages = $2(".page-last, .page_last").text();
-        if (currentPage) {
-          totalPages = (/(\d+)/g.exec(totalPages) ?? [""])[0];
-          return +totalPages == +currentPage;
-        }
-        return true;
-      };
-    }
-  };
-
-  // src/Manganato/MangaBoxHelpers.ts
-  init_buffer();
-  var URLBuilder = class {
-    constructor(baseUrl) {
-      this.parameters = {};
-      this.pathComponents = [];
-      this.baseUrl = baseUrl.replace(/(^\/)?(?=.*)(\/$)?/gim, "");
-    }
-    addPathComponent(component) {
-      this.pathComponents.push(component.replace(/(^\/)?(?=.*)(\/$)?/gim, ""));
-      return this;
-    }
-    addQueryParameter(key, value) {
-      this.parameters[key] = value;
-      return this;
-    }
-    buildUrl({ addTrailingSlash, includeUndefinedParameters } = { addTrailingSlash: false, includeUndefinedParameters: false }) {
-      let finalUrl = this.baseUrl + "/";
-      finalUrl += this.pathComponents.join("/");
-      finalUrl += addTrailingSlash ? "/" : "";
-      finalUrl += Object.values(this.parameters).length > 0 ? "?" : "";
-      finalUrl += Object.entries(this.parameters).map((entry) => {
-        if (Array.isArray(entry[1])) {
-          return entry[1].map((value) => value || includeUndefinedParameters ? `${entry[0]}[]=${value}` : void 0).filter((x) => x !== void 0).join("&");
-        }
-        if (typeof entry[1] === "object") {
-          return Object.keys(entry[1]).map((key) => entry[1][key] || includeUndefinedParameters ? `${entry[0]}[${key}]=${entry[1][key]}` : void 0).filter((x) => x !== void 0).join("&");
-        }
-        return `${entry[0]}=${entry[1]}`;
-      }).filter((x) => x !== void 0).join("&");
-      return finalUrl;
-    }
-  };
-
-  // src/Manganato/MangaBoxSettings.ts
-  init_buffer();
-  var getImageServer = async (stateManager) => {
-    return await stateManager.retrieve("imageServer") ?? "server1";
-  };
-  var chapterSettings = (stateManager) => {
-    return App.createDUINavigationButton({
-      id: "chapter_settings",
-      label: "Chapter Settings",
-      form: App.createDUIForm({
-        sections: async () => [
-          App.createDUISection({
-            id: "image_server_settings",
-            header: "Image Server Settings",
-            isHidden: false,
-            rows: async () => [
-              App.createDUISelect({
-                id: "imageServer",
-                label: "Image Server",
-                options: ["server1", "server2"],
-                value: App.createDUIBinding({
-                  get: () => getImageServer(stateManager).then(
-                    (value) => [value[0]]
-                  ),
-                  set: async (newValue) => await stateManager.store(
-                    "imageServer",
-                    newValue
-                  )
-                }),
-                allowsMultiselect: false,
-                labelResolver: async (value) => value == "server1" ? "Server 1" : "Server 2"
-              })
-            ]
-          })
-        ]
-      })
-    });
-  };
-  var getProxyUser = async (stateManager) => {
-    return await stateManager.retrieve("proxy_user") ?? "";
-  };
-  var getProxyPass = async (stateManager) => {
-    return await stateManager.retrieve("proxy_pass") ?? "";
-  };
-  var getProxyAccess = async (stateManager) => {
-    return await stateManager.retrieve("proxy_token") ?? "";
-  };
-  var getProxyServer = async (stateManager) => {
-    return await stateManager.retrieve("proxy_server") ?? "";
-  };
-  var getEnableProxyServer = async (stateManager) => {
-    return await stateManager.retrieve("enable_proxy_server") ?? false;
-  };
-  var proxySettings = (stateManager, requestManager) => {
-    return App.createDUINavigationButton({
-      id: "proxy_settings",
-      label: "Proxy Settings",
-      form: App.createDUIForm({
-        sections: async () => [
-          App.createDUISection({
-            id: "proxy",
-            footer: "Proxy Settings",
-            isHidden: false,
-            rows: async () => [
-              App.createDUIInputField({
-                id: "proxy_server",
-                label: "Proxy Server",
-                value: App.createDUIBinding({
-                  get: () => getProxyServer(stateManager),
-                  set: async (newValue) => await stateManager.store(
-                    "proxy_server",
-                    newValue
-                  )
-                })
-              }),
-              App.createDUIInputField({
-                id: "proxy_user",
-                label: "Proxy Username",
-                value: App.createDUIBinding({
-                  get: () => getProxyUser(stateManager),
-                  set: async (newValue) => await stateManager.store(
-                    "proxy_user",
-                    newValue
-                  )
-                })
-              }),
-              App.createDUIInputField({
-                id: "proxy_pass",
-                label: "Proxy Password",
-                value: App.createDUIBinding({
-                  get: () => getProxyPass(stateManager),
-                  set: async (newValue) => await stateManager.store(
-                    "proxy_pass",
-                    newValue
-                  )
-                })
-              }),
-              App.createDUISwitch({
-                id: "enable_proxy_server",
-                label: "Enable Proxy Server",
-                value: App.createDUIBinding({
-                  get: () => getEnableProxyServer(stateManager),
-                  set: async (newValue) => await stateManager.store(
-                    "enable_proxy_server",
-                    newValue
-                  )
-                })
-              }),
-              App.createDUIButton({
-                id: "test_proxy",
-                label: "Test Proxy Server",
-                onTap: async () => {
-                  const proxyURL = await getProxyServer(
-                    stateManager
-                  );
-                  const request = App.createRequest({
-                    url: `${proxyURL}`,
-                    method: "GET",
-                    headers: {
-                      referer: `${proxyURL}/`
-                    }
-                  });
-                  const response = await requestManager.schedule(
-                    request,
-                    1
-                  );
-                  throw new Error(`${response.status}`);
-                }
-              }),
-              App.createDUIButton({
-                id: "login_proxy_server",
-                label: "Login to Proxy Server",
-                onTap: async () => {
-                  const proxyURL = await getProxyServer(
-                    stateManager
-                  );
-                  const username = await getProxyUser(
-                    stateManager
-                  );
-                  const password = await getProxyPass(
-                    stateManager
-                  );
-                  const request = App.createRequest({
-                    url: `${proxyURL}/api/auth/login`,
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "application/json",
-                      referer: `${proxyURL}/`
-                    },
-                    param: `?username=${username}&password=${password}`
-                  });
-                  const response = await requestManager.schedule(
-                    request,
-                    1
-                  );
-                  const json = JSON.parse(
-                    response.data
-                  );
-                  if (response.status === 200) {
-                    await stateManager.store(
-                      "proxy_token",
-                      json.token
-                    );
-                    throw new Error(
-                      `Done Login: ${json.token}`
-                    );
-                  } else {
-                    throw new Error(
-                      `Login failed with error code: ${JSON.stringify(
-                        json
-                      )}`
-                    );
-                  }
-                }
-              })
-            ]
-          })
-        ]
-      })
-    });
-  };
-
-  // node_modules/cheerio/dist/browser/index.js
-  var browser_exports = {};
-  __export(browser_exports, {
-    contains: () => contains,
-    load: () => load,
-    merge: () => merge
-  });
-  init_buffer();
-
-  // node_modules/cheerio/dist/browser/static.js
-  var static_exports = {};
-  __export(static_exports, {
-    contains: () => contains,
-    extract: () => extract,
-    html: () => html,
-    merge: () => merge,
-    parseHTML: () => parseHTML,
-    root: () => root,
-    text: () => text,
-    xml: () => xml
-  });
-  init_buffer();
-
-  // node_modules/domutils/lib/esm/index.js
-  var esm_exports2 = {};
-  __export(esm_exports2, {
-    DocumentPosition: () => DocumentPosition,
-    append: () => append,
-    appendChild: () => appendChild,
-    compareDocumentPosition: () => compareDocumentPosition,
-    existsOne: () => existsOne,
-    filter: () => filter,
-    find: () => find,
-    findAll: () => findAll,
-    findOne: () => findOne,
-    findOneChild: () => findOneChild,
-    getAttributeValue: () => getAttributeValue,
-    getChildren: () => getChildren,
-    getElementById: () => getElementById,
-    getElements: () => getElements,
-    getElementsByClassName: () => getElementsByClassName,
-    getElementsByTagName: () => getElementsByTagName,
-    getElementsByTagType: () => getElementsByTagType,
-    getFeed: () => getFeed,
-    getInnerHTML: () => getInnerHTML,
-    getName: () => getName,
-    getOuterHTML: () => getOuterHTML,
-    getParent: () => getParent,
-    getSiblings: () => getSiblings,
-    getText: () => getText,
-    hasAttrib: () => hasAttrib,
-    hasChildren: () => hasChildren,
-    innerText: () => innerText,
-    isCDATA: () => isCDATA,
-    isComment: () => isComment,
-    isDocument: () => isDocument,
-    isTag: () => isTag2,
-    isText: () => isText,
-    nextElementSibling: () => nextElementSibling,
-    prepend: () => prepend,
-    prependChild: () => prependChild,
-    prevElementSibling: () => prevElementSibling,
-    removeElement: () => removeElement,
-    removeSubsets: () => removeSubsets,
-    replaceElement: () => replaceElement,
-    testElement: () => testElement,
-    textContent: () => textContent,
-    uniqueSort: () => uniqueSort
-  });
-  init_buffer();
-
-  // node_modules/domutils/lib/esm/stringify.js
-  init_buffer();
-
-  // node_modules/domhandler/lib/esm/index.js
-  init_buffer();
-
-  // node_modules/domelementtype/lib/esm/index.js
-  init_buffer();
-  var ElementType;
-  (function(ElementType2) {
-    ElementType2["Root"] = "root";
-    ElementType2["Text"] = "text";
-    ElementType2["Directive"] = "directive";
-    ElementType2["Comment"] = "comment";
-    ElementType2["Script"] = "script";
-    ElementType2["Style"] = "style";
-    ElementType2["Tag"] = "tag";
-    ElementType2["CDATA"] = "cdata";
-    ElementType2["Doctype"] = "doctype";
-  })(ElementType || (ElementType = {}));
-  function isTag(elem) {
-    return elem.type === ElementType.Tag || elem.type === ElementType.Script || elem.type === ElementType.Style;
-  }
-  var Root = ElementType.Root;
-  var Text = ElementType.Text;
-  var Directive = ElementType.Directive;
-  var Comment = ElementType.Comment;
-  var Script = ElementType.Script;
-  var Style = ElementType.Style;
-  var Tag = ElementType.Tag;
-  var CDATA = ElementType.CDATA;
-  var Doctype = ElementType.Doctype;
-
-  // node_modules/domhandler/lib/esm/node.js
-  init_buffer();
-  var Node = class {
-    constructor() {
-      this.parent = null;
-      this.prev = null;
-      this.next = null;
-      this.startIndex = null;
-      this.endIndex = null;
-    }
-    // Read-write aliases for properties
-    /**
-     * Same as {@link parent}.
-     * [DOM spec](https://dom.spec.whatwg.org)-compatible alias.
-     */
-    get parentNode() {
-      return this.parent;
-    }
-    set parentNode(parent2) {
-      this.parent = parent2;
-    }
-    /**
-     * Same as {@link prev}.
-     * [DOM spec](https://dom.spec.whatwg.org)-compatible alias.
-     */
-    get previousSibling() {
-      return this.prev;
-    }
-    set previousSibling(prev2) {
-      this.prev = prev2;
-    }
-    /**
-     * Same as {@link next}.
-     * [DOM spec](https://dom.spec.whatwg.org)-compatible alias.
-     */
-    get nextSibling() {
-      return this.next;
-    }
-    set nextSibling(next2) {
-      this.next = next2;
-    }
-    /**
-     * Clone this node, and optionally its children.
-     *
-     * @param recursive Clone child nodes as well.
-     * @returns A clone of the node.
-     */
-    cloneNode(recursive = false) {
-      return cloneNode(this, recursive);
-    }
-  };
-  var DataNode = class extends Node {
-    /**
-     * @param data The content of the data node
-     */
-    constructor(data2) {
-      super();
-      this.data = data2;
-    }
-    /**
-     * Same as {@link data}.
-     * [DOM spec](https://dom.spec.whatwg.org)-compatible alias.
-     */
-    get nodeValue() {
-      return this.data;
-    }
-    set nodeValue(data2) {
-      this.data = data2;
-    }
-  };
-  var Text2 = class extends DataNode {
-    constructor() {
-      super(...arguments);
-      this.type = ElementType.Text;
-    }
-    get nodeType() {
-      return 3;
-    }
-  };
-  var Comment2 = class extends DataNode {
-    constructor() {
-      super(...arguments);
-      this.type = ElementType.Comment;
-    }
-    get nodeType() {
-      return 8;
-    }
-  };
-  var ProcessingInstruction = class extends DataNode {
-    constructor(name, data2) {
-      super(data2);
-      this.name = name;
-      this.type = ElementType.Directive;
-    }
-    get nodeType() {
-      return 1;
-    }
-  };
-  var NodeWithChildren = class extends Node {
-    /**
-     * @param children Children of the node. Only certain node types can have children.
-     */
-    constructor(children2) {
-      super();
-      this.children = children2;
-    }
-    // Aliases
-    /** First child of the node. */
-    get firstChild() {
-      var _a2;
-      return (_a2 = this.children[0]) !== null && _a2 !== void 0 ? _a2 : null;
-    }
-    /** Last child of the node. */
-    get lastChild() {
-      return this.children.length > 0 ? this.children[this.children.length - 1] : null;
-    }
-    /**
-     * Same as {@link children}.
-     * [DOM spec](https://dom.spec.whatwg.org)-compatible alias.
-     */
-    get childNodes() {
-      return this.children;
-    }
-    set childNodes(children2) {
-      this.children = children2;
-    }
-  };
-  var CDATA2 = class extends NodeWithChildren {
-    constructor() {
-      super(...arguments);
-      this.type = ElementType.CDATA;
-    }
-    get nodeType() {
-      return 4;
-    }
-  };
-  var Document = class extends NodeWithChildren {
-    constructor() {
-      super(...arguments);
-      this.type = ElementType.Root;
-    }
-    get nodeType() {
-      return 9;
-    }
-  };
-  var Element = class extends NodeWithChildren {
-    /**
-     * @param name Name of the tag, eg. `div`, `span`.
-     * @param attribs Object mapping attribute names to attribute values.
-     * @param children Children of the node.
-     */
-    constructor(name, attribs, children2 = [], type = name === "script" ? ElementType.Script : name === "style" ? ElementType.Style : ElementType.Tag) {
-      super(children2);
-      this.name = name;
-      this.attribs = attribs;
-      this.type = type;
-    }
-    get nodeType() {
-      return 1;
-    }
-    // DOM Level 1 aliases
-    /**
-     * Same as {@link name}.
-     * [DOM spec](https://dom.spec.whatwg.org)-compatible alias.
-     */
-    get tagName() {
-      return this.name;
-    }
-    set tagName(name) {
-      this.name = name;
-    }
-    get attributes() {
-      return Object.keys(this.attribs).map((name) => {
-        var _a2, _b;
-        return {
-          name,
-          value: this.attribs[name],
-          namespace: (_a2 = this["x-attribsNamespace"]) === null || _a2 === void 0 ? void 0 : _a2[name],
-          prefix: (_b = this["x-attribsPrefix"]) === null || _b === void 0 ? void 0 : _b[name]
-        };
-      });
-    }
-  };
-  function isTag2(node) {
-    return isTag(node);
-  }
-  function isCDATA(node) {
-    return node.type === ElementType.CDATA;
-  }
-  function isText(node) {
-    return node.type === ElementType.Text;
-  }
-  function isComment(node) {
-    return node.type === ElementType.Comment;
-  }
-  function isDirective(node) {
-    return node.type === ElementType.Directive;
-  }
-  function isDocument(node) {
-    return node.type === ElementType.Root;
-  }
-  function hasChildren(node) {
-    return Object.prototype.hasOwnProperty.call(node, "children");
-  }
-  function cloneNode(node, recursive = false) {
-    let result;
-    if (isText(node)) {
-      result = new Text2(node.data);
-    } else if (isComment(node)) {
-      result = new Comment2(node.data);
-    } else if (isTag2(node)) {
-      const children2 = recursive ? cloneChildren(node.children) : [];
-      const clone2 = new Element(node.name, { ...node.attribs }, children2);
-      children2.forEach((child) => child.parent = clone2);
-      if (node.namespace != null) {
-        clone2.namespace = node.namespace;
-      }
-      if (node["x-attribsNamespace"]) {
-        clone2["x-attribsNamespace"] = { ...node["x-attribsNamespace"] };
-      }
-      if (node["x-attribsPrefix"]) {
-        clone2["x-attribsPrefix"] = { ...node["x-attribsPrefix"] };
-      }
-      result = clone2;
-    } else if (isCDATA(node)) {
-      const children2 = recursive ? cloneChildren(node.children) : [];
-      const clone2 = new CDATA2(children2);
-      children2.forEach((child) => child.parent = clone2);
-      result = clone2;
-    } else if (isDocument(node)) {
-      const children2 = recursive ? cloneChildren(node.children) : [];
-      const clone2 = new Document(children2);
-      children2.forEach((child) => child.parent = clone2);
-      if (node["x-mode"]) {
-        clone2["x-mode"] = node["x-mode"];
-      }
-      result = clone2;
-    } else if (isDirective(node)) {
-      const instruction = new ProcessingInstruction(node.name, node.data);
-      if (node["x-name"] != null) {
-        instruction["x-name"] = node["x-name"];
-        instruction["x-publicId"] = node["x-publicId"];
-        instruction["x-systemId"] = node["x-systemId"];
-      }
-      result = instruction;
-    } else {
-      throw new Error(`Not implemented yet: ${node.type}`);
-    }
-    result.startIndex = node.startIndex;
-    result.endIndex = node.endIndex;
-    if (node.sourceCodeLocation != null) {
-      result.sourceCodeLocation = node.sourceCodeLocation;
-    }
-    return result;
-  }
-  function cloneChildren(childs) {
-    const children2 = childs.map((child) => cloneNode(child, true));
-    for (let i = 1; i < children2.length; i++) {
-      children2[i].prev = children2[i - 1];
-      children2[i - 1].next = children2[i];
-    }
-    return children2;
-  }
-
-  // node_modules/domhandler/lib/esm/index.js
-  var defaultOpts = {
-    withStartIndices: false,
-    withEndIndices: false,
-    xmlMode: false
-  };
-  var DomHandler = class {
-    /**
-     * @param callback Called once parsing has completed.
-     * @param options Settings for the handler.
-     * @param elementCB Callback whenever a tag is closed.
-     */
-    constructor(callback, options, elementCB) {
-      this.dom = [];
-      this.root = new Document(this.dom);
-      this.done = false;
-      this.tagStack = [this.root];
-      this.lastNode = null;
-      this.parser = null;
-      if (typeof options === "function") {
-        elementCB = options;
-        options = defaultOpts;
-      }
-      if (typeof callback === "object") {
-        options = callback;
-        callback = void 0;
-      }
-      this.callback = callback !== null && callback !== void 0 ? callback : null;
-      this.options = options !== null && options !== void 0 ? options : defaultOpts;
-      this.elementCB = elementCB !== null && elementCB !== void 0 ? elementCB : null;
-    }
-    onparserinit(parser) {
-      this.parser = parser;
-    }
-    // Resets the handler back to starting state
-    onreset() {
-      this.dom = [];
-      this.root = new Document(this.dom);
-      this.done = false;
-      this.tagStack = [this.root];
-      this.lastNode = null;
-      this.parser = null;
-    }
-    // Signals the handler that parsing is done
-    onend() {
-      if (this.done)
-        return;
-      this.done = true;
-      this.parser = null;
-      this.handleCallback(null);
-    }
-    onerror(error) {
-      this.handleCallback(error);
-    }
-    onclosetag() {
-      this.lastNode = null;
-      const elem = this.tagStack.pop();
-      if (this.options.withEndIndices) {
-        elem.endIndex = this.parser.endIndex;
-      }
-      if (this.elementCB)
-        this.elementCB(elem);
-    }
-    onopentag(name, attribs) {
-      const type = this.options.xmlMode ? ElementType.Tag : void 0;
-      const element = new Element(name, attribs, void 0, type);
-      this.addNode(element);
-      this.tagStack.push(element);
-    }
-    ontext(data2) {
-      const { lastNode } = this;
-      if (lastNode && lastNode.type === ElementType.Text) {
-        lastNode.data += data2;
-        if (this.options.withEndIndices) {
-          lastNode.endIndex = this.parser.endIndex;
-        }
-      } else {
-        const node = new Text2(data2);
-        this.addNode(node);
-        this.lastNode = node;
-      }
-    }
-    oncomment(data2) {
-      if (this.lastNode && this.lastNode.type === ElementType.Comment) {
-        this.lastNode.data += data2;
-        return;
-      }
-      const node = new Comment2(data2);
-      this.addNode(node);
-      this.lastNode = node;
-    }
-    oncommentend() {
-      this.lastNode = null;
-    }
-    oncdatastart() {
-      const text3 = new Text2("");
-      const node = new CDATA2([text3]);
-      this.addNode(node);
-      text3.parent = node;
-      this.lastNode = text3;
-    }
-    oncdataend() {
-      this.lastNode = null;
-    }
-    onprocessinginstruction(name, data2) {
-      const node = new ProcessingInstruction(name, data2);
-      this.addNode(node);
-    }
-    handleCallback(error) {
-      if (typeof this.callback === "function") {
-        this.callback(error, this.dom);
-      } else if (error) {
-        throw error;
-      }
-    }
-    addNode(node) {
-      const parent2 = this.tagStack[this.tagStack.length - 1];
-      const previousSibling = parent2.children[parent2.children.length - 1];
-      if (this.options.withStartIndices) {
-        node.startIndex = this.parser.startIndex;
-      }
-      if (this.options.withEndIndices) {
-        node.endIndex = this.parser.endIndex;
-      }
-      parent2.children.push(node);
-      if (previousSibling) {
-        node.prev = previousSibling;
-        previousSibling.next = node;
-      }
-      node.parent = parent2;
-      this.lastNode = null;
-    }
-  };
-
-  // node_modules/dom-serializer/lib/esm/index.js
-  init_buffer();
 
   // node_modules/dom-serializer/lib/esm/foreignNames.js
   init_buffer();
@@ -5345,7 +4464,7 @@ Type: ${row["type"]}`
         return renderCdata(node);
       case Script:
       case Style:
-      case Tag:
+      case Tag2:
         return renderTag(node, options);
       case Text:
         return renderText(node, options);
@@ -17980,11 +17099,26 @@ Type: ${row["type"]}`
   var load = getLoad(parse5, (dom, options) => options._useHtmlParser2 ? esm_default(dom, options) : renderWithParse5(dom));
 
   // src/Manganato/main.ts
-  var MangaBox = class extends import__.Source {
+  var MANGANATO_DOMAIN = "https://batocomic.org";
+  var ManganatoInterceptor = class extends import_types3.PaperbackInterceptor {
+    async interceptRequest(request) {
+      request.headers = {
+        ...request.headers ?? {},
+        ...{
+          referer: `${MANGANATO_DOMAIN}/`,
+          "user-agent": await Application.getDefaultUserAgent()
+        }
+      };
+      return request;
+    }
+    async interceptResponse(request, response, data2) {
+      return data2;
+    }
+  };
+  var ManganatoExtension = class {
     constructor() {
-      super(...arguments);
       // Website base URL. Eg. https://manganato.com
-      this.baseURL = "https://manganato.com";
+      this.baseURL = MANGANATO_DOMAIN;
       // Language code supported by the source.
       this.languageCode = "\u{1F1EC}\u{1F1E7}";
       // Path for manga list. Eg. https://manganato.com/genre-all the path is 'genre-all'
@@ -18020,220 +17154,219 @@ Type: ${row["type"]}`
       // Selector for manga chapter images.
       this.chapterImagesSelector = "div.container-chapter-reader img";
       this.parser = new MangaBoxParser();
-      this.stateManager = App.createSourceStateManager();
-      this.requestManager = App.createRequestManager({
-        requestsPerSecond: 3,
-        requestTimeout: 2e4,
-        interceptor: {
-          interceptRequest: async (request) => {
-            request.headers = {
-              ...request.headers ?? {},
-              ...{
-                referer: `${this.baseURL}/`,
-                "user-agent": await this.requestManager.getDefaultUserAgent()
-              }
-            };
-            return request;
-          },
-          interceptResponse: async (response) => {
-            return response;
-          }
-        }
+      this.globalRateLimiter = new import_types3.BasicRateLimiter("rateLimiter", {
+        numberOfRequests: 4,
+        bufferInterval: 1,
+        ignoreImages: true
       });
+      this.mainRequestInterceptor = new ManganatoInterceptor("main");
     }
-    async getSourceMenu() {
-      return App.createDUISection({
-        id: "main",
-        header: "Source Settings",
-        isHidden: false,
-        rows: async () => [
-          chapterSettings(this.stateManager),
-          proxySettings(this.stateManager, this.requestManager)
-        ]
+    async initialise() {
+      this.globalRateLimiter.registerInterceptor();
+      this.mainRequestInterceptor.registerInterceptor();
+      if (Application.isResourceLimited) return;
+      Application.registerSearchFilter({
+        id: "includeOperator",
+        type: "dropdown",
+        options: [
+          { id: "AND", value: "AND" },
+          { id: "OR", value: "OR" }
+        ],
+        value: "AND",
+        title: "Include Operator"
       });
-    }
-    getMangaShareUrl(mangaId) {
-      return `${mangaId}`;
-    }
-    async getHomePageSections(sectionCallback) {
-      const sections = [
-        {
-          request: App.createRequest({
-            url: new URLBuilder(this.baseURL).addPathComponent(this.mangaListPath).addQueryParameter("type", "latest").buildUrl(),
-            method: "GET"
-          }),
-          section: App.createHomeSection({
-            id: "latest",
-            title: "Latest Updates",
-            type: import__.HomeSectionType.singleRowLarge,
-            containsMoreItems: true
-          })
-        },
-        {
-          request: App.createRequest({
-            url: new URLBuilder(this.baseURL).addPathComponent(this.mangaListPath).addQueryParameter("type", "newest").buildUrl(),
-            method: "GET"
-          }),
-          section: App.createHomeSection({
-            id: "newest",
-            title: "New Titles",
-            type: import__.HomeSectionType.singleRowNormal,
-            containsMoreItems: true
-          })
-        },
-        {
-          request: App.createRequest({
-            url: new URLBuilder(this.baseURL).addPathComponent(this.mangaListPath).addQueryParameter("type", "topview").buildUrl(),
-            method: "GET"
-          }),
-          section: App.createHomeSection({
-            id: "topview",
-            title: "Most Popular",
-            type: import__.HomeSectionType.singleRowNormal,
-            containsMoreItems: true
-          })
-        }
-      ];
-      const promises = [];
-      for (const section of sections) {
-        sectionCallback(section.section);
-        promises.push(
-          this.requestManager.schedule(section.request, 1).then((response) => {
-            const $2 = this.cheerio.load(response.data);
-            const items = this.parser.parseManga($2, this);
-            section.section.items = items;
-            sectionCallback(section.section);
-          })
-        );
+      Application.registerSearchFilter({
+        id: "excludeOperator",
+        type: "dropdown",
+        options: [
+          { id: "AND", value: "AND" },
+          { id: "OR", value: "OR" }
+        ],
+        value: "OR",
+        title: "Exclude Operator"
+      });
+      for (const tags of await this.getSearchTags()) {
+        Application.registerSearchFilter({
+          type: "multiselect",
+          options: tags.tags.map((x) => ({ id: x.id, value: x.title })),
+          id: "tags-" + tags.id,
+          allowExclusion: true,
+          title: tags.title,
+          value: {},
+          allowEmptySelection: true,
+          maximum: void 0
+        });
       }
     }
     async getMangaDetails(mangaId) {
-      const request = App.createRequest({
+      const request = {
         url: `${mangaId}`,
         method: "GET"
-      });
-      const response = await this.requestManager.schedule(request, 1);
-      const $2 = this.cheerio.load(response.data);
+      };
+      const $2 = await this.fetchCheerio(request);
       return this.parser.parseMangaDetails($2, mangaId, this);
     }
-    async getChapters(mangaId) {
-      const request = App.createRequest({
-        url: `${mangaId}`,
+    async getChapters(sourceManga) {
+      const request = {
+        url: `${sourceManga.mangaId}`,
         method: "GET"
-      });
-      const response = await this.requestManager.schedule(request, 1);
-      const $2 = this.cheerio.load(response.data);
-      return this.parser.parseChapters($2, mangaId, this);
+      };
+      const $2 = await this.fetchCheerio(request);
+      return this.parser.parseChapters($2, sourceManga, this);
     }
-    async getChapterDetails(mangaId, chapterId) {
-      const cookieDomainRegex = chapterId.match(/(https?:\/\/[^\\/]+\/)/g);
-      const cookieDomain = cookieDomainRegex ? cookieDomainRegex[0] : this.baseURL;
-      const imageServer = await getImageServer(this.stateManager).then(
-        (value) => value[0]
-      );
-      const request = App.createRequest({
+    async getChapterDetails(chapter) {
+      const chapterId = chapter.chapterId;
+      const mangaId = chapter.sourceManga.mangaId;
+      const request = {
         url: `${chapterId}`,
         method: "GET",
-        cookies: [
-          App.createCookie({
-            name: "content_server",
-            value: imageServer ?? "server1",
-            domain: cookieDomain
-          })
-        ]
-      });
-      const response = await this.requestManager.schedule(request, 1);
-      const $2 = this.cheerio.load(response.data);
-      let chapters = await this.parser.parseChapterDetails(
+        cookies: {
+          content_server: "server2"
+        }
+      };
+      const $2 = await this.fetchCheerio(request);
+      return await this.parser.parseChapterDetails(
         $2,
         mangaId,
         chapterId,
         this
       );
-      let accessToken = await getProxyAccess(this.stateManager);
-      let proxyURL = await getProxyServer(this.stateManager);
-      let enableProxyServer = await getEnableProxyServer(this.stateManager);
-      if (enableProxyServer && proxyURL != "") {
-        let params = "?";
-        for (const page in chapters.pages) {
-          params += `imageUrls=${chapters.pages[page].replace(
-            "?undefined",
-            ""
-          )}&`;
-        }
-        params = params.slice(0, -1);
-        const request2 = App.createRequest({
-          url: `${proxyURL}/generic`,
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            referer: `${proxyURL}/`,
-            Authorization: `Bearer ${accessToken}`
-          },
-          param: params
-        });
-        const response2 = await this.requestManager.schedule(request2, 1);
-        const json = JSON.parse(response2.data);
-        chapters.pages = json.processedImages;
-      }
-      return chapters;
     }
-    async getViewMoreItems(homePageSectionId, metadata) {
-      const page = metadata?.page ?? 1;
-      const request = App.createRequest({
-        url: new URLBuilder(this.baseURL).addPathComponent(`${this.mangaListPath}/${page}`).addQueryParameter("type", homePageSectionId).buildUrl(),
-        method: "GET"
-      });
-      const response = await this.requestManager.schedule(request, 1);
-      const $2 = this.cheerio.load(response.data);
-      const results = this.parser.parseManga($2, this);
-      metadata = !this.parser.isLastPage($2) ? { page: page + 1 } : void 0;
-      return App.createPagedResults({
-        results,
-        metadata
-      });
-    }
+    // override async getHomePageSections(
+    // 	sectionCallback: (section: HomeSection) => void
+    // ): Promise<void> {
+    // 	const sections = [
+    // 		{
+    // 			request: App.createRequest({
+    // 				url: new URLBuilder(this.baseURL)
+    // 					.addPathComponent(this.mangaListPath)
+    // 					.addQueryParameter("type", "latest")
+    // 					.buildUrl(),
+    // 				method: "GET",
+    // 			}),
+    // 			section: App.createHomeSection({
+    // 				id: "latest",
+    // 				title: "Latest Updates",
+    // 				type: HomeSectionType.singleRowLarge,
+    // 				containsMoreItems: true,
+    // 			}),
+    // 		},
+    // 		{
+    // 			request: App.createRequest({
+    // 				url: new URLBuilder(this.baseURL)
+    // 					.addPathComponent(this.mangaListPath)
+    // 					.addQueryParameter("type", "newest")
+    // 					.buildUrl(),
+    // 				method: "GET",
+    // 			}),
+    // 			section: App.createHomeSection({
+    // 				id: "newest",
+    // 				title: "New Titles",
+    // 				type: HomeSectionType.singleRowNormal,
+    // 				containsMoreItems: true,
+    // 			}),
+    // 		},
+    // 		{
+    // 			request: App.createRequest({
+    // 				url: new URLBuilder(this.baseURL)
+    // 					.addPathComponent(this.mangaListPath)
+    // 					.addQueryParameter("type", "topview")
+    // 					.buildUrl(),
+    // 				method: "GET",
+    // 			}),
+    // 			section: App.createHomeSection({
+    // 				id: "topview",
+    // 				title: "Most Popular",
+    // 				type: HomeSectionType.singleRowNormal,
+    // 				containsMoreItems: true,
+    // 			}),
+    // 		},
+    // 	];
+    // 	const promises: Promise<void>[] = [];
+    // 	for (const section of sections) {
+    // 		sectionCallback(section.section);
+    // 		promises.push(
+    // 			this.requestManager
+    // 				.schedule(section.request, 1)
+    // 				.then((response) => {
+    // 					const $ = this.cheerio.load(response.data as string);
+    // 					const items = this.parser.parseManga($, this);
+    // 					section.section.items = items;
+    // 					sectionCallback(section.section);
+    // 				})
+    // 		);
+    // 	}
+    // }
+    // override async getViewMoreItems(
+    // 	homePageSectionId: string,
+    // 	metadata: any
+    // ): Promise<PagedResults> {
+    // 	const page: number = metadata?.page ?? 1;
+    // 	const request = {
+    // 		url: new URLBuilder(this.baseURL)
+    // 			.addPathComponent(`${this.mangaListPath}/${page}`)
+    // 			.addQueryParameter("type", homePageSectionId)
+    // 			.buildUrl(),
+    // 		method: "GET",
+    // 	};
+    // 	const $ = await this.fetchCheerio(request);
+    // 	const results = this.parser.parseManga($, this);
+    // 	metadata = !this.parser.isLastPage($) ? { page: page + 1 } : undefined;
+    // 	return {
+    // 		results: results,
+    // 		metadata: metadata,
+    // 	};
+    // }
     async supportsTagExclusion() {
       return true;
     }
     async getSearchTags() {
-      const request = App.createRequest({
-        url: new URLBuilder(this.baseURL).addPathComponent("advanced_search").buildUrl(),
+      const request = {
+        url: `${this.baseURL}/advanced_search`,
         method: "GET"
-      });
-      const response = await this.requestManager.schedule(request, 1);
-      const $2 = this.cheerio.load(response.data);
+      };
+      const $2 = await this.fetchCheerio(request);
       return this.parser.parseTags($2, this);
     }
     async getSearchResults(query, metadata) {
       const page = metadata?.page ?? 1;
-      const request = App.createRequest({
-        url: new URLBuilder(this.baseURL).addPathComponent("advanced_search").addQueryParameter(
-          "keyw",
-          query.title?.replace(/[^a-zA-Z0-9 ]/g, "").replace(/ +/g, "_").toLowerCase() ?? ""
-        ).addQueryParameter(
-          "g_i",
-          `_${query.includedTags?.map((t) => t.id).join("_")}_`
-        ).addQueryParameter(
-          "g_e",
-          `_${query.excludedTags?.map((t) => t.id).join("_")}_`
-        ).addQueryParameter("page", page).buildUrl(),
+      let url = `${this.baseURL}/advanced_search?keyw=${query.title?.replace(/[^a-zA-Z0-9 ]/g, "").replace(/ +/g, "_").toLowerCase() ?? ""}`;
+      let included = "";
+      let excluded = "";
+      for (const filter4 of query.filters) {
+        if (filter4.id.startsWith("tags")) {
+          const tags = filter4.value ?? {};
+          for (const tag of Object.entries(tags)) {
+            switch (tag[1]) {
+              case "excluded":
+                excluded += `&g_e_${excluded}${tag[0]}_`;
+                break;
+              case "included":
+                included += `&g_i=_${included}${tag[0]}_`;
+                break;
+            }
+          }
+        }
+      }
+      url = `${url}${included}${excluded}&page=${page}`;
+      const request = {
+        url,
         method: "GET"
-      });
-      const response = await this.requestManager.schedule(request, 1);
-      const $2 = this.cheerio.load(response.data);
+      };
+      const $2 = await this.fetchCheerio(request);
       const results = this.parser.parseManga($2, this, query);
       metadata = !this.parser.isLastPage($2) ? { page: page + 1 } : void 0;
-      return App.createPagedResults({
-        results,
+      return {
+        items: results,
         metadata
-      });
+      };
+    }
+    async fetchCheerio(request) {
+      const [_, data2] = await Application.scheduleRequest(request);
+      return load(Application.arrayBufferToUTF8String(data2));
     }
   };
-  var Manganato = (0, import__.CompatWrapper)(
-    { registerHomeSectionsInInitialise: true },
-    new MangaBox(browser_exports)
-  );
+  var Manganato = new ManganatoExtension();
   return __toCommonJS(main_exports);
 })();
 /*! Bundled license information:
