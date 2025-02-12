@@ -24633,6 +24633,7 @@ Type: ${row["type"]}`
       this.checkResponseError(response);
       const $2 = this.cheerio.load(response.data);
       const results = await this.parser.parseSearchResults($2, this);
+      throw new Error(`${results.length} results found. Parsing...`);
       const manga = [];
       for (const result of results) {
         if (this.usePostIds) {
@@ -24659,7 +24660,7 @@ Type: ${row["type"]}`
           );
         }
       }
-      metadata = results.length >= 18 ? { page: page + 1 } : void 0;
+      metadata = results.length >= 10 ? { page: page + 1 } : void 0;
       return App.createPagedResults({
         results: manga,
         metadata

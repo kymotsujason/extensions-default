@@ -1,5 +1,5 @@
 {
-  "buildTime": "2025-02-12T03:26:16.472Z",
+  "buildTime": "2025-02-12T03:35:17.592Z",
   "builtWith": {
     "toolchain": "1.0.0-alpha.33",
     "types": "1.0.0-alpha.33"
@@ -68,8 +68,8 @@
       "contentRating": "MATURE",
       "developers": [
         {
-          "name": "kymotsujason",
-          "website": "http://github.com/kymotsujason"
+          "name": "Netsky",
+          "website": "http://github.com/TheNetsky"
         }
       ],
       "badges": [],
