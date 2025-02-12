@@ -221,7 +221,9 @@ export const parseChapterList = (
 
 		chapters.push({
 			chapterId: chapterId,
-			title: title,
+			title: title
+				.replace(/^Chapter\s*(\d+(?:\.\d+)?)(?:\s*[-:]\s*)?/i, "")
+				.trim(),
 			langCode: language,
 			chapNum: chapNum,
 			publishDate: date,

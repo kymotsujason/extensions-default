@@ -63,6 +63,7 @@ class KunmangaInterceptor extends PaperbackInterceptor {
 }
 
 export class KunmangaExtension implements KunmangaImplementation {
+	baseUrl = KUNMANGA_DOMAIN;
 	language = "🇬🇧";
 	searchMangaSelector = "div.c-tabs-item > div";
 	searchPagePathName = "page";
@@ -147,9 +148,7 @@ export class KunmangaExtension implements KunmangaImplementation {
 		const mangaId = chapter.sourceManga.mangaId;
 		let url: string;
 		const slugData: any = await this.convertPostIdToSlug(Number(mangaId));
-		url = `${KUNMANGA_DOMAIN}/${slugData.path}/${
-			slugData.slug
-		}/${chapterId}/${"?style=list"}`;
+		url = `${KUNMANGA_DOMAIN}/${slugData.path}/${slugData.slug}/${chapterId}/?style=list`;
 
 		const request = {
 			url: url,

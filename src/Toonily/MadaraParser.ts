@@ -163,7 +163,7 @@ export class Parser {
 				title: chapName
 					? Application.decodeHTMLEntities(chapName)
 							.replace(
-								/^Chapter\s*(\d+(?:\.\d+)?)(?:\s*-\s*)?/i,
+								/^Chapter\s*(\d+(?:\.\d+)?)(?:\s*[-:]\s*)?/i,
 								""
 							)
 							.trim()

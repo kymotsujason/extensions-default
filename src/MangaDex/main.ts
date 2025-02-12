@@ -474,9 +474,10 @@ export class MangaDexExtension implements MangaDexImplementation {
 			for (const chapter of json.data) {
 				const chapterId = chapter.id;
 				const chapterDetails = chapter.attributes;
-				const name = Application.decodeHTMLEntities(
-					chapterDetails.title
-				);
+				const name =
+					Application.decodeHTMLEntities(
+						chapterDetails.title ?? ""
+					) ?? "";
 				const chapNum = Number(chapterDetails?.chapter);
 				const volume = Number(chapterDetails?.volume);
 				const langCode: string = MDLanguages.getFlagCode(

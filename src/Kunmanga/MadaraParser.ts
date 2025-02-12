@@ -101,6 +101,7 @@ export class Parser {
 				status: status,
 				rating: rating,
 				contentRating: ContentRating.EVERYONE,
+				shareUrl: `${source.baseUrl}/?p=${mangaId}`,
 			},
 		};
 	}
@@ -159,7 +160,14 @@ export class Parser {
 				chapterId: id,
 				langCode: source.language,
 				chapNum: chapNum,
-				title: chapName ? Application.decodeHTMLEntities(chapName) : "",
+				title: chapName
+					? Application.decodeHTMLEntities(chapName)
+							.replace(
+								/^Chapter\s*(\d+(?:\.\d+)?)(?:\s*[-:]\s*)?/i,
+								""
+							)
+							.trim()
+					: "",
 				publishDate: mangaTime,
 				sortingIndex,
 				volume: 0,
@@ -365,16 +373,11 @@ export class Parser {
 			image = "";
 		}
 
-		if (source?.stateManager) {
-			const HQthumb = true;
-			if (HQthumb) {
-				image = image
-					?.replace("-110x150", "")
-					.replace("-175x238", "")
-					.replace("-193x278", "")
-					.replace("-350x476", "");
-			}
-		}
+		image = image
+			?.replace("-110x150", "")
+			.replace("-175x238", "")
+			.replace("-193x278", "")
+			.replace("-350x476", "");
 
 		if (image?.startsWith("/")) {
 			image = source.baseUrl + image;

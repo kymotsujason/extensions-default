@@ -36,11 +36,10 @@ export const parseMangaList = async (
 					thumbnailSelector()
 			  )}`
 			: "https://mangadex.org/_nuxt/img/cover-placeholder.d12c3c5.jpg";
-		const subtitle = parseChapterTitle({
-			title: undefined,
-			volume: mangaDetails.lastVolume,
-			chapter: mangaDetails.lastChapter,
-		});
+		const subtitle = parseChapterTitle(
+			mangaDetails.lastVolume,
+			mangaDetails.lastChapter
+		);
 
 		let relevance = 0;
 		if (query?.title) {
@@ -134,16 +133,11 @@ export const parseMangaDetails = (
 	};
 };
 
-export const parseChapterTitle = (info: {
-	title?: string;
-	volume?: string;
-	chapter?: string;
-}): string => {
-	if (!info) {
-		return "Not found";
-	}
-
-	return `${info.volume ? `Vol. ${info.volume}` : ""} ${
-		info.chapter ? `Ch. ${info.chapter}` : ""
-	} ${info.title ? info.title : ""}`.trim();
+export const parseChapterTitle = (
+	volume?: string,
+	chapter?: string
+): string => {
+	return `${volume ? `Vol. ${volume}` : ""} ${
+		chapter ? `Ch. ${chapter}` : ""
+	}`.trim();
 };
