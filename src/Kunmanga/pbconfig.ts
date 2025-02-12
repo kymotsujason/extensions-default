@@ -2,9 +2,9 @@ import { ContentRating, SourceIntents } from "@paperback/types";
 
 export default {
 	icon: "icon.png",
-	name: "King of Shojo",
+	name: "Kun Manga",
 	version: "0.9.1",
-	description: "The kingofshojo.com extension.",
+	description: "The kunmanga.com extension.",
 	contentRating: ContentRating.MATURE,
 	developers: [
 		{

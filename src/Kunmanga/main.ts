@@ -131,7 +131,7 @@ export class Madara
 	/**
 	 * The Madara URL of the website. Eg. https://webtoon.xyz
 	 */
-	baseUrl: string = "https://manhwaclan.com";
+	baseUrl: string = "https://kunmanga.com";
 
 	/**
 	 * The language code the source's content is served in in string form.
@@ -184,7 +184,7 @@ export class Madara
 	 * each page while on a chapter page. This is the selector
 	 * which is looped over. This may be overridden if required.
 	 */
-	chapterDetailsSelector = "div.reading-content > div";
+	chapterDetailsSelector = "div.reading-content > div> img";
 
 	/**
 	 * Some websites have the Cloudflare defense check enabled on specific parts of the website, these need to be loaded when using the Cloudflare bypass within the app
@@ -756,7 +756,7 @@ export class Madara
 	}
 }
 
-export const Manhwaclan = CompatWrapper(
+export const Kunmanga = CompatWrapper(
 	{ registerHomeSectionsInInitialise: true },
 	new Madara(cheerios)
 );

@@ -19,7 +19,12 @@ export class Parser {
 		source: any
 	): Promise<SourceManga> {
 		const title: string = decodeHTMLEntity(
-			$("div.post-title > h1").children().remove().end().text().trim()
+			$("div.post-title h1, div#manga-title h1")
+				.children()
+				.remove()
+				.end()
+				.text()
+				.trim()
 		);
 		const author: string = decodeHTMLEntity(
 			$("div.author-content").first().text().replace("\\n", "").trim()
