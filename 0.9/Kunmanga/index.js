@@ -16879,7 +16879,7 @@ var source = (() => {
       const $2 = await this.fetchCheerio(request);
       throw new Error(
         Application.decodeHTMLEntities(
-          $2(".averagerate").first().text().trim()
+          $2("span:nth-child(3) > span").first().text().trim()
         )
       );
       return this.parser.parseMangaDetails($2, mangaId, this);
