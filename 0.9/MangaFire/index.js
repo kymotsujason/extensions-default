@@ -18099,6 +18099,7 @@ var source = (() => {
         chapterId,
         MANGAFIRE_DOMAIN
       );
+      throw new Error(JSON.stringify(chapters));
       let accessToken = getProxyAccess();
       let proxyURL = getProxyServer();
       let enableProxyServer = getEnableProxyServer();
