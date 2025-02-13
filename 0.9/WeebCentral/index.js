@@ -16713,48 +16713,53 @@ var source = (() => {
     const mangaId = sourceManga.mangaId;
     const floatRegex = /(\d+\.\d+|\d+)/g;
     const chapters = [];
-    const arrChapters = $2("a.flex.items-center").toArray();
     const types = {};
     let currTypeId = 0;
     let sortingIndex = 0;
-    for (const chapterObj of arrChapters) {
-      const chapterId = $2(chapterObj).attr("href")?.replace(/\/$/, "")?.split("/").pop() ?? "";
-      if (!chapterId) continue;
-      const time = new Date(
-        $2("time.opacity-50", chapterObj).attr("datetime") ?? ""
-      );
-      let chapName = $2("span.grow.flex.gap-2 span", chapterObj).first().text().trim();
+    $2("a.flex.items-center").each((index2, chapterElem) => {
+      const $chapter = $2(chapterElem);
+      const href = $chapter.attr("href");
+      if (!href) return;
+      const chapterId = href.replace(/\/$/, "").split("/").pop();
+      if (!chapterId) return;
+      const datetime = $chapter.find("time.opacity-50").attr("datetime");
+      const time = datetime ? new Date(datetime) : /* @__PURE__ */ new Date();
+      const chapNameElem = $chapter.find("span.grow.flex.gap-2 > span").first();
+      const chapName = chapNameElem.text().trim();
       let chapNum = 0;
       let chapType = "";
       const matches = chapName.match(floatRegex);
-      if (matches && matches[matches.length - 1]) {
-        chapNum = parseFloat(matches[matches.length - 1] ?? "0");
-        chapType = chapName.slice(0, -matches[matches.length - 1].length).trim();
+      if (matches && matches.length > 0) {
+        const lastMatch = matches[matches.length - 1];
+        chapNum = parseFloat(lastMatch);
+        chapType = chapName.slice(0, chapName.lastIndexOf(lastMatch)).trim();
       }
       sortingIndex--;
       if (!(chapType in types)) {
         types[chapType] = currTypeId--;
       }
+      const title = chapName.replace(
+        /^(Chapter|Episode|Round|Volume|Days)\s*(\d+(?:\.\d+)?)(?:\s*[-:]\s*)?/i,
+        ""
+      ).trim();
       chapters.push({
         chapterId,
-        title: chapName.replace(
-          /^(Chapter|Episode|Round|Volume|Days)\s*(\d+(?:\.\d+)?)(?:\s*[-:]\s*)?/i,
-          ""
-        ).trim(),
+        title,
         chapNum,
         publishDate: time,
         sortingIndex,
         langCode: "en",
         sourceManga
       });
-    }
-    if (chapters.length == 0) {
+    });
+    if (chapters.length === 0) {
       throw new Error(`Couldn't find any chapters for mangaId: ${mangaId}`);
     }
-    return chapters.map((chapter) => {
-      chapter.sortingIndex += chapters.length;
-      return chapter;
+    const totalChapters = chapters.length;
+    chapters.forEach((chapter) => {
+      chapter.sortingIndex += totalChapters;
     });
+    return chapters;
   };
   var parseChapterDetails = ($2, mangaId, chapterId) => {
     const pages = [];
@@ -17111,8 +17116,9 @@ var source = (() => {
         url: `${WEEBCENTRAL_DOMAIN}/series/${sourceManga.mangaId}/full-chapter-list`,
         method: "GET"
       };
-      var start = (/* @__PURE__ */ new Date()).getTime();
       const $2 = await this.fetchCheerio(request);
+      var start = (/* @__PURE__ */ new Date()).getTime();
+      await parseChapterList($2, sourceManga);
       var end2 = (/* @__PURE__ */ new Date()).getTime();
       var time = end2 - start;
       throw new Error(`Fetch chapter details took ${time} milliseconds`);
