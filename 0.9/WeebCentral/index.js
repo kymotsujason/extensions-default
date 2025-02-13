@@ -17052,38 +17052,6 @@ var source = (() => {
       this.mainRequestInterceptor.registerInterceptor();
       this.cookieStorageInterceptor.registerInterceptor();
       if (Application.isResourceLimited) return;
-      Application.registerSearchFilter({
-        id: "includeOperator",
-        type: "dropdown",
-        options: [
-          { id: "AND", value: "AND" },
-          { id: "OR", value: "OR" }
-        ],
-        value: "AND",
-        title: "Include Operator"
-      });
-      Application.registerSearchFilter({
-        id: "excludeOperator",
-        type: "dropdown",
-        options: [
-          { id: "AND", value: "AND" },
-          { id: "OR", value: "OR" }
-        ],
-        value: "OR",
-        title: "Exclude Operator"
-      });
-      for (const tags of await this.getSearchTags()) {
-        Application.registerSearchFilter({
-          type: "multiselect",
-          options: tags.tags.map((x) => ({ id: x.id, value: x.title })),
-          id: "tags-" + tags.id,
-          allowExclusion: true,
-          title: tags.title,
-          value: {},
-          allowEmptySelection: true,
-          maximum: void 0
-        });
-      }
     }
     async getSearchFilters() {
       const includeFilter = {
