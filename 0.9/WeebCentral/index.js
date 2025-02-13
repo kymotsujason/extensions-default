@@ -18684,9 +18684,9 @@ var source = (() => {
       };
       const $2 = await this.fetchCheerio(request);
       var start = (/* @__PURE__ */ new Date()).getTime();
+      await parseChapterList($2, sourceManga);
       var end2 = (/* @__PURE__ */ new Date()).getTime();
       var time = end2 - start;
-      await parseChapterList($2, sourceManga);
       throw new Error(`Fetch chapter details took ${time} milliseconds`);
       return parseChapterList($2, sourceManga);
     }
