@@ -17263,7 +17263,10 @@ var source = (() => {
       return load(Application.arrayBufferToUTF8String(data2), {
         xml: {
           xmlMode: false,
-          decodeEntities: false
+          decodeEntities: false,
+          lowerCaseTags: false,
+          recognizeSelfClosing: false,
+          recognizeCDATA: false
         }
       });
     }
