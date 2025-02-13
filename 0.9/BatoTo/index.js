@@ -25008,7 +25008,8 @@ var source = (() => {
       this.checkCloudflareStatus(response.status);
       return load(Application.arrayBufferToUTF8String(data2), {
         xml: {
-          xmlMode: false
+          xmlMode: false,
+          decodeEntities: false
         }
       });
     }

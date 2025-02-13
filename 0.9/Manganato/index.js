@@ -17466,10 +17466,10 @@ var source = (() => {
     }
     async fetchCheerio(request) {
       const [_, data2] = await Application.scheduleRequest(request);
-      return load(Application.arrayBufferToUTF8String(data2));
       return load(Application.arrayBufferToUTF8String(data2), {
         xml: {
-          xmlMode: false
+          xmlMode: false,
+          decodeEntities: false
         }
       });
     }
