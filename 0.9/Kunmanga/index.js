@@ -15475,13 +15475,13 @@ var source = (() => {
     return result;
   }
 
-  // node_modules/htmlparser2/lib/esm/index.js
+  // node_modules/cheerio/node_modules/htmlparser2/lib/esm/index.js
   init_buffer();
 
-  // node_modules/htmlparser2/lib/esm/Parser.js
+  // node_modules/cheerio/node_modules/htmlparser2/lib/esm/Parser.js
   init_buffer();
 
-  // node_modules/htmlparser2/lib/esm/Tokenizer.js
+  // node_modules/cheerio/node_modules/htmlparser2/lib/esm/Tokenizer.js
   init_buffer();
   var CharCodes2;
   (function(CharCodes3) {
@@ -16169,7 +16169,7 @@ var source = (() => {
     }
   };
 
-  // node_modules/htmlparser2/lib/esm/Parser.js
+  // node_modules/cheerio/node_modules/htmlparser2/lib/esm/Parser.js
   var formTags = /* @__PURE__ */ new Set([
     "input",
     "option",
@@ -16617,7 +16617,7 @@ var source = (() => {
     }
   };
 
-  // node_modules/htmlparser2/lib/esm/index.js
+  // node_modules/cheerio/node_modules/htmlparser2/lib/esm/index.js
   function parseDocument(data2, options) {
     const handler = new DomHandler(void 0, options);
     new Parser2(handler, options).end(data2);
