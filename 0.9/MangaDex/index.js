@@ -5250,7 +5250,9 @@ var source = (() => {
       this.globalRateLimiter.registerInterceptor();
       this.mainRequestInterceptor.registerInterceptor();
       if (Application.isResourceLimited) return;
-      Application.registerSearchFilter({
+    }
+    async getSearchFilters() {
+      const includeFilter = {
         id: "includeOperator",
         type: "dropdown",
         options: [
@@ -5259,8 +5261,8 @@ var source = (() => {
         ],
         value: "AND",
         title: "Include Operator"
-      });
-      Application.registerSearchFilter({
+      };
+      const excludeFilter = {
         id: "excludeOperator",
         type: "dropdown",
         options: [
@@ -5269,19 +5271,26 @@ var source = (() => {
         ],
         value: "OR",
         title: "Exclude Operator"
-      });
-      for (const tags of this.getSearchTags()) {
-        Application.registerSearchFilter({
-          type: "multiselect",
-          options: tags.tags.map((x) => ({ id: x.id, value: x.title })),
-          id: "tags-" + tags.id,
-          allowExclusion: true,
-          title: tags.title,
-          value: {},
-          allowEmptySelection: true,
-          maximum: void 0
-        });
+      };
+      let tagFilter = {
+        type: "multiselect",
+        options: [],
+        id: "",
+        allowExclusion: true,
+        title: "",
+        value: {},
+        allowEmptySelection: true,
+        maximum: void 0
+      };
+      for (const tags of await this.getSearchTags()) {
+        tagFilter.options = tags.tags.map((x) => ({
+          id: x.id,
+          value: x.title
+        }));
+        tagFilter.id = "tags-" + tags.id;
+        tagFilter.title = tags.title;
       }
+      return [includeFilter, excludeFilter, tagFilter];
     }
     async getDiscoverSections() {
       return [

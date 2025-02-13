@@ -24811,7 +24811,9 @@ var source = (() => {
       this.mainRequestInterceptor.registerInterceptor();
       this.cookieStorageInterceptor.registerInterceptor();
       if (Application.isResourceLimited) return;
-      Application.registerSearchFilter({
+    }
+    async getSearchFilters() {
+      const includeFilter = {
         id: "includeOperator",
         type: "dropdown",
         options: [
@@ -24820,8 +24822,8 @@ var source = (() => {
         ],
         value: "AND",
         title: "Include Operator"
-      });
-      Application.registerSearchFilter({
+      };
+      const excludeFilter = {
         id: "excludeOperator",
         type: "dropdown",
         options: [
@@ -24830,19 +24832,26 @@ var source = (() => {
         ],
         value: "OR",
         title: "Exclude Operator"
-      });
+      };
+      let tagFilter = {
+        type: "multiselect",
+        options: [],
+        id: "",
+        allowExclusion: true,
+        title: "",
+        value: {},
+        allowEmptySelection: true,
+        maximum: void 0
+      };
       for (const tags of await this.getSearchTags()) {
-        Application.registerSearchFilter({
-          type: "multiselect",
-          options: tags.tags.map((x) => ({ id: x.id, value: x.title })),
-          id: "tags-" + tags.id,
-          allowExclusion: true,
-          title: tags.title,
-          value: {},
-          allowEmptySelection: true,
-          maximum: void 0
-        });
+        tagFilter.options = tags.tags.map((x) => ({
+          id: x.id,
+          value: x.title
+        }));
+        tagFilter.id = "tags-" + tags.id;
+        tagFilter.title = tags.title;
       }
+      return [includeFilter, excludeFilter, tagFilter];
     }
     async getSettingsForm() {
       return new BatotoSettingsForm();
