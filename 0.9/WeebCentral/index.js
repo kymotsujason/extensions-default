@@ -17258,7 +17258,6 @@ var source = (() => {
       this.checkCloudflareStatus(response.status);
       return load(Application.arrayBufferToUTF8String(data2), {
         xml: {
-          // Disable `xmlMode` to parse HTML with htmlparser2.
           xmlMode: false
         }
       });
