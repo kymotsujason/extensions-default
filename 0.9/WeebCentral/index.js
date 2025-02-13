@@ -17260,14 +17260,7 @@ var source = (() => {
     async fetchCheerio(request) {
       const [response, data2] = await Application.scheduleRequest(request);
       this.checkCloudflareStatus(response.status);
-      return load(Application.arrayBufferToUTF8String(data2), {
-        xml: {
-          xmlMode: false,
-          decodeEntities: false,
-          lowerCaseAttributeNames: false,
-          lowerCaseTags: false
-        }
-      });
+      return (void 0)(Buffer2.from(data2));
     }
     checkCloudflareStatus(status) {
       if (status == 503 || status == 403) {
