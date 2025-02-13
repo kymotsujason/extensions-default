@@ -17257,12 +17257,48 @@ var source = (() => {
       const $2 = await this.fetchCheerio(request);
       return parseTags($2);
     }
+    arrayBufferToUTF8String(arrayBuffer) {
+      var result = "";
+      var uint8Array = new Uint8Array(arrayBuffer);
+      var len = uint8Array.length;
+      var i = 0;
+      while (i < len) {
+        var c = uint8Array[i++];
+        if (c < 128) {
+          result += String.fromCharCode(c);
+        } else if (c > 191 && c < 224) {
+          var c2 = uint8Array[i++];
+          result += String.fromCharCode((c & 31) << 6 | c2 & 63);
+        } else if (c > 223 && c < 240) {
+          var c2 = uint8Array[i++];
+          var c3 = uint8Array[i++];
+          result += String.fromCharCode(
+            // @ts-ignore
+            (c & 15) << 12 | (c2 & 63) << 6 | c3 & 63
+          );
+        } else if (c > 239 && c < 248) {
+          var c2 = uint8Array[i++];
+          var c3 = uint8Array[i++];
+          var c4 = uint8Array[i++];
+          var codepoint = (
+            // @ts-ignore
+            (c & 7) << 18 | // @ts-ignore
+            (c2 & 63) << 12 | // @ts-ignore
+            (c3 & 63) << 6 | // @ts-ignore
+            (c4 & 63) - 65536
+          );
+          result += String.fromCharCode(
+            55296 + (codepoint >> 10),
+            56320 + (codepoint & 1023)
+          );
+        }
+      }
+      return result;
+    }
     async fetchCheerio(request) {
       const [response, data2] = await Application.scheduleRequest(request);
       this.checkCloudflareStatus(response.status);
-      const decoder = new TextDecoder("utf-8");
-      const htmlString = decoder.decode(data2);
-      return load(htmlString, {
+      return load(this.arrayBufferToUTF8String(data2), {
         xml: {
           xmlMode: false,
           decodeEntities: false
