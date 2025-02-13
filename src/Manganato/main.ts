@@ -336,7 +336,12 @@ export class ManganatoExtension implements ManganatoImplementation {
 
 	async fetchCheerio(request: Request): Promise<CheerioAPI> {
 		const [_, data] = await Application.scheduleRequest(request);
-		return cheerio.load(Application.arrayBufferToUTF8String(data));
+		return cheerio.load(Application.arrayBufferToUTF8String(data), {
+			xml: {
+				xmlMode: false,
+				decodeEntities: false,
+			},
+		});
 	}
 }
 

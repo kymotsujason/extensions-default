@@ -322,7 +322,12 @@ export class WeebCentralExtension implements WeebCentralImplementation {
 	async fetchCheerio(request: Request): Promise<CheerioAPI> {
 		const [response, data] = await Application.scheduleRequest(request);
 		this.checkCloudflareStatus(response.status);
-		return cheerio.load(Application.arrayBufferToUTF8String(data));
+		return cheerio.load(Application.arrayBufferToUTF8String(data), {
+			xml: {
+				xmlMode: false,
+				decodeEntities: false,
+			},
+		});
 	}
 
 	checkCloudflareStatus(status: number): void {

@@ -26,7 +26,6 @@ import {
 
 import * as cheerio from "cheerio";
 import { CheerioAPI } from "cheerio";
-
 import { Parser } from "./MadaraParser";
 
 const KUNMANGA_DOMAIN = "https://kunmanga.com";
@@ -409,7 +408,12 @@ export class KunmangaExtension implements KunmangaImplementation {
 	async fetchCheerio(request: Request): Promise<CheerioAPI> {
 		const [response, data] = await Application.scheduleRequest(request);
 		this.checkCloudflareStatus(response.status);
-		return cheerio.load(Application.arrayBufferToUTF8String(data));
+		return cheerio.load(Application.arrayBufferToUTF8String(data), {
+			xml: {
+				xmlMode: false,
+				decodeEntities: false,
+			},
+		});
 	}
 
 	checkCloudflareStatus(status: number): void {
