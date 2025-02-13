@@ -2435,14 +2435,14 @@ var source = (() => {
       init_buffer();
       Object.defineProperty(exports, "__esModule", { value: true });
       exports.DiscoverSectionType = void 0;
-      var DiscoverSectionType;
-      (function(DiscoverSectionType2) {
-        DiscoverSectionType2[DiscoverSectionType2["featured"] = 0] = "featured";
-        DiscoverSectionType2[DiscoverSectionType2["simpleCarousel"] = 1] = "simpleCarousel";
-        DiscoverSectionType2[DiscoverSectionType2["prominentCarousel"] = 2] = "prominentCarousel";
-        DiscoverSectionType2[DiscoverSectionType2["chapterUpdates"] = 3] = "chapterUpdates";
-        DiscoverSectionType2[DiscoverSectionType2["genres"] = 4] = "genres";
-      })(DiscoverSectionType || (exports.DiscoverSectionType = DiscoverSectionType = {}));
+      var DiscoverSectionType2;
+      (function(DiscoverSectionType3) {
+        DiscoverSectionType3[DiscoverSectionType3["featured"] = 0] = "featured";
+        DiscoverSectionType3[DiscoverSectionType3["simpleCarousel"] = 1] = "simpleCarousel";
+        DiscoverSectionType3[DiscoverSectionType3["prominentCarousel"] = 2] = "prominentCarousel";
+        DiscoverSectionType3[DiscoverSectionType3["chapterUpdates"] = 3] = "chapterUpdates";
+        DiscoverSectionType3[DiscoverSectionType3["genres"] = 4] = "genres";
+      })(DiscoverSectionType2 || (exports.DiscoverSectionType = DiscoverSectionType2 = {}));
     }
   });
 
@@ -3216,6 +3216,28 @@ var source = (() => {
           pages
         };
         return chapterDetails;
+      };
+      this.parseViewMore = ($2, source) => {
+        const mangaItems = [];
+        const collecedIds = [];
+        for (const manga of $2(source.mangaListSelector).toArray()) {
+          const mangaId = $2("a", manga).first().attr("href");
+          const image = $2("img", manga).first().attr("src")?.trim() ?? "";
+          const title = Application.decodeHTMLEntities(
+            $2("a", manga).first().attr("title")?.trim() ?? ""
+          );
+          const subtitle = $2(source.mangaSubtitleSelector, manga).first().text().trim() ?? "";
+          if (!mangaId || !title || collecedIds.includes(mangaId)) continue;
+          collecedIds.push(mangaId);
+          mangaItems.push({
+            type: "simpleCarouselItem",
+            mangaId,
+            imageUrl: image,
+            title,
+            subtitle: subtitle ? subtitle : "No Chapters"
+          });
+        }
+        return mangaItems;
       };
       this.parseTags = ($2, source) => {
         const genres = [];
@@ -17239,91 +17261,55 @@ var source = (() => {
         this
       );
     }
-    // override async getHomePageSections(
-    // 	sectionCallback: (section: HomeSection) => void
-    // ): Promise<void> {
-    // 	const sections = [
-    // 		{
-    // 			request: App.createRequest({
-    // 				url: new URLBuilder(this.baseURL)
-    // 					.addPathComponent(this.mangaListPath)
-    // 					.addQueryParameter("type", "latest")
-    // 					.buildUrl(),
-    // 				method: "GET",
-    // 			}),
-    // 			section: App.createHomeSection({
-    // 				id: "latest",
-    // 				title: "Latest Updates",
-    // 				type: HomeSectionType.singleRowLarge,
-    // 				containsMoreItems: true,
-    // 			}),
-    // 		},
-    // 		{
-    // 			request: App.createRequest({
-    // 				url: new URLBuilder(this.baseURL)
-    // 					.addPathComponent(this.mangaListPath)
-    // 					.addQueryParameter("type", "newest")
-    // 					.buildUrl(),
-    // 				method: "GET",
-    // 			}),
-    // 			section: App.createHomeSection({
-    // 				id: "newest",
-    // 				title: "New Titles",
-    // 				type: HomeSectionType.singleRowNormal,
-    // 				containsMoreItems: true,
-    // 			}),
-    // 		},
-    // 		{
-    // 			request: App.createRequest({
-    // 				url: new URLBuilder(this.baseURL)
-    // 					.addPathComponent(this.mangaListPath)
-    // 					.addQueryParameter("type", "topview")
-    // 					.buildUrl(),
-    // 				method: "GET",
-    // 			}),
-    // 			section: App.createHomeSection({
-    // 				id: "topview",
-    // 				title: "Most Popular",
-    // 				type: HomeSectionType.singleRowNormal,
-    // 				containsMoreItems: true,
-    // 			}),
-    // 		},
-    // 	];
-    // 	const promises: Promise<void>[] = [];
-    // 	for (const section of sections) {
-    // 		sectionCallback(section.section);
-    // 		promises.push(
-    // 			this.requestManager
-    // 				.schedule(section.request, 1)
-    // 				.then((response) => {
-    // 					const $ = this.cheerio.load(response.data as string);
-    // 					const items = this.parser.parseManga($, this);
-    // 					section.section.items = items;
-    // 					sectionCallback(section.section);
-    // 				})
-    // 		);
-    // 	}
-    // }
-    // override async getViewMoreItems(
-    // 	homePageSectionId: string,
-    // 	metadata: any
-    // ): Promise<PagedResults> {
-    // 	const page: number = metadata?.page ?? 1;
-    // 	const request = {
-    // 		url: new URLBuilder(this.baseURL)
-    // 			.addPathComponent(`${this.mangaListPath}/${page}`)
-    // 			.addQueryParameter("type", homePageSectionId)
-    // 			.buildUrl(),
-    // 		method: "GET",
-    // 	};
-    // 	const $ = await this.fetchCheerio(request);
-    // 	const results = this.parser.parseManga($, this);
-    // 	metadata = !this.parser.isLastPage($) ? { page: page + 1 } : undefined;
-    // 	return {
-    // 		results: results,
-    // 		metadata: metadata,
-    // 	};
-    // }
+    async getDiscoverSections() {
+      return [
+        {
+          id: "latest_releases",
+          title: "Latest Releases",
+          type: import_types3.DiscoverSectionType.simpleCarousel
+        },
+        {
+          id: "popular_manga",
+          title: "Popular Manga",
+          type: import_types3.DiscoverSectionType.simpleCarousel
+        },
+        {
+          id: "newest_release",
+          title: "Newest Releases",
+          type: import_types3.DiscoverSectionType.simpleCarousel
+        }
+      ];
+    }
+    async getDiscoverSectionItems(section, metadata) {
+      const page = metadata?.page ?? 1;
+      let param = "";
+      switch (section.id) {
+        case "popular_manga":
+          param = `/genre-all/${page}?type=topview`;
+          break;
+        case "latest_releases":
+          param = `/genre-all/${page}`;
+          break;
+        case "newest_release":
+          param = `/genre-all/${page}?type=newest`;
+          break;
+        default:
+          throw new Error(
+            "Requested to getViewMoreItems for a section ID which doesn't exist"
+          );
+      }
+      const request = {
+        url: `${this.baseURL}${param}`,
+        method: "GET"
+      };
+      const $2 = await this.fetchCheerio(request);
+      const manga = this.parser.parseViewMore($2, this);
+      metadata = !this.parser.isLastPage($2) ? { page: page + 1 } : void 0;
+      return {
+        items: manga,
+        metadata
+      };
+    }
     async supportsTagExclusion() {
       return true;
     }
