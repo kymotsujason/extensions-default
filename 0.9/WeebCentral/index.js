@@ -16709,19 +16709,18 @@ var source = (() => {
       }
     };
   };
-  var parseChapterList = ($2, sourceManga) => {
+  var parseChapterList = async ($2, sourceManga) => {
     const mangaId = sourceManga.mangaId;
     const floatRegex = /(\d+\.\d+|\d+)/g;
-    const chapters = [];
     const types = {};
     let currTypeId = 0;
-    let sortingIndex = 0;
-    $2("a.flex.items-center").each((index2, chapterElem) => {
+    const chapterElements = $2("a.flex.items-center").toArray();
+    const chapterPromises = chapterElements.map(async (chapterElem, index2) => {
       const $chapter = $2(chapterElem);
       const href = $chapter.attr("href");
-      if (!href) return;
+      if (!href) return null;
       const chapterId = href.replace(/\/$/, "").split("/").pop();
-      if (!chapterId) return;
+      if (!chapterId) return null;
       const datetime = $chapter.find("time.opacity-50").attr("datetime");
       const time = datetime ? new Date(datetime) : /* @__PURE__ */ new Date();
       const chapNameElem = $chapter.find("span.grow.flex.gap-2 > span").first();
@@ -16734,31 +16733,41 @@ var source = (() => {
         chapNum = parseFloat(lastMatch);
         chapType = chapName.slice(0, chapName.lastIndexOf(lastMatch)).trim();
       }
-      sortingIndex--;
-      if (!(chapType in types)) {
-        types[chapType] = currTypeId--;
-      }
       const title = chapName.replace(
         /^(Chapter|Episode|Round|Volume|Days)\s*(\d+(?:\.\d+)?)(?:\s*[-:]\s*)?/i,
         ""
       ).trim();
-      chapters.push({
+      const localSortingIndex = -index2 - 1;
+      return {
         chapterId,
         title,
         chapNum,
         publishDate: time,
-        sortingIndex,
+        sortingIndex: localSortingIndex,
         langCode: "en",
-        sourceManga
-      });
+        sourceManga,
+        chapType
+        // Temporarily include chapType for processing
+      };
     });
-    if (chapters.length === 0) {
+    const chaptersWithChapType = (await Promise.all(chapterPromises)).filter(
+      (chapter) => chapter !== null
+    );
+    if (chaptersWithChapType.length === 0) {
       throw new Error(`Couldn't find any chapters for mangaId: ${mangaId}`);
     }
-    const totalChapters = chapters.length;
-    chapters.forEach((chapter) => {
+    chaptersWithChapType.forEach((chapter) => {
+      const { chapType } = chapter;
+      if (!(chapType in types)) {
+        types[chapType] = currTypeId--;
+      }
+      delete chapter.chapType;
+    });
+    const totalChapters = chaptersWithChapType.length;
+    chaptersWithChapType.forEach((chapter) => {
       chapter.sortingIndex += totalChapters;
     });
+    const chapters = chaptersWithChapType;
     return chapters;
   };
   var parseChapterDetails = ($2, mangaId, chapterId) => {
