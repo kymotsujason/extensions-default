@@ -80,7 +80,7 @@ query ($page: Int, $search: String) {
     pageInfo {
       hasNextPage
     }
-    media (search: $search, type: MANGA, isAdult: false) {
+    media (search: $search, type: MANGA, format: MANGA, isAdult: false) {
 			id
       title {
 				userPreferred
