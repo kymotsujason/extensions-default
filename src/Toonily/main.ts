@@ -21,6 +21,7 @@ import {
 	DiscoverSectionItem,
 	DiscoverSectionType,
 	SearchResultItem,
+	SearchFilter,
 } from "@paperback/types";
 
 import * as cheerio from "cheerio";
@@ -90,8 +91,10 @@ export class ToonilyExtension implements ToonilyImplementation {
 		this.cookieStorageInterceptor.registerInterceptor();
 
 		if (Application.isResourceLimited) return;
+	}
 
-		Application.registerSearchFilter({
+	async getSearchFilters(): Promise<SearchFilter[]> {
+		const includeFilter: SearchFilter = {
 			id: "includeOperator",
 			type: "dropdown",
 			options: [
@@ -100,20 +103,28 @@ export class ToonilyExtension implements ToonilyImplementation {
 			],
 			value: "AND",
 			title: "Include Operator",
-		});
+		};
 
+		let tagFilter: SearchFilter = {
+			type: "multiselect",
+			options: [],
+			id: "",
+			allowExclusion: true,
+			title: "",
+			value: {},
+			allowEmptySelection: true,
+			maximum: undefined,
+		};
 		for (const tags of await this.getSearchTags()) {
-			Application.registerSearchFilter({
-				type: "multiselect",
-				options: tags.tags.map((x) => ({ id: x.id, value: x.title })),
-				id: "tags-" + tags.id,
-				allowExclusion: true,
-				title: tags.title,
-				value: {},
-				allowEmptySelection: true,
-				maximum: undefined,
-			});
+			tagFilter.options = tags.tags.map((x) => ({
+				id: x.id,
+				value: x.title,
+			}));
+			tagFilter.id = "tags-" + tags.id;
+			tagFilter.title = tags.title;
 		}
+
+		return [includeFilter, tagFilter];
 	}
 
 	async getMangaDetails(mangaId: string): Promise<SourceManga> {

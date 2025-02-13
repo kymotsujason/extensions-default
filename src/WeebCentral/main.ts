@@ -23,6 +23,7 @@ import {
 	Cookie,
 	CookieStorageInterceptor,
 	CloudflareError,
+	SearchFilter,
 } from "@paperback/types";
 import { CheerioAPI } from "cheerio";
 import * as cheerio from "cheerio";
@@ -33,7 +34,6 @@ import {
 	parseMangaDetails,
 	parseSearch,
 	parseTags,
-	parseThumbnailUrl,
 	parseViewMore,
 } from "./WeebCentralParser";
 import {
@@ -125,6 +125,51 @@ export class WeebCentralExtension implements WeebCentralImplementation {
 				maximum: undefined,
 			});
 		}
+	}
+
+	async getSearchFilters(): Promise<SearchFilter[]> {
+		const includeFilter: SearchFilter = {
+			id: "includeOperator",
+			type: "dropdown",
+			options: [
+				{ id: "AND", value: "AND" },
+				{ id: "OR", value: "OR" },
+			],
+			value: "AND",
+			title: "Include Operator",
+		};
+
+		const excludeFilter: SearchFilter = {
+			id: "excludeOperator",
+			type: "dropdown",
+			options: [
+				{ id: "AND", value: "AND" },
+				{ id: "OR", value: "OR" },
+			],
+			value: "OR",
+			title: "Exclude Operator",
+		};
+
+		let tagFilter: SearchFilter = {
+			type: "multiselect",
+			options: [],
+			id: "",
+			allowExclusion: true,
+			title: "",
+			value: {},
+			allowEmptySelection: true,
+			maximum: undefined,
+		};
+		for (const tags of await this.getSearchTags()) {
+			tagFilter.options = tags.tags.map((x) => ({
+				id: x.id,
+				value: x.title,
+			}));
+			tagFilter.id = "tags-" + tags.id;
+			tagFilter.title = tags.title;
+		}
+
+		return [includeFilter, excludeFilter, tagFilter];
 	}
 
 	async getSettingsForm(): Promise<Form> {

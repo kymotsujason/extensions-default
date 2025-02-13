@@ -12,6 +12,7 @@ import {
 	PaperbackInterceptor,
 	Request,
 	Response,
+	SearchFilter,
 	SearchQuery,
 	SearchResultItem,
 	SearchResultsProviding,
@@ -134,8 +135,10 @@ export class ManganatoExtension implements ManganatoImplementation {
 		this.mainRequestInterceptor.registerInterceptor();
 
 		if (Application.isResourceLimited) return;
+	}
 
-		Application.registerSearchFilter({
+	async getSearchFilters(): Promise<SearchFilter[]> {
+		const includeFilter: SearchFilter = {
 			id: "includeOperator",
 			type: "dropdown",
 			options: [
@@ -144,9 +147,9 @@ export class ManganatoExtension implements ManganatoImplementation {
 			],
 			value: "AND",
 			title: "Include Operator",
-		});
+		};
 
-		Application.registerSearchFilter({
+		const excludeFilter: SearchFilter = {
 			id: "excludeOperator",
 			type: "dropdown",
 			options: [
@@ -155,20 +158,28 @@ export class ManganatoExtension implements ManganatoImplementation {
 			],
 			value: "OR",
 			title: "Exclude Operator",
-		});
+		};
 
+		let tagFilter: SearchFilter = {
+			type: "multiselect",
+			options: [],
+			id: "",
+			allowExclusion: true,
+			title: "",
+			value: {},
+			allowEmptySelection: true,
+			maximum: undefined,
+		};
 		for (const tags of await this.getSearchTags()) {
-			Application.registerSearchFilter({
-				type: "multiselect",
-				options: tags.tags.map((x) => ({ id: x.id, value: x.title })),
-				id: "tags-" + tags.id,
-				allowExclusion: true,
-				title: tags.title,
-				value: {},
-				allowEmptySelection: true,
-				maximum: undefined,
-			});
+			tagFilter.options = tags.tags.map((x) => ({
+				id: x.id,
+				value: x.title,
+			}));
+			tagFilter.id = "tags-" + tags.id;
+			tagFilter.title = tags.title;
 		}
+
+		return [includeFilter, excludeFilter, tagFilter];
 	}
 
 	async getMangaDetails(mangaId: string): Promise<SourceManga> {

@@ -18,6 +18,7 @@ import {
 	PaperbackInterceptor,
 	Request,
 	Response,
+	SearchFilter,
 	SearchQuery,
 	SearchResultItem,
 	SearchResultsProviding,
@@ -166,8 +167,10 @@ export class MangaDexExtension implements MangaDexImplementation {
 		this.mainRequestInterceptor.registerInterceptor();
 
 		if (Application.isResourceLimited) return;
+	}
 
-		Application.registerSearchFilter({
+	async getSearchFilters(): Promise<SearchFilter[]> {
+		const includeFilter: SearchFilter = {
 			id: "includeOperator",
 			type: "dropdown",
 			options: [
@@ -176,9 +179,9 @@ export class MangaDexExtension implements MangaDexImplementation {
 			],
 			value: "AND",
 			title: "Include Operator",
-		});
+		};
 
-		Application.registerSearchFilter({
+		const excludeFilter: SearchFilter = {
 			id: "excludeOperator",
 			type: "dropdown",
 			options: [
@@ -187,20 +190,28 @@ export class MangaDexExtension implements MangaDexImplementation {
 			],
 			value: "OR",
 			title: "Exclude Operator",
-		});
+		};
 
-		for (const tags of this.getSearchTags()) {
-			Application.registerSearchFilter({
-				type: "multiselect",
-				options: tags.tags.map((x) => ({ id: x.id, value: x.title })),
-				id: "tags-" + tags.id,
-				allowExclusion: true,
-				title: tags.title,
-				value: {},
-				allowEmptySelection: true,
-				maximum: undefined,
-			});
+		let tagFilter: SearchFilter = {
+			type: "multiselect",
+			options: [],
+			id: "",
+			allowExclusion: true,
+			title: "",
+			value: {},
+			allowEmptySelection: true,
+			maximum: undefined,
+		};
+		for (const tags of await this.getSearchTags()) {
+			tagFilter.options = tags.tags.map((x) => ({
+				id: x.id,
+				value: x.title,
+			}));
+			tagFilter.id = "tags-" + tags.id;
+			tagFilter.title = tags.title;
 		}
+
+		return [includeFilter, excludeFilter, tagFilter];
 	}
 
 	async getDiscoverSections(): Promise<DiscoverSection[]> {

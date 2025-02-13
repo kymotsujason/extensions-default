@@ -23,6 +23,7 @@ import {
 	Cookie,
 	CookieStorageInterceptor,
 	CloudflareError,
+	SearchFilter,
 } from "@paperback/types";
 import { CheerioAPI } from "cheerio";
 import * as cheerio from "cheerio";
@@ -111,8 +112,10 @@ export class BatoToExtension implements BatotoImplementation {
 		this.cookieStorageInterceptor.registerInterceptor();
 
 		if (Application.isResourceLimited) return;
+	}
 
-		Application.registerSearchFilter({
+	async getSearchFilters(): Promise<SearchFilter[]> {
+		const includeFilter: SearchFilter = {
 			id: "includeOperator",
 			type: "dropdown",
 			options: [
@@ -121,9 +124,9 @@ export class BatoToExtension implements BatotoImplementation {
 			],
 			value: "AND",
 			title: "Include Operator",
-		});
+		};
 
-		Application.registerSearchFilter({
+		const excludeFilter: SearchFilter = {
 			id: "excludeOperator",
 			type: "dropdown",
 			options: [
@@ -132,20 +135,28 @@ export class BatoToExtension implements BatotoImplementation {
 			],
 			value: "OR",
 			title: "Exclude Operator",
-		});
+		};
 
+		let tagFilter: SearchFilter = {
+			type: "multiselect",
+			options: [],
+			id: "",
+			allowExclusion: true,
+			title: "",
+			value: {},
+			allowEmptySelection: true,
+			maximum: undefined,
+		};
 		for (const tags of await this.getSearchTags()) {
-			Application.registerSearchFilter({
-				type: "multiselect",
-				options: tags.tags.map((x) => ({ id: x.id, value: x.title })),
-				id: "tags-" + tags.id,
-				allowExclusion: true,
-				title: tags.title,
-				value: {},
-				allowEmptySelection: true,
-				maximum: undefined,
-			});
+			tagFilter.options = tags.tags.map((x) => ({
+				id: x.id,
+				value: x.title,
+			}));
+			tagFilter.id = "tags-" + tags.id;
+			tagFilter.title = tags.title;
 		}
+
+		return [includeFilter, excludeFilter, tagFilter];
 	}
 
 	async getSettingsForm(): Promise<Form> {
