@@ -13,8 +13,8 @@ export default {
 	capabilities: [
 		SourceIntents.SETTINGS_UI,
 		SourceIntents.MANGA_SEARCH,
-		SourceIntents.MANGA_TRACKING,
-		SourceIntents.HOMEPAGE_SECTIONS,
+		SourceIntents.MANGA_PROGRESS,
+		SourceIntents.DISCOVER_SECIONS,
 	],
 	developers: [
 		{

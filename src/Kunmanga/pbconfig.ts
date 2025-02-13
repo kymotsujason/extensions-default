@@ -3,7 +3,7 @@ import { ContentRating, SourceIntents } from "@paperback/types";
 export default {
 	icon: "icon.png",
 	name: "Kun Manga",
-	version: "4.0.0",
+	version: "1.0.0",
 	description: "The kunmanga.com extension.",
 	contentRating: ContentRating.MATURE,
 	developers: [
@@ -15,7 +15,7 @@ export default {
 	badges: [],
 	capabilities: [
 		SourceIntents.MANGA_CHAPTERS,
-		SourceIntents.HOMEPAGE_SECTIONS,
+		SourceIntents.DISCOVER_SECIONS,
 		SourceIntents.MANGA_SEARCH,
 		SourceIntents.CLOUDFLARE_BYPASS_REQUIRED,
 	],
