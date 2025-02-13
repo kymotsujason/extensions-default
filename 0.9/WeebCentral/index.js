@@ -17111,7 +17111,11 @@ var source = (() => {
         url: `${WEEBCENTRAL_DOMAIN}/series/${sourceManga.mangaId}/full-chapter-list`,
         method: "GET"
       };
+      var start = (/* @__PURE__ */ new Date()).getTime();
       const $2 = await this.fetchCheerio(request);
+      var end2 = (/* @__PURE__ */ new Date()).getTime();
+      var time = end2 - start;
+      throw new Error(`Fetch chapter details took ${time}ms`);
       return parseChapterList($2, sourceManga);
     }
     async getChapterDetails(chapter) {
@@ -17256,7 +17260,9 @@ var source = (() => {
     async fetchCheerio(request) {
       const [response, data2] = await Application.scheduleRequest(request);
       this.checkCloudflareStatus(response.status);
-      return load(Application.arrayBufferToUTF8String(data2), {
+      const decoder = new TextDecoder("utf-8");
+      const htmlString = decoder.decode(data2);
+      return load(htmlString, {
         xml: {
           xmlMode: false,
           decodeEntities: false
