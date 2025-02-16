@@ -16963,7 +16963,8 @@ var source = (() => {
       if (Application.isResourceLimited) return;
     }
     async getSearchFilters() {
-      const includeFilter = {
+      const filters2 = [];
+      filters2.push({
         id: "includeOperator",
         type: "dropdown",
         options: [
@@ -16972,8 +16973,8 @@ var source = (() => {
         ],
         value: "AND",
         title: "Include Operator"
-      };
-      let tagFilter = {
+      });
+      filters2.push({
         type: "multiselect",
         options: [],
         id: "",
@@ -16982,16 +16983,23 @@ var source = (() => {
         value: {},
         allowEmptySelection: true,
         maximum: void 0
-      };
+      });
       for (const tags of await this.getSearchTags()) {
-        tagFilter.options = tags.tags.map((x) => ({
-          id: x.id,
-          value: x.title
-        }));
-        tagFilter.id = "tags-" + tags.id;
-        tagFilter.title = tags.title;
+        filters2.push({
+          type: "multiselect",
+          allowExclusion: true,
+          value: {},
+          allowEmptySelection: true,
+          maximum: void 0,
+          options: tags.tags.map((x) => ({
+            id: x.id,
+            value: x.title
+          })),
+          id: "tags-" + tags.id,
+          title: tags.title
+        });
       }
-      return [includeFilter, tagFilter];
+      return filters2;
     }
     async getMangaDetails(mangaId) {
       const request = {
