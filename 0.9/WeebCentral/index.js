@@ -17214,6 +17214,7 @@ var source = (() => {
         let excluded = "";
         for (const filter4 of query.filters) {
           if (filter4.id.startsWith("tags")) {
+            throw new Error(filter4.id);
             const tags = filter4.value ?? {};
             for (const tag of Object.entries(tags)) {
               switch (tag[1]) {
@@ -17230,7 +17231,6 @@ var source = (() => {
         searchParams.concat(
           `${included}${excluded}&limit=${LIMIT}&offset=${offset}`
         );
-        throw new Error(searchParams);
       }
       const request = {
         url: `${WEEBCENTRAL_DOMAIN}/search/data?sort=Best+Match&order=Ascending&display_mode=Full+Display${searchParams}`,
