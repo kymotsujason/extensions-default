@@ -17221,7 +17221,6 @@ var source = (() => {
                   excluded += `&excluded_tag=${excluded}${tag[0]}`;
                   break;
                 case "included":
-                  throw new Error(tag[0]);
                   included += `&included_tag=${included}${tag[0]}`;
                   break;
               }
@@ -17231,6 +17230,7 @@ var source = (() => {
         searchParams.concat(
           `${included}${excluded}&limit=${LIMIT}&offset=${offset}`
         );
+        throw new Error(included);
       }
       const request = {
         url: `${WEEBCENTRAL_DOMAIN}/search/data?sort=Best+Match&order=Ascending&display_mode=Full+Display${searchParams}`,
