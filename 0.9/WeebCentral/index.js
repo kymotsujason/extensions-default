@@ -17214,9 +17214,9 @@ var source = (() => {
         let excluded = "";
         for (const filter4 of query.filters) {
           if (filter4.id.startsWith("tags")) {
-            throw new Error(filter4.id);
             const tags = filter4.value ?? {};
             for (const tag of Object.entries(tags)) {
+              throw new Error(tag[1]);
               switch (tag[1]) {
                 case "excluded":
                   excluded += `&excluded_tag=${excluded}${tag[0]}`;
