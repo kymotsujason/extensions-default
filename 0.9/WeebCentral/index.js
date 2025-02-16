@@ -17218,10 +17218,10 @@ var source = (() => {
             for (const tag of Object.entries(tags)) {
               switch (tag[1]) {
                 case "excluded":
-                  excluded += `&excluded_tag=${excluded}${tag[0]}`;
+                  excluded += `&excluded_tag${tag[0]}`;
                   break;
                 case "included":
-                  included += `&included_tag=${included}${tag[0]}`;
+                  included += `&included_tag=${tag[0]}`;
                   break;
               }
             }
@@ -17230,7 +17230,6 @@ var source = (() => {
         searchParams.concat(
           `${included}${excluded}&limit=${LIMIT}&offset=${offset}`
         );
-        throw new Error(included);
       }
       const request = {
         url: `${WEEBCENTRAL_DOMAIN}/search/data?sort=Best+Match&order=Ascending&display_mode=Full+Display${searchParams}`,
