@@ -93,7 +93,9 @@ export class ToonilyExtension implements ToonilyImplementation {
 	}
 
 	async getSearchFilters(): Promise<SearchFilter[]> {
-		const includeFilter: SearchFilter = {
+		const filters: SearchFilter[] = [];
+
+		filters.push({
 			id: "includeOperator",
 			type: "dropdown",
 			options: [
@@ -102,9 +104,9 @@ export class ToonilyExtension implements ToonilyImplementation {
 			],
 			value: "AND",
 			title: "Include Operator",
-		};
+		});
 
-		let tagFilter: SearchFilter = {
+		filters.push({
 			type: "multiselect",
 			options: [],
 			id: "",
@@ -113,17 +115,25 @@ export class ToonilyExtension implements ToonilyImplementation {
 			value: {},
 			allowEmptySelection: true,
 			maximum: undefined,
-		};
+		});
+
 		for (const tags of await this.getSearchTags()) {
-			tagFilter.options = tags.tags.map((x) => ({
-				id: x.id,
-				value: x.title,
-			}));
-			tagFilter.id = "tags-" + tags.id;
-			tagFilter.title = tags.title;
+			filters.push({
+				type: "multiselect",
+				allowExclusion: true,
+				value: {},
+				allowEmptySelection: true,
+				maximum: undefined,
+				options: tags.tags.map((x) => ({
+					id: x.id,
+					value: x.title,
+				})),
+				id: "tags-" + tags.id,
+				title: tags.title,
+			});
 		}
 
-		return [includeFilter, tagFilter];
+		return filters;
 	}
 
 	async getMangaDetails(mangaId: string): Promise<SourceManga> {
@@ -271,7 +281,7 @@ export class ToonilyExtension implements ToonilyImplementation {
 			let url = `${TOONILY_DOMAIN}/${
 				this.searchPagePathName
 			}/${page.toString()}/?s=${encodeURIComponent(query?.title ?? "")}`;
-			let included = "&";
+			let included = "";
 			for (const filter of query.filters) {
 				if (filter.id.startsWith("tags")) {
 					const tags = (filter.value ?? {}) as Record<
@@ -281,13 +291,12 @@ export class ToonilyExtension implements ToonilyImplementation {
 					for (const tag of Object.entries(tags)) {
 						switch (tag[1]) {
 							case "included":
-								included += `genre[]=${included}${tag[0]}&`;
+								included += `&genre[]=${included}${tag[0]}`;
 								break;
 						}
 					}
 				}
 			}
-			included = included.slice(0, -1);
 			return {
 				url: `${url}${included}`,
 				method: "GET",

@@ -93,7 +93,9 @@ export class WeebCentralExtension implements WeebCentralImplementation {
 	}
 
 	async getSearchFilters(): Promise<SearchFilter[]> {
-		const includeFilter: SearchFilter = {
+		const filters: SearchFilter[] = [];
+
+		filters.push({
 			id: "includeOperator",
 			type: "dropdown",
 			options: [
@@ -102,9 +104,9 @@ export class WeebCentralExtension implements WeebCentralImplementation {
 			],
 			value: "AND",
 			title: "Include Operator",
-		};
+		});
 
-		const excludeFilter: SearchFilter = {
+		filters.push({
 			id: "excludeOperator",
 			type: "dropdown",
 			options: [
@@ -113,28 +115,25 @@ export class WeebCentralExtension implements WeebCentralImplementation {
 			],
 			value: "OR",
 			title: "Exclude Operator",
-		};
+		});
 
-		let tagFilter: SearchFilter = {
-			type: "multiselect",
-			options: [],
-			id: "",
-			allowExclusion: true,
-			title: "",
-			value: {},
-			allowEmptySelection: true,
-			maximum: undefined,
-		};
 		for (const tags of await this.getSearchTags()) {
-			tagFilter.options = tags.tags.map((x) => ({
-				id: x.id,
-				value: x.title,
-			}));
-			tagFilter.id = "tags-" + tags.id;
-			tagFilter.title = tags.title;
+			filters.push({
+				type: "multiselect",
+				allowExclusion: true,
+				value: {},
+				allowEmptySelection: true,
+				maximum: undefined,
+				options: tags.tags.map((x) => ({
+					id: x.id,
+					value: x.title,
+				})),
+				id: "tags-" + tags.id,
+				title: tags.title,
+			});
 		}
 
-		return [includeFilter, excludeFilter, tagFilter];
+		return filters;
 	}
 
 	async getSettingsForm(): Promise<Form> {
@@ -284,16 +283,16 @@ export class WeebCentralExtension implements WeebCentralImplementation {
 					for (const tag of Object.entries(tags)) {
 						switch (tag[1]) {
 							case "excluded":
-								excluded += `&excluded_tag=${excluded}${tag[0]}`;
+								excluded += `&excluded_tag${tag[0]}`;
 								break;
 							case "included":
-								included += `&included_tag=${included}${tag[0]}`;
+								included += `&included_tag=${tag[0]}`;
 								break;
 						}
 					}
 				}
 			}
-			searchParams.concat(
+			searchParams = searchParams.concat(
 				`${included}${excluded}&limit=${LIMIT}&offset=${offset}`
 			);
 		}
