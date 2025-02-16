@@ -17132,20 +17132,20 @@ var source = (() => {
     constructSearchRequest(page, query) {
       if (query.title == "") {
         let url = `${TOONILY_DOMAIN}/${this.searchPagePathName}/${page.toString()}/?s=${encodeURIComponent(query?.title ?? "")}`;
-        let included = "&";
+        let included = "";
         for (const filter4 of query.filters) {
           if (filter4.id.startsWith("tags")) {
             const tags = filter4.value ?? {};
             for (const tag of Object.entries(tags)) {
               switch (tag[1]) {
                 case "included":
-                  included += `genre[]=${included}${tag[0]}&`;
+                  included += `&genre[]=${included}${tag[0]}`;
                   break;
               }
             }
           }
         }
-        included = included.slice(0, -1);
+        throw new Error(`${url}${included}`);
         return {
           url: `${url}${included}`,
           method: "GET"
