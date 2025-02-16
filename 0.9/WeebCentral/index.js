@@ -17231,6 +17231,9 @@ var source = (() => {
           `${included}${excluded}&limit=${LIMIT}&offset=${offset}`
         );
       }
+      throw new Error(
+        `${WEEBCENTRAL_DOMAIN}/search/data?sort=Best+Match&order=Ascending&display_mode=Full+Display${searchParams}`
+      );
       const request = {
         url: `${WEEBCENTRAL_DOMAIN}/search/data?sort=Best+Match&order=Ascending&display_mode=Full+Display${searchParams}`,
         method: "GET"
