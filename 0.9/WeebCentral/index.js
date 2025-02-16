@@ -17216,12 +17216,12 @@ var source = (() => {
           if (filter4.id.startsWith("tags")) {
             const tags = filter4.value ?? {};
             for (const tag of Object.entries(tags)) {
-              throw new Error(tag[1]);
               switch (tag[1]) {
                 case "excluded":
                   excluded += `&excluded_tag=${excluded}${tag[0]}`;
                   break;
                 case "included":
+                  throw new Error(tag[0]);
                   included += `&included_tag=${included}${tag[0]}`;
                   break;
               }
