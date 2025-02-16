@@ -17145,7 +17145,6 @@ var source = (() => {
             }
           }
         }
-        throw new Error(`${url}${included}`);
         return {
           url: `${url}${included}`,
           method: "GET"
