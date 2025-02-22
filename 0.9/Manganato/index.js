@@ -17237,6 +17237,7 @@ var source = (() => {
         ...request.headers ?? {},
         ...{
           referer: `${MANGANATO_DOMAIN}/`,
+          origin: `${MANGANATO_DOMAIN}/`,
           "user-agent": await Application.getDefaultUserAgent()
         }
       };
@@ -17484,6 +17485,7 @@ var source = (() => {
           method: "GET",
           headers: {
             referer: `${CHAPTER_DOMAIN}/`,
+            origin: `${CHAPTER_DOMAIN}/`,
             "user-agent": await Application.getDefaultUserAgent()
           }
         });
