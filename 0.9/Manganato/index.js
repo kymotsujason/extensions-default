@@ -17470,9 +17470,6 @@ var source = (() => {
     async fetchCheerio(request) {
       const bypassRequest = await this.getCloudflareBypassRequestAsync();
       const [response, data2] = await Application.scheduleRequest(request);
-      if (response.status !== 200) {
-        throw new Error(`Failed to fetch data from ${request.url}`);
-      }
       this.checkCloudflareStatus(response.status);
       return load(Application.arrayBufferToUTF8String(data2), {
         xml: {
