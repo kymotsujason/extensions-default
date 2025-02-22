@@ -1,5 +1,5 @@
 {
-  "buildTime": "2025-02-18T02:37:38.962Z",
+  "buildTime": "2025-02-22T04:51:43.093Z",
   "builtWith": {
     "toolchain": "1.0.0-alpha.34",
     "types": "1.0.0-alpha.34"
@@ -124,7 +124,8 @@
       "capabilities": [
         1,
         4,
-        64
+        64,
+        16
       ],
       "id": "Manganato"
     },

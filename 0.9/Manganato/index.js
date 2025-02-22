@@ -2191,7 +2191,7 @@ var source = (() => {
       init_buffer();
       Object.defineProperty(exports, "__esModule", { value: true });
       exports.CloudflareError = void 0;
-      var CloudflareError = class extends Error {
+      var CloudflareError2 = class extends Error {
         resolutionRequest;
         type = "cloudflareError";
         constructor(resolutionRequest, message = "Cloudflare bypass is required") {
@@ -2199,7 +2199,7 @@ var source = (() => {
           this.resolutionRequest = resolutionRequest;
         }
       };
-      exports.CloudflareError = CloudflareError;
+      exports.CloudflareError = CloudflareError2;
     }
   });
 
@@ -2212,7 +2212,7 @@ var source = (() => {
       exports.CookieStorageInterceptor = void 0;
       var PaperbackInterceptor_1 = require_PaperbackInterceptor();
       var cookieStateKey = "cookie_store_cookies";
-      var CookieStorageInterceptor = class extends PaperbackInterceptor_1.PaperbackInterceptor {
+      var CookieStorageInterceptor2 = class extends PaperbackInterceptor_1.PaperbackInterceptor {
         options;
         _cookies = {};
         get cookies() {
@@ -2354,7 +2354,7 @@ var source = (() => {
           Application.setState(this.cookies.filter((x) => x.expires), cookieStateKey);
         }
       };
-      exports.CookieStorageInterceptor = CookieStorageInterceptor;
+      exports.CookieStorageInterceptor = CookieStorageInterceptor2;
     }
   });
 
@@ -17290,10 +17290,14 @@ var source = (() => {
         ignoreImages: true
       });
       this.mainRequestInterceptor = new ManganatoInterceptor("main");
+      this.cookieStorageInterceptor = new import_types3.CookieStorageInterceptor({
+        storage: "stateManager"
+      });
     }
     async initialise() {
       this.globalRateLimiter.registerInterceptor();
       this.mainRequestInterceptor.registerInterceptor();
+      this.cookieStorageInterceptor.registerInterceptor();
       if (Application.isResourceLimited) return;
     }
     async getSearchFilters() {
@@ -17463,13 +17467,26 @@ var source = (() => {
       };
     }
     async fetchCheerio(request) {
-      const [_, data2] = await Application.scheduleRequest(request);
+      const [response, data2] = await Application.scheduleRequest(request);
+      this.checkCloudflareStatus(response.status);
       return load(Application.arrayBufferToUTF8String(data2), {
         xml: {
           xmlMode: false,
           decodeEntities: false
         }
       });
+    }
+    checkCloudflareStatus(status) {
+      if (status == 503 || status == 403) {
+        throw new import_types3.CloudflareError({ url: MANGANATO_DOMAIN, method: "GET" });
+      }
+    }
+    async saveCloudflareBypassCookies(cookies) {
+      for (const cookie of cookies) {
+        if (cookie.name.startsWith("cf") || cookie.name.startsWith("_cf") || cookie.name.startsWith("__cf")) {
+          this.cookieStorageInterceptor.setCookie(cookie);
+        }
+      }
     }
   };
   var Manganato = new ManganatoExtension();
