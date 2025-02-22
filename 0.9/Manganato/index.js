@@ -17237,7 +17237,6 @@ var source = (() => {
         ...request.headers ?? {},
         ...{
           referer: `${MANGANATO_DOMAIN}/`,
-          origin: `${MANGANATO_DOMAIN}/`,
           "user-agent": await Application.getDefaultUserAgent()
         }
       };
@@ -17405,9 +17404,6 @@ var source = (() => {
           param = `/genre-all/${page}`;
           break;
         case "newest_release":
-          throw new Error(
-            JSON.stringify(Application.getState("__ddg1_"))
-          );
           param = `/genre-all/${page}?type=newest`;
           break;
         default:
@@ -17487,8 +17483,7 @@ var source = (() => {
           url: CHAPTER_DOMAIN,
           method: "GET",
           headers: {
-            referer: `${CHAPTER_DOMAIN}/`,
-            origin: `${CHAPTER_DOMAIN}/`,
+            referer: `${MANGANATO_DOMAIN}/`,
             "user-agent": await Application.getDefaultUserAgent()
           }
         });
