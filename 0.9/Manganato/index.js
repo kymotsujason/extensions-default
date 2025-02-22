@@ -17467,7 +17467,11 @@ var source = (() => {
       };
     }
     async fetchCheerio(request) {
+      await this.getCloudflareBypassRequestAsync();
       const [response, data2] = await Application.scheduleRequest(request);
+      if (response.status !== 200) {
+        throw new Error(`Failed to fetch data from ${request.url}`);
+      }
       this.checkCloudflareStatus(response.status);
       return load(Application.arrayBufferToUTF8String(data2), {
         xml: {
@@ -17477,16 +17481,20 @@ var source = (() => {
       });
     }
     checkCloudflareStatus(status) {
-      if (status == 503 || status == 403) {
+      if (status === 503 || status === 403) {
         throw new import_types3.CloudflareError({ url: MANGANATO_DOMAIN, method: "GET" });
       }
     }
-    async saveCloudflareBypassCookies(cookies) {
-      for (const cookie of cookies) {
-        if (cookie.name.startsWith("cf") || cookie.name.startsWith("_cf") || cookie.name.startsWith("__cf")) {
-          this.cookieStorageInterceptor.setCookie(cookie);
+    async getCloudflareBypassRequestAsync() {
+      return {
+        url: `${MANGANATO_DOMAIN}/`,
+        method: "GET",
+        headers: {
+          referer: `${MANGANATO_DOMAIN}/`,
+          origin: `${MANGANATO_DOMAIN}/`,
+          "user-agent": await Application.getDefaultUserAgent()
         }
-      }
+      };
     }
   };
   var Manganato = new ManganatoExtension();
