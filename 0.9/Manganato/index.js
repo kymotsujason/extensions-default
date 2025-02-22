@@ -17494,6 +17494,11 @@ var source = (() => {
         throw new import_types3.CloudflareError({ url: CHAPTER_DOMAIN, method: "GET" });
       }
     }
+    async saveCloudflareBypassCookies(cookies) {
+      for (const cookie of cookies) {
+        this.cookieStorageInterceptor.setCookie(cookie);
+      }
+    }
   };
   var Manganato = new ManganatoExtension();
   return __toCommonJS(main_exports);
