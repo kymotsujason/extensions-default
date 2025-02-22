@@ -3,6 +3,9 @@ import {
 	Chapter,
 	ChapterDetails,
 	ChapterProviding,
+	CloudflareError,
+	Cookie,
+	CookieStorageInterceptor,
 	DiscoverSection,
 	DiscoverSectionItem,
 	DiscoverSectionType,
@@ -18,6 +21,7 @@ import {
 	SearchResultsProviding,
 	SourceManga,
 	TagSection,
+	CloudflareBypassRequestProviding,
 } from "@paperback/types";
 
 import { MangaBoxParser } from "./MangaBoxParser";
@@ -25,10 +29,12 @@ import { CheerioAPI } from "cheerio";
 import * as cheerio from "cheerio";
 
 const MANGANATO_DOMAIN = "https://manganato.com";
+const CHAPTER_DOMAIN = "https://chapmanganato.to/";
 
 type ManganatoImplementation = Extension &
 	SearchResultsProviding &
 	MangaProviding &
+	CloudflareBypassRequestProviding &
 	ChapterProviding;
 
 class ManganatoInterceptor extends PaperbackInterceptor {
@@ -129,10 +135,14 @@ export class ManganatoExtension implements ManganatoImplementation {
 		ignoreImages: true,
 	});
 	mainRequestInterceptor = new ManganatoInterceptor("main");
+	cookieStorageInterceptor = new CookieStorageInterceptor({
+		storage: "stateManager",
+	});
 
 	async initialise(): Promise<void> {
 		this.globalRateLimiter.registerInterceptor();
 		this.mainRequestInterceptor.registerInterceptor();
+		this.cookieStorageInterceptor.registerInterceptor();
 
 		if (Application.isResourceLimited) return;
 	}
@@ -334,13 +344,40 @@ export class ManganatoExtension implements ManganatoImplementation {
 	}
 
 	async fetchCheerio(request: Request): Promise<CheerioAPI> {
-		const [_, data] = await Application.scheduleRequest(request);
+		// eslint-disable-next-line @typescript-eslint/no-unused-vars
+		const bypassRequest = await this.getCloudflareBypassRequestAsync();
+		const [response, data] = await Application.scheduleRequest(request);
+		this.checkCloudflareStatus(response.status);
 		return cheerio.load(Application.arrayBufferToUTF8String(data), {
 			xml: {
 				xmlMode: false,
 				decodeEntities: false,
 			},
 		});
+	}
+
+	async getCloudflareBypassRequestAsync(): Promise<Request> {
+		return {
+			url: `${CHAPTER_DOMAIN}/`,
+			method: "GET",
+			headers: {
+				referer: `${CHAPTER_DOMAIN}/`,
+				origin: `${CHAPTER_DOMAIN}/`,
+				"user-agent": await Application.getDefaultUserAgent(),
+			},
+		};
+	}
+
+	checkCloudflareStatus(status: number): void {
+		if (status === 503 || status === 403) {
+			throw new CloudflareError({ url: CHAPTER_DOMAIN, method: "GET" });
+		}
+	}
+
+	async saveCloudflareBypassCookies(cookies: Cookie[]): Promise<void> {
+		for (const cookie of cookies) {
+			this.cookieStorageInterceptor.setCookie(cookie);
+		}
 	}
 }
 
