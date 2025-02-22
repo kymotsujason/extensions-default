@@ -17405,6 +17405,9 @@ var source = (() => {
           param = `/genre-all/${page}`;
           break;
         case "newest_release":
+          throw new Error(
+            JSON.stringify(Application.getState("__ddg1_"))
+          );
           param = `/genre-all/${page}?type=newest`;
           break;
         default:
@@ -17494,9 +17497,6 @@ var source = (() => {
     async saveCloudflareBypassCookies(cookies) {
       for (const cookie of cookies) {
         if (cookie.name.startsWith("ddg") || cookie.name.startsWith("_ddg") || cookie.name.startsWith("__ddg")) {
-          console.log(
-            `Saving Cloudflare bypass cookie: ${JSON.stringify(cookie)}`
-          );
           this.cookieStorageInterceptor.setCookie(cookie);
         }
       }
