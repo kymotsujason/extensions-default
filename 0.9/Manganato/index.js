@@ -17478,8 +17478,8 @@ var source = (() => {
       });
     }
     async checkCloudflareStatus(status) {
-      throw new Error(status.toString());
       if (status == 503 || status == 403) {
+        throw new Error(status.toString());
         throw new import_types3.CloudflareError({
           url: CHAPTER_DOMAIN,
           method: "GET",
