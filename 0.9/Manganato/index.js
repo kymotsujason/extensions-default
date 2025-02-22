@@ -17469,7 +17469,7 @@ var source = (() => {
     }
     async fetchCheerio(request) {
       const [response, data2] = await Application.scheduleRequest(request);
-      this.checkCloudflareStatus(response.status);
+      await this.checkCloudflareStatus(response.status);
       return load(Application.arrayBufferToUTF8String(data2), {
         xml: {
           xmlMode: false,
@@ -17477,9 +17477,16 @@ var source = (() => {
         }
       });
     }
-    checkCloudflareStatus(status) {
+    async checkCloudflareStatus(status) {
       if (status == 503 || status == 403) {
-        throw new import_types3.CloudflareError({ url: CHAPTER_DOMAIN, method: "GET" });
+        throw new import_types3.CloudflareError({
+          url: CHAPTER_DOMAIN,
+          method: "GET",
+          headers: {
+            referer: `${CHAPTER_DOMAIN}/`,
+            "user-agent": await Application.getDefaultUserAgent()
+          }
+        });
       }
     }
     async saveCloudflareBypassCookies(cookies) {
