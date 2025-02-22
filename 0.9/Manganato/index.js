@@ -17469,7 +17469,6 @@ var source = (() => {
       };
     }
     async fetchCheerio(request) {
-      throw new Error(JSON.stringify(request));
       const [response, data2] = await Application.scheduleRequest(request);
       await this.checkCloudflareStatus(response.status);
       return load(Application.arrayBufferToUTF8String(data2), {
@@ -17495,6 +17494,9 @@ var source = (() => {
     async saveCloudflareBypassCookies(cookies) {
       for (const cookie of cookies) {
         if (cookie.name.startsWith("ddg") || cookie.name.startsWith("_ddg") || cookie.name.startsWith("__ddg")) {
+          console.log(
+            `Saving Cloudflare bypass cookie: ${JSON.stringify(cookie)}`
+          );
           this.cookieStorageInterceptor.setCookie(cookie);
         }
       }
