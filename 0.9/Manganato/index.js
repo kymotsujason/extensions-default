@@ -17483,7 +17483,7 @@ var source = (() => {
     }
     async saveCloudflareBypassCookies(cookies) {
       for (const cookie of cookies) {
-        if (cookie.name.startsWith("ci") || cookie.name.startsWith("_ci") || cookie.name.startsWith("__ci")) {
+        if (cookie.name.startsWith("ddg") || cookie.name.startsWith("_ddg") || cookie.name.startsWith("__ddg")) {
           this.cookieStorageInterceptor.setCookie(cookie);
         }
       }
