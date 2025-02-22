@@ -17230,13 +17230,13 @@ var source = (() => {
 
   // src/Manganato/main.ts
   var MANGANATO_DOMAIN = "https://manganato.com";
+  var CHAPTER_DOMAIN = "https://chapmanganato.to/";
   var ManganatoInterceptor = class extends import_types3.PaperbackInterceptor {
     async interceptRequest(request) {
       request.headers = {
         ...request.headers ?? {},
         ...{
           referer: `${MANGANATO_DOMAIN}/`,
-          origin: `${MANGANATO_DOMAIN}/`,
           "user-agent": await Application.getDefaultUserAgent()
         }
       };
@@ -17469,7 +17469,7 @@ var source = (() => {
     }
     async fetchCheerio(request) {
       const [response, data2] = await Application.scheduleRequest(request);
-      await this.checkCloudflareStatusAsync(response.status);
+      this.checkCloudflareStatus(response.status);
       return load(Application.arrayBufferToUTF8String(data2), {
         xml: {
           xmlMode: false,
@@ -17477,17 +17477,9 @@ var source = (() => {
         }
       });
     }
-    async checkCloudflareStatusAsync(status) {
+    checkCloudflareStatus(status) {
       if (status == 503 || status == 403) {
-        throw new import_types3.CloudflareError({
-          url: MANGANATO_DOMAIN,
-          method: "GET",
-          headers: {
-            referer: `${MANGANATO_DOMAIN}/`,
-            origin: `${MANGANATO_DOMAIN}/`,
-            "user-agent": await Application.getDefaultUserAgent()
-          }
-        });
+        throw new import_types3.CloudflareError({ url: CHAPTER_DOMAIN, method: "GET" });
       }
     }
     async saveCloudflareBypassCookies(cookies) {
