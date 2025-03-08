@@ -4025,7 +4025,7 @@ query($id: Int) {
       const genres = [];
       for (const genre of mangaDetails.genres) {
         genres.push({
-          id: genre.replace(" ", "-").toLowerCase(),
+          id: genre.replace(/ /g, "-").toLowerCase(),
           title: genre
         });
       }
