@@ -61,7 +61,7 @@ export const parseMangaDetails = (
 		.next("span")
 		.children()
 		.toArray()) {
-		const label = $(tag).text().trim();
+		const label = $(tag).text().replace(/ /g, "_").trim();
 		const id = encodeURI(BTGenres.getParam(label) ?? label);
 
 		if (!id || !label) continue;
