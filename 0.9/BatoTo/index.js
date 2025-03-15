@@ -24313,7 +24313,7 @@ var source = (() => {
     }).toArray().join(", ") : "";
     const arrayTags = [];
     for (const tag of $3('div.attr-item b:contains("Genres")').next("span").children().toArray()) {
-      const label = $3(tag).text().trim();
+      const label = $3(tag).text().replace(/ /g, "_").trim();
       const id = encodeURI(BTGenres.getParam(label) ?? label);
       if (!id || !label) continue;
       arrayTags.push({ id, title: label });
