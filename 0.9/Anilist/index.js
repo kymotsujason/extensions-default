@@ -4145,7 +4145,7 @@ query($id: Int) {
               notes: "",
               progress,
               progressVolumes: volume,
-              repeat: 1,
+              repeat: 0,
               private: false,
               hiddenFromStatusLists: false,
               score: 0
