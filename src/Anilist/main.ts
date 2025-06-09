@@ -563,7 +563,7 @@ export class AniListExtension implements AniListImplementation {
 						notes: "",
 						progress: progress,
 						progressVolumes: volume,
-						repeat: 1,
+						repeat: 0,
 						private: false,
 						hiddenFromStatusLists: false,
 						score: 0,
